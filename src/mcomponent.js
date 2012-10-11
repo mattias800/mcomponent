@@ -1,0 +1,1925 @@
+(function($) {
+  $.fn.mcomponent = function(args) {
+
+    var startTag = "{%";
+    var endTag = "%}";
+    var that = this;
+    var list;
+    var result = {};
+    var placeHolder = undefined;
+
+    var rootModel;
+
+    args = $.extend({
+                      viewHtml : undefined,
+                      viewFromComponent : undefined,
+                      model : undefined,
+                      clipboard : {},
+                      iter : {},
+                      maxTagCount : 1000,
+                      placeHolder : undefined,
+                      placeHolderId : undefined,
+                      containerType : "div",
+                      clearPlaceHolderBeforeRender : true,
+                      logTags : false
+                    }, args);
+
+    var init = function() {
+      if (args.placeHolder) {
+        placeHolder = args.placeHolder;
+      } else if (args.placeHolderId) {
+        placeHolder = document.getElementById(args.placeHolderId);
+        if (!placeHolder) throw "Unable to find placeholder in DOM with id=" + args.placeHolderId;
+      }
+      if (that.length) {
+        var node = that[0];
+        if (node.tagName == "SCRIPT") {
+          _setViewWithHtml($(node)[0].text);
+        } else {
+          throw "Source element is not a script tag.";
+        }
+      } else if (args.viewHtml) {
+        _setViewWithHtml(args.viewHtml);
+      } else if (args.viewFromComponent) {
+        _setViewFromComponent(args.viewFromComponent);
+      }
+      if (args.model) {
+        rootModel = args.model;
+        _setModel(rootModel);
+      }
+      for (var id in args.clipboard) {
+        var html = args.clipboard[id];
+        var r = buildList(html);
+        if (r.error) {
+          throw "Failed to add clipboard with id='" + id + "':" + r.message;
+        } else {
+          executionContext.setClipboardWithName(id, buildTree(r.list));
+        }
+      }
+      for (var iterId in args.iter) {
+        executionContext.setIteratorConfigForId(iterId,
+                                                $.extend({
+                                                           usePages : false,
+                                                           itemsPerPage : 10,
+                                                           allItemsAreShowingCallback : function() {
+                                                           },
+                                                           notAllItemsAreShowingCallback : function() {
+                                                           }
+                                                         }, args.iter[iterId]
+                                                )
+        );
+      }
+    };
+
+    /**
+     * @constructor
+     */
+    var ExecutionContext_ = function() {
+
+      this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
+      this.globals = {};
+      this.clipboard = {};
+      this.iterators = {};
+      this.iteratorConfigs = {};
+
+      var that = this;
+
+      this.readyForRender = function() {
+        this.globals = {};
+      };
+
+      /**
+       * Clipboard
+       */
+
+      this.getClipboard = function() {
+        return this.clipboard;
+      };
+
+      this.getClipboardWithName = function(name) {
+        return this.clipboard[name];
+      };
+
+      this.setClipboardWithName = function(name, val) {
+        this.clipboard[name] = val;
+      };
+
+      /**
+       * Iterator configs
+       */
+
+      this.getIteratorConfigForId = function(id) {
+        return this.iteratorConfigs[id];
+      };
+
+      this.setIteratorConfigForId = function(id, val) {
+        this.iteratorConfigs[id] = val;
+      };
+
+      this.getIteratorConfigs = function() {
+        return this.iteratorConfigs;
+      };
+
+      /**
+       * Iterators
+       */
+
+      this.getIteratorWithName = function(iteratorName) {
+        return this.iterators[iteratorName];
+      };
+
+      this.setIteratorWithName = function(iteratorName, val) {
+        this.iterators[iteratorName] = val;
+      };
+
+      this.getIterators = function() {
+        return this.iterators;
+      };
+
+      this.ensureIterator = function(iteratorName, model) {
+        if (!this.iterators[iteratorName]) {
+          this.buildIterator(iteratorName, model);
+        }
+        return this.iterators[iteratorName];
+      };
+
+      this.clearIterators = function() {
+        this.iterators = {};
+      };
+
+      this.buildIterator = function(iteratorName, model) {
+        if (this.iteratorConfigs[iteratorName]) {
+          this.iteratorConfigs[iteratorName].name = iteratorName;
+          this.iterators[iteratorName] = new IteratorContext_(this.iteratorConfigs[iteratorName], model);
+        } else {
+          // We require the configuration to exist to reduce amount of errors.
+          throw "Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.";
+        }
+      };
+
+      /**
+       * Looks up a property name, such as "user.name.first" on stack.
+       * If undefined is found, it will keep looking, but return undefined if no value is found further up the model stack.
+       * @param name
+       */
+      this.lookup = function(name) {
+
+        var value = undefined;
+        var foundValue = false;
+
+        if (this.getStackSize() > 0) {
+
+          try {
+            value = this.lookupModelInStack(name);
+            foundValue = true;
+          } catch (e) {
+          }
+
+          // If we found a value, return it.
+          if (value !== undefined) return value;
+
+        }
+
+
+        var f = createExpressionFunction(name);
+        try {
+          value = this.runFunction(f);
+          foundValue = true;
+        } catch (e) {
+        }
+
+        if (!foundValue) throw "Unable to lookup property on model stack: " + name;
+        return value;
+      };
+
+      /**
+       * Looks up a property name (such as "user.name.first") on the model stack.
+       * If undefined is found, it will keep looking for a value, but return undefined if no value is found.
+       * If nothing is found at all, it throws an exception.
+       * @param name
+       */
+      this.lookupModelInStack = function(name) {
+        var stack = this.executionStack;
+        var value = undefined;
+        var foundValue = false;
+        for (var i = stack.length - 1; i >= 0; i--) {
+          var model = stack[i].model;
+          try {
+            value = lookup(name, model);
+            foundValue = true;
+          } catch (e) {
+          }
+          if (value !== undefined) return value;
+        }
+        if (!foundValue) throw "Unable to lookup model property in model stack: " + name;
+        return value;
+      };
+
+      /*
+       TODO:
+       1. Make sure that all tests work. Some don't for some reason.
+       2. Update lookupContextInStack to use same mechanics, and update all usages to handle the exception thrown when not finding anything.
+       */
+
+      this.lookupContextInStack = function(name) {
+        var stack = this.executionStack;
+        var value = undefined;
+        var foundValue;
+        for (var i = stack.length - 1; i >= 0; i--) {
+          var model = stack[i].context;
+          try {
+            value = lookup(name, model);
+            foundValue = true;
+          } catch (e) {
+          }
+          if (value !== undefined) return value;
+        }
+        if (!foundValue) throw "Unable to lookup context property in model stack: " + name;
+        return value;
+      };
+
+      this.getStackItem = function(i) {
+        return this.executionStack[i];
+      };
+
+      this.getStackSize = function() {
+        return this.executionStack.length;
+      };
+
+      this.getTagApi = function() {
+        var that = this;
+        return {
+          lookup : function(name) {
+            try {
+              return that.lookup(name);
+            } catch (e) {
+              return undefined;
+            }
+          },
+          getIterator : function(iteratorName) {
+            var i = executionContext.getIteratorWithName(iteratorName);
+            return i ? i.getPublicInterface() : undefined;
+          }
+        }
+      };
+
+      this.runFunction = function(f) {
+        return f.apply(this, [this.getModel(), this.getContext(), this.getGlobals(), this.getTagApi()]);
+      };
+
+      this.clear = function() {
+        this.executionStack = [];
+        this.globals = [];
+      };
+
+      this.getModel = function() {
+        if (this.executionStack.length == 0) return undefined;
+        return this.executionStack[this.executionStack.length - 1].model;
+      };
+
+      this.getContext = function() {
+        if (this.executionStack.length == 0) return undefined;
+        return this.executionStack[this.executionStack.length - 1].context;
+      };
+
+      this.getGlobals = function() {
+        return this.globals;
+      };
+
+      this.push = function(stackItem) {
+        if (stackItem === undefined) throw "Trying to push undefined to execution stack.";
+        this.executionStack.push(stackItem);
+        this.updateLocalState();
+      };
+
+      this.pushModel = function(model) {
+        this.executionStack.push({model : model});
+        this.updateLocalState();
+      };
+
+      this.pop = function() {
+        if (this.executionStack.length == 0) throw "Trying to pop execution stack, but it is already empty.";
+        var v = this.executionStack.pop();
+        this.updateLocalState();
+        return v;
+      };
+
+      this.peek = function() {
+        return this.executionStack[this.executionStack.length - 1];
+      };
+
+      this.updateLocalState = function() {
+        this.model = this.getModel();
+        this.context = this.getContext();
+      };
+    };
+
+    var executionContext = new ExecutionContext_();
+
+    /**
+     * @constructor
+     */
+    var IteratorContext_ = function(iterConfig, modelUsed) {
+
+      if (modelUsed == undefined) throw "IteratorContext must get a model as second parameter.";
+
+      var model = modelUsed;
+      var config = iterConfig;
+      var itemsShowing = iterConfig.itemsPerPage;
+      var currentPage = 0;
+      var showingAllItems = false;
+
+      this.getStart = function() {
+        if (config.usePages) {
+          return currentPage * config.itemsPerPage;
+        }
+        else {
+          return 0;
+        }
+      };
+
+      this.getEnd = function() {
+        if (config.usePages) {
+          return currentPage * config.itemsPerPage + config.itemsPerPage;
+        }
+        else {
+          return itemsShowing;
+        }
+      };
+
+      this.renderUpdate = function(start, end) {
+        if (!config.usePages) {
+          if (this.getStart() == 0 && this.getEnd() >= model.length) {
+            if (typeof config.allItemsAreShowingCallback === "function") {
+              showingAllItems = true;
+              try {
+                config.allItemsAreShowingCallback(this.getPublicInterface());
+              } catch (e) {
+                throw "Error running callback allItemsAreShowing: " + e.toString();
+              }
+            } else {
+              throw "Iterator '" + config.name + "' allItemsAreShowingCallback is not a function.";
+            }
+          } else {
+            if (typeof config.notAllItemsAreShowingCallback === "function") {
+              showingAllItems = false;
+              try {
+              config.notAllItemsAreShowingCallback(this.getPublicInterface());
+              } catch (e) {
+                throw "Error running callback notAllItemsAreShowing: " + e.toString();
+              }
+            } else {
+              throw "Iterator '" + config.name + "' notAllItemsAreShowingCallback is not a function.";
+            }
+          }
+        }
+      };
+
+      var getPageCount = function() {
+        return Math.ceil(model.length / config.itemsPerPage);
+      };
+
+      this.getPublicInterface = function() {
+        return {
+
+          showingAllItems : showingAllItems,
+          currentPage : currentPage,
+          itemsShowing : itemsShowing >= model.length ? model.length : itemsShowing,
+          itemsPerPage : config.itemsPerPage,
+          itemsTotal : model.length,
+
+          showMoreItems : function() {
+            if (config.usePages) throw "Iterator '" + config.name + "' cannot use showMoreItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
+            itemsShowing += config.itemsPerPage;
+            if (itemsShowing >= model.length) itemsShowing = model.length;
+            showingAllItems = itemsShowing == model.length;
+          },
+          showAllItems : function() {
+            if (config.usePages) throw "Iterator '" + config.name + "' cannot use showAllItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
+            itemsShowing = model.length;
+            showingAllItems = true;
+          },
+          getPageCount : function() {
+            return getPageCount();
+          },
+          showNextPage : function() {
+            if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
+            currentPage++;
+            if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
+          },
+          showPrevPage : function() {
+            if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
+            currentPage--;
+            if (currentPage < 0) currentPage = 0;
+          }
+        }
+
+      };
+    };
+
+    var tagTypes = {
+      tag_show : {
+        token : "show",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var name = tagInstance.tag.parameters;
+          var v;
+          if (!name) {
+            v = executionContext.getModel();
+          } else {
+            v = executionContext.lookup(name);
+          }
+          return v !== undefined ? v : "";
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var name = tagInstance.tag.parameters;
+          if (name) {
+            var compiledLookup = compileLookup(name);
+            result.pushCompiledSource(compiledLookup.compiledSource);
+            result.pushBufferEmptyStringIfUndefined(compiledLookup.varName);
+          } else {
+            result.pushBuffer("model !== undefined ? model : ''");
+          }
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_context : {
+        token : "context",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var name = tagInstance.tag.parameters;
+          var v;
+          if (!name) {
+            throw "'context' tag requires one parameter, the context property to display.";
+          } else {
+            v = executionContext.lookupContextInStack(name);
+          }
+          return v !== undefined ? v : "";
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var name = tagInstance.tag.parameters;
+          result.pushBufferEmptyStringIfUndefined("executionContext.lookupContextInStack('" + name + "')");
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_showjs : {
+        token : "showjs",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var model = executionContext.getModel();
+          var context = executionContext.getContext();
+          var f = createExpressionFunction(tagInstance.tag.parameters);
+          var v = executionContext.runFunction(f);
+          return v !== undefined ? v : "";
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          result.pushBufferEmptyStringIfUndefined(tagInstance.tag.parameters);
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_js : {
+        token : "js",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var f = createExpressionFunction(tagInstance.tag.parameters);
+          executionContext.runFunction(f);
+          return "";
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          result.push(tagInstance.tag.parameters);
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_setglobal : {
+        token : "setglobal",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
+          executionContext.getGlobals()[p.iterName] = executionContext.lookup(p.variableName);
+          return "";
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
+          result.push("executionContext.getGlobals()['" + p.iterName + "'] = " + p.variableName);
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_throw : {
+        token : "throw",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          throw executionContext.lookup(tagInstance.tag.parameters);
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_log : {
+        token : "log",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          log(executionContext.lookup(tagInstance.tag.parameters));
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_if : {
+        token : "if",
+        hasBlock : true,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          // Step over each condition, find the first that is true. If none is true, use else.
+          for (var i = 0; i < tagInstance.conditions.length; i++) {
+            var r = executionContext.runFunction(tagInstance.conditionFunctions[i]);
+            if (r) {
+              return interpret({tree : tagInstance.contentRoots[i]});
+            }
+          }
+          if (tagInstance.elseContent) {
+            // Append else statements
+            return interpret({tree : tagInstance.elseContent});
+          } else {
+            return "";
+          }
+        },
+
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var param = tagInstance.tag.parameters;
+          var isFirst = true;
+
+          for (var i = 0; i < tagInstance.conditions.length; i++) {
+            result.push((isFirst ? "" : "} else ") + "if (" + tagInstance.conditions[i] + ") {");
+            result.pushCompiledSource(compilePartToSource({tree : tagInstance.contentRoots[i]}).indent());
+            isFirst = false;
+          }
+
+          if (tagInstance.elseContent && tagInstance.elseContent.length) {
+            result.push("} else {");
+            result.pushCompiledSource(compilePartToSource({tree : tagInstance.elseContent}).indent());
+          }
+          result.push("}");
+          return result;
+        },
+
+        createTagInstance : function(args) {
+          if (!args.tag.parameters) throw "If tag does not include a condition. Ex: {% if this.model.isNice %}";
+          var condition = args.tag.parameters;
+          var conditionFunction = createExpressionFunction(args.tag.parameters);
+          var c = createIfTag(args.subList, condition);
+
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content,
+            condition : condition,
+            conditions : c.conditions,
+            conditionFunctions : c.conditionFunctions,
+            contentRoots : c.contentRoots,
+            elseContent : c.elseContent
+          };
+        }
+      },
+
+      tag_push : {
+        token : "push",
+        hasBlock : true,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var name = tagInstance.tag.parameters;
+          if (!name) throw "'push' tag has no parameter. First parameter should be property to push.";
+          var model = executionContext.lookup(name);
+          if (model) {
+            executionContext.pushModel(model);
+            var result = interpret({tree : tagInstance.content});
+            executionContext.pop();
+            return result;
+          } else {
+            throw "Trying to push '" + name + "' but there is no such property in the model stack.";
+          }
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var param = tagInstance.tag.parameters;
+          var compiledLookup = compileLookup(param);
+          result.pushCompiledSource(compiledLookup.compiledSource);
+          result.push("model = " + compiledLookup.varName);
+          result.push("executionContext.pushModel(model)");
+          result.pushCompiledSource(compilePartToSource({tree : tagInstance.content}));
+          result.push("executionContext.pop()");
+          result.pushCompiledSource(createModelContextUpdateCompiledSource());
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_copy : {
+        token : "copy",
+        hasBlock : true,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          return interpret({tree : tagInstance.content});
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          // Do nothing in compiled tag, we add it at parse time.
+          var result = new CompiledSource();
+          result.pushCompiledSource(compilePartToSource({tree : tagInstance.content}));
+          return result;
+        },
+        createTagInstance : function(args) {
+          var name = args.tag.parameters;
+          if (!name) name = "default";
+          executionContext.setClipboardWithName(name, args.content);
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_paste : {
+        token : "paste",
+        hasBlock : false,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          var name = tagInstance.tag.parameters;
+          if (!name) name = "default";
+          return interpret({tree : executionContext.getClipboardWithName(name)});
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var result = new CompiledSource();
+          var name = tagInstance.tag.parameters;
+          if (!name) name = "default";
+          result.pushCompiledSource(compilePartToSource({tree : executionContext.getClipboardWithName(name)}));
+          return result;
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_iter : {
+        token : "iter",
+        hasBlock : true,
+        interpretTagInstance : function(tagInstance, executionContext, args) {
+          return tagTypes.tag_niter.interpretTagInstance(tagInstance, executionContext, args);
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          return tagTypes.tag_niter.compileTagInstance(tagInstance, executionContext, args);
+        },
+        createTagInstance : function(args) {
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      },
+
+      tag_niter : {
+        token : "niter",
+        hasBlock : true,
+        interpretTagInstance : function(tagInstance, executionContext) {
+          var isNiter = tagInstance.tagName == "niter";
+          var iterContext;
+          var niterParameters;
+
+          var name = tagInstance.tag.parameters;
+
+          if (isNiter) {
+            niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
+            name = niterParameters.variableName;
+          }
+
+          var list;
+          if (!name) {
+            list = executionContext.getModel();
+            name = "current model";
+          } else {
+            list = executionContext.lookup(name);
+          }
+
+          if (isNiter) {
+            iterContext = executionContext.ensureIterator(niterParameters.iterName, list);
+          }
+
+          if (list == undefined) throw "Trying to use '" + name + "' as model for iterator, but there is no such property in the model stack.";
+          if (!$.isArray(list)) throw "'" + tagInstance.tagName + "' tag parameter '" + name + "' is not a list.";
+
+          var start = iterContext ? iterContext.getStart() : 0;
+          var end = iterContext ? Math.min(iterContext.getEnd(), list.length) : list.length;
+
+          var result = "";
+          for (var i = start; i < end; i++) {
+            var model = list[i];
+            executionContext.push({
+                                    model : model,
+                                    context : {
+                                      index : i,
+                                      size : list.length,
+                                      isFirst : (i == 0),
+                                      isLast : (i == list.length - 1),
+                                      isEven : (i % 2 == 0),
+                                      isOdd : !(i % 2 == 0),
+                                      parity : (i % 2 == 0) ? "even" : "odd"
+                                    }
+                                  });
+            result += interpret({tree : tagInstance.content});
+            executionContext.pop();
+          }
+          if (isNiter && iterContext) {
+            iterContext.renderUpdate(start, end);
+          }
+          return result;
+
+        },
+        compileTagInstance : function(tagInstance, executionContext, args) {
+          var resultOuter = new CompiledSource();
+          var result = new CompiledSource();
+
+          var isNiter = tagInstance.tagName == "niter";
+          var iterContext;
+          var niterParameters;
+
+          var name = tagInstance.tag.parameters;
+
+          if (isNiter) {
+            niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
+            name = niterParameters.variableName;
+          }
+
+          var listVar = getUncompiledVariableName("list");
+          var iVar = getUncompiledVariableName("i");
+          var iterContextVar = getUncompiledVariableName("iterContext");
+          var startVar = getUncompiledVariableName("start");
+          var endVar = getUncompiledVariableName("end");
+          var stackItemVar = getUncompiledVariableName("stackItem");
+
+          var compiledLookup = _compileLookup(name);
+          var lookupVar = compiledLookup.lookupFunctionName;
+          resultOuter.pushCompiledSource(compiledLookup.compiledSource);
+          resultOuter.push("var " + listVar + " = " + createConditionForValueExists("model", name) + " ? model." + name + " : " + lookupVar + "()");
+          resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
+
+          if (isNiter) {
+            resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + niterParameters.iterName + "', " + listVar + ")");
+            resultOuter.push("var " + startVar + " = " + iterContextVar + ".getStart()");
+            resultOuter.push("var " + endVar + " = Math.min(" + iterContextVar + ".getEnd(), " + listVar + ".length)");
+          } else {
+            // Is normal iter, do full list
+            resultOuter.push("var " + startVar + " = 0");
+            resultOuter.push("var " + endVar + " = " + listVar + ".length");
+          }
+
+          // DEBUG
+
+          resultOuter.push("for (var " + iVar + " = " + startVar + "; " + iVar + " < " + endVar + "; " + iVar + "++) {");
+          result.push("model = " + listVar + "[" + iVar + "]");
+          result.push("context = {" +
+                      "index : " + iVar + "," +
+                      "size : " + listVar + ".length," +
+                      "isFirst : (" + iVar + " == 0)," +
+                      "isLast : (" + iVar + " == " + listVar + ".length - 1)," +
+                      "isEven : (" + iVar + " % 2 == 0)," +
+                      "isOdd : !(" + iVar + " % 2 == 0)," +
+                      "parity : (" + iVar + " % 2 == 0) ? 'even' : 'odd'" +
+                      "}");
+          result.push("var " + stackItemVar + " = {model: model, context: context}");
+          result.push("executionContext.push(" + stackItemVar + ")");
+
+          result.pushCompiledSource(compilePartToSource({tree : tagInstance.content}));
+
+          result.push("executionContext.pop()");
+          result.indent();
+          resultOuter.pushCompiledSource(result);
+          resultOuter.push("}");
+          resultOuter.pushCompiledSource(createModelContextUpdateCompiledSource());
+
+          if (isNiter) {
+            resultOuter.push(iterContextVar + ".renderUpdate(" + startVar + ", " + endVar + ")");
+          }
+
+          resultOuter.push("/**************");
+          resultOuter.push(" * End of iter");
+          resultOuter.push(" **************/");
+
+          return resultOuter;
+        },
+        createTagInstance : function(args) {
+          // Cannot lookup iterConfig here, it might change after view has been rendered.
+          return {
+            tagName : this.token,
+            tag : args.tag,
+            content : args.content
+          };
+        }
+      }
+    };
+
+    var view = {
+      html : undefined,
+      tree : {},
+      list : []
+    };
+
+    var createExpressionFunction = function(exp) {
+      return new Function("model", "context", "globals", "api", "return " + exp);
+    };
+
+    var _setModel = function(model) {
+      executionContext.clearIterators(); // If we change model, all iterators are reset.
+      executionContext.clear();
+      executionContext.pushModel(model);
+    };
+
+    var _getModel = function() {
+      return executionContext.getModel();
+    };
+
+    var compileList = function() {
+      var r = buildList(view.html);
+      if (r.error) {
+        throw r.message;
+      } else {
+        view.list = r.list;
+      }
+    };
+
+    var compileView = function() {
+      var r = buildList(view.html);
+      if (r.error) {
+        throw r.message;
+      } else {
+        view.list = r.list;
+        view.tree = buildTree(view.list);
+        view.template = compile({tree : getView().tree});
+      }
+    };
+
+    var _setViewWithHtml = function(html) {
+      view.html = html;
+      if (html) {
+        compileView();
+      } else {
+        view.list = [];
+        view.tree = {};
+        view.template = undefined;
+      }
+    };
+
+    var _setViewFromComponent = function(component) {
+      _setView(component._getView());
+    };
+
+    var getView = function() {
+      return view;
+    };
+
+    var _setView = function(v) {
+      view = v;
+    };
+
+    /**
+     * Builds a list of elements from a view.
+     * Even elements are HTML, odd elements are tags.
+     */
+    var buildList = function(viewHtml) {
+      var list = [];
+      for (var i = 0; i < args.maxTagCount; i++) {
+        var startIndex = viewHtml.indexOf(startTag);
+
+        if (startIndex < 0) {
+          // No tags left, just add rest as HTML.
+          if (viewHtml) list.push({html : viewHtml});
+          break;
+        } else if (startIndex > 0) {
+          // There was HTML in front of tag, adding it.
+          var html = viewHtml.substring(0, startIndex);
+          if (html) list.push({html : html});
+        }
+
+        var endIndex = viewHtml.indexOf(endTag);
+
+        if (endIndex < 0) {
+          return {error : true, message : "Missing end tag."};
+        } else if (endIndex < startIndex) {
+          return {error : true, message : "Too many end tags."};
+        }
+
+        var tagContent = $.trim(viewHtml.substring(startIndex + startTag.length, endIndex));
+
+        list.push(createTagObject(tagContent));
+
+        viewHtml = viewHtml.substring(endIndex + endTag.length);
+
+      }
+      return {
+        error : false,
+        list : list
+      };
+    };
+
+    var buildTree = function(list) {
+      var root = [];
+      for (var i = 0; i < list.length; i++) {
+        var item = list[i];
+        if (item.html) {
+          root.push(item);
+        } else {
+          var tagType = getTagType(item.tagName);
+          var endIndex, subList, endIndexTag;
+          if (tagType && tagType.token == tagTypes.tag_if.token) {
+            // Special case for if, to support elseif and else
+            // Find block, build tree out of it
+
+            try {
+              endIndexTag = findBlockEnd(list, i, {});
+            } catch (e) {
+              throw e;
+            }
+            subList = list.slice(i + 1, endIndexTag.index);
+            root.push(tagType.createTagInstance({
+                                                  tag : item,
+                                                  subList : subList,
+                                                  content : buildTree(subList)
+                                                }));
+            i = endIndexTag.index;
+
+          } else if (tagType && tagType.hasBlock) {
+            // Find block, build tree out of it
+            try {
+              endIndex = findBlockEnd(list, i, {}).index;
+            } catch (e) {
+              throw e;
+            }
+            subList = list.slice(i + 1, endIndex);
+            root.push(tagType.createTagInstance({
+                                                  tag : item,
+                                                  content : buildTree(subList)
+                                                }));
+            i = endIndex;
+
+          } else if (tagType) {
+            // not hasBlock.
+            root.push(tagType.createTagInstance({
+                                                  tag : item
+                                                }));
+          } else {
+            // Is not a system tag
+            root.push(item);
+            //throw "No such tag type: " + item.tagName;
+          }
+        }
+      }
+      return root;
+    };
+
+    /**
+     * Creates if tag using list that is the content between "if" and "endif".
+     * Can contain "else" and "elseif". Can also contain inner if cases.
+     * Needs firstCondition since we don't get first if case.
+     * @param list
+     */
+    var createIfTag = function(list, firstCondition) {
+      var conditions = [];
+      var contentRoots = [];
+      var elseContent = [];
+      var ifCounter = 0;
+      var lastFoundTagName = "if";
+      var currentCondition = firstCondition;
+      var hasElse = false;
+
+      var startIndex = 0;
+
+      for (var i = 0; i < list.length; i++) {
+        var isOnLastItem = i == list.length - 1;
+        var item = list[i];
+
+        // HERE!
+        /**
+         * When we find an if, run createIfTag recursively and push the result! No need to use ifCounter. Doesn't work anyway, since it doesn't take care of inner if cases properly.
+         * NO! Run buildTree()
+         */
+        if (item.tagName == "if") {
+          ifCounter++;
+        }
+        else if (item.tagName == "endif") ifCounter--;
+
+        if (ifCounter == 0 && (isOnLastItem || item.tagName == "else" || item.tagName == "elseif")) {
+
+          if (lastFoundTagName == "else" && !isOnLastItem) throw createThrowMessage("Found 'else' or 'elseif' tag after 'else' tag.", item);
+
+          var endIndex = i + (isOnLastItem ? 1 : 0);
+          var subList = list.slice(startIndex, endIndex);
+          var node = buildTree(subList);
+
+          if (lastFoundTagName == "else") {
+            if (isOnLastItem) {
+              elseContent = node;
+            } else {
+              throw createThrowMessage("If case miss match.", item);
+            }
+          } else {
+            conditions.push(currentCondition);
+            contentRoots.push(node);
+          }
+
+          currentCondition = item.parameters;
+
+          lastFoundTagName = item.tagName;
+          if (lastFoundTagName == "else") hasElse = true;
+
+          startIndex = i + 1;
+        } else if (ifCounter != 0 && isOnLastItem) { // Is on last element
+          throw createThrowMessage("Not matching if, elseif, else.", item);
+        }
+      }
+
+      var conditionFunctions = [];
+      for (i = 0; i < conditions.length; i++) {
+        var con = conditions[i];
+        conditionFunctions.push(createExpressionFunction(con));
+      }
+
+      return {
+        conditions : conditions,
+        conditionFunctions : conditionFunctions,
+        contentRoots : contentRoots,
+        elseContent : elseContent
+      };
+    };
+
+    var getTagType = function(token) {
+      return tagTypes["tag_" + token];
+    };
+
+    var findBlockEnd = function(list, i, args) {
+      args = $.extend(
+        {
+          endTags : [], // If set, standard "end*" will be overridden.
+          startIndex : i // The index to start searching. If undefined, starts at i.
+        }, args);
+      if (!$.isArray(args.endTags)) {
+        throw "Argument endTags to findBlockEnd() must be a list.";
+      }
+      var endTags = args.endTags; // If one of these is found at level 0, the end is found!
+      var startItem = list[i];
+      if (startItem.html) {
+        throw "The tag that is opening the block is a HTML element and not a tag.";
+      }
+      if (list.length < 2) {
+        throw createThrowMessage("Missing end tag for the '" + startItem.tagName + "' tag.", startItem);
+      }
+
+      if (args.startIndex !== undefined) i = args.startIndex;
+      var startTagType = getTagType(startItem.tagName);
+      if (startTagType && !startTagType.hasBlock) throw "Looking for end tag, but start tag does not open block.";
+      if (startTagType) {
+        var stack = [startItem];
+        for (i++; i < list.length; i++) {
+          var item = list[i];
+          if (item.tagName) {
+            // Is a tag, otherwise it is just HTML which we ignore.
+            if (endTags && endTags.length && listContains(endTags, item.tagName)) {
+              // Is "else" or "elseif"
+              if (stack.length == 1) { // 1 since we have "if" on stack.
+                return {
+                  index : i,
+                  endTag : item.tagName
+                };
+              }
+            } else if (item.tagName.substring(0, 3) == "end") {
+              // Is end* tag
+              var tagName = item.tagName.substring(3, item.length);
+              if (stack[stack.length - 1].tagName == tagName) {
+                stack.pop();
+                if (stack.length == 0) {
+                  return {
+                    index : i,
+                    endTag : item.tagName
+                  };
+                }
+              } else {
+                throw createThrowMessage("Found closing tag '" + tagName + "' without starting tag.", item);
+              }
+            } else {
+              // Something other than end*
+              var tagType = getTagType(item.tagName);
+              if (tagType && tagType.hasBlock) {
+                // Is starting new block, push it!
+                stack.push(item);
+              }
+            }
+          }
+        }
+      }
+      throw createThrowMessage("Found no closing tag to '" + startItem.tag + "'.", startItem);
+    };
+
+    var getNiterParametersFromTagParameter = function(tagParameter) {
+      var iterName = undefined;
+      var variableName = undefined;
+      if (tagParameter.indexOf(" ") >= 0) {
+        iterName = tagParameter.substring(0, tagParameter.indexOf(" "));
+        variableName = tagParameter.substring(tagParameter.indexOf(" ") + 1, tagParameter.length);
+      } else {
+        iterName = tagParameter;
+      }
+      return {
+        iterName : iterName ? iterName : undefined,
+        variableName : variableName ? variableName : undefined
+      }
+    };
+
+    var createTagObject = function(tagContent) {
+      return {
+        tag : tagContent,
+        tagName : getTagNameFromTag(tagContent),
+        parameters : getTagParameters(tagContent)
+      };
+    };
+
+    var getTagNameFromTag = function(tag) {
+      var i = tag.indexOf(" ");
+      if (i < 0) {
+        return tag;
+      }
+      else {
+        return tag.substring(0, i);
+      }
+    };
+
+    var getTagParameters = function(tag) {
+      var i = tag.indexOf(" ");
+      if (i < 0) {
+        return "";
+      }
+      else {
+        return tag.substring(i + 1, tag.length);
+      }
+    };
+
+    var _uncompiledVariableName = {};
+
+    /**
+     * Formats a string to be usable as variable name. For example, list[0].name becomes list0_name
+     * @param name
+     */
+    var formatVariableName = function(name) {
+      return name
+        .replace(/\(/g, "")
+        .replace(/\)/g, "")
+        .replace(/'/g, "")
+        .replace(/"/g, "")
+        .replace(/\[/g, "")
+        .replace(/\]/g, "")
+        .replace(/\;/g, "")
+        .replace(/\,/g, "")
+        .replace(/\./g, "_");
+    };
+
+    /**
+     * Returns a variable name that is not already in use by the compiled code. Ensures no variable name collisions.
+     * @param name
+     */
+    var getUncompiledVariableName = function(name) {
+      name = formatVariableName(name);
+      if (_uncompiledVariableName[name] == undefined) {
+        _uncompiledVariableName[name] = 0;
+      }
+      return name + "__" + _uncompiledVariableName[name]++;
+    };
+
+    var encodeStringToJsString = function(s) {
+      s = s
+        .replace(/\\/g, "\\\\")
+        .replace(/\n/g, "\\n")
+        .replace(/\t/g, "\\t")
+        .replace(/\r/g, "\\r")
+        .replace(/"/g, '\\"')
+        .replace(/'/g, "\\'")
+      ;
+      return "\"" + s + "\"";
+    };
+
+    var createThrowMessage = function(text, tag) {
+      return text + " - tag: {% " + tag.tag.tag + " %}";
+    };
+
+    var compilePartToSource = function(args) {
+
+      var result = new CompiledSource();
+
+      args = $.extend({
+                        tree : []
+                      }, args);
+
+      for (var i = 0; i < args.tree.length; i++) {
+        var item = args.tree[i];
+        if (item.html) {
+          result.pushBuffer(encodeStringToJsString(item.html));
+        } else {
+          var tagType = getTagType(item.tagName);
+          result.pushTagComment(item);
+          if (tagType) {
+            try {
+              result.pushCompiledSource(tagType.compileTagInstance(item, executionContext));
+            } catch (e) {
+              throw "Compiling tag failed.";
+            }
+          } else {
+            try {
+              console.log("item", item);
+              result.pushCompiledSource(compilePropertyTag(item));
+            } catch (e) {
+              throw "Compiling property tag failed.";
+            }
+          }
+        }
+      }
+
+      return result;
+    };
+
+    var compileToSource = function(args) {
+
+      var result = new CompiledSource();
+      var useTryCatch = false;
+
+      // executionContext is available at all times.
+      result.push("var globals = executionContext.getGlobals()");
+      result.push("var model = rootModel");
+      result.push("var context = {}");
+      result.push("var ___currentTag = ''");
+      result.push("var r = []");
+      var c = compilePartToSource(args);
+      if (useTryCatch) {
+        result.push("try {");
+        c.indent();
+      }
+      result.pushCompiledSource(c);
+      if (useTryCatch) {
+        result.push("} catch (e) {");
+        result.push("   r.push('Tag failed: ' + ___currentTag)");
+        result.push("   r.push('Error: ' + e)");
+        result.push("   throw 'Error: ' + e.toString() + ' at tag: ' + ___currentTag)");
+        result.push("}");
+      }
+      result.push("return r.join('')");
+
+      return result;
+
+    };
+
+    var compile = function(args) {
+      var debugEnabled = true;
+      var source = compileToSource(args).toString();
+      if (args.logSource) console.log(source);
+      var f;
+
+      try {
+        f = new Function("executionContext", "api", "rootModel", source);
+      } catch (e) {
+        if (debugEnabled && typeof console == "object") {
+          console.log(source);
+          console.log(e);
+          console.log(e.toString());
+        }
+        throw "View is not formatted correctly, please check your tags: " + e.toString();
+      }
+      return {
+        getSource : function() {
+          return source;
+        },
+        render : function() {
+          var r = {};
+          if (f) {
+            executionContext.readyForRender();
+            try {
+              r = f.apply(executionContext, [executionContext, executionContext.getTagApi(), _getModel()]);
+            } catch (e) {
+              if (debugEnabled && typeof console == "object") {
+                console.log(source);
+                console.log(e);
+                console.log(e.toString());
+                console.log("model", _getModel());
+              }
+              throw "Error rendering with compiled view: " + e.toString();
+            }
+          }
+          return r;
+        },
+        process : function() {
+          var html = "";
+          var ok = true;
+          var error = undefined;
+          try {
+            html = this.render();
+          } catch (e) {
+            error = e;
+          }
+          return {
+            ok : ok,
+            html : html,
+            error : error
+          };
+        }
+      };
+    };
+
+    var compileLookup = function(name) {
+      var r = new CompiledSource();
+
+      var names = name.split(".");
+
+      var varName = getUncompiledVariableName(names.join(''));
+
+      if (name.substring(0, 6) == "model." ||
+          name.substring(0, 8) == "context." ||
+          name.substring(0, 8) == "globals." ||
+          name.substring(0, 4) == "api." ||
+          name.indexOf("(") >= 0 ||
+          name.indexOf(")") >= 0) {
+        r.push(varName + " = " + name);
+      } else if (name.substring(0, 13) == "this.context." ||
+                 name.substring(0, 11) == "this.model." ||
+                 name.substring(0, 13) == "this.globals.") {
+        r.push(varName + " = " + name.substring(5));
+      } else {
+        var compiledLookup = _compileLookup(name);
+        var lookupVar = compiledLookup.lookupFunctionName;
+        r.pushCompiledSource(compiledLookup.compiledSource);
+        r.push(varName + " = " + "(" + createConditionForValueExists("model", name) + " !== undefined ? model." + name + " : " + lookupVar + "())");
+      }
+
+      return {
+        compiledSource : r,
+        varName : varName
+      };
+
+    };
+
+    /**
+     * Creates a condition expression for checking if a value exists. For example:
+     * "model" + "user.name.first" becomes "model && model.user && model.user.name && model.user.name.first"
+     */
+    var createConditionForValueExists = function(tempVar, name) {
+
+      var names = name.split(".");
+
+      var ifConditions = [];
+
+      ifConditions.push(tempVar);
+      for (var i = 0; i < names.length; i++) {
+        var c = [];
+        c.push(tempVar);
+        for (var j = 0; j <= i; j++) {
+          c.push(names[j]);
+        }
+        ifConditions.push(c.join('.'));
+      }
+      return ifConditions.join(" && ");
+
+    };
+
+    /**
+     * This does a lookupOnObject, implemented in compiler instead of in runtime.
+     * @param name
+     */
+    var _compileLookup = function(name) {
+
+      var names = name.split(".");
+
+      var r = new CompiledSource();
+      var innerFunction = new CompiledSource();
+      var insideDo = new CompiledSource();
+      var insideIf = new CompiledSource();
+
+      var lookupVar = getUncompiledVariableName("lookup__" + names.join(''));
+      var tempVar = "aStackModel";
+      var iVar = "i";
+      //var tempVar = getUncompiledVariableName("aStackModel");
+      //var iVar = getUncompiledVariableName("i");
+      r.push("var " + lookupVar + " = function() {");
+      innerFunction.push("// lookup name=" + name);
+      innerFunction.push("var " + tempVar);
+      innerFunction.push("var " + iVar + " = executionContext.executionStack.length - 1");
+      innerFunction.push("do {");
+      insideDo.push(tempVar + " = executionContext.executionStack[" + iVar + "].model");
+
+      var ifCondition = createConditionForValueExists(tempVar, name);
+
+      insideDo.push("if (" + ifCondition + ") { ");
+      insideIf.push("return " + tempVar + "." + name);
+      insideIf.push("break");
+      insideIf.indent();
+      insideDo.pushCompiledSource(insideIf);
+      insideDo.push("}");
+      insideDo.push(iVar + "--");
+      insideDo.indent();
+      innerFunction.pushCompiledSource(insideDo);
+      innerFunction.push("} while (" + iVar + " >= 0)");
+      innerFunction.indent();
+      r.pushCompiledSource(innerFunction);
+      r.push("}");
+
+      return {
+        compiledSource : r,
+        lookupFunctionName : lookupVar
+      };
+
+    };
+
+    var compilePropertyTag = function(tag) {
+      var result = new CompiledSource();
+      var name = tag.tag;
+      if (name.substring(0, 6) == "model.") name = name.substring(6);
+      var compiledLookup = compileLookup(name);
+      result.pushCompiledSource(compiledLookup.compiledSource);
+      result.pushBuffer(compiledLookup.varName);
+      return result;
+    };
+
+    var createModelContextUpdateCompiledSource = function(item) {
+      var r = new CompiledSource();
+      r.push("var peek = executionContext.peek()");
+      r.push("model = peek ? peek.model : undefined");
+      r.push("context = peek ? peek.context : undefined");
+      return r;
+    };
+
+
+    var CompiledSource = function() {
+      var stack = [];
+
+      this.getStack = function() {
+        return stack;
+      };
+
+      this.push = function(item) {
+        stack.push(item);
+      };
+
+      this.pushBuffer = function(item) {
+        stack.push("r.push(" + item + ")");
+      };
+
+      this.pushComment = function(item) {
+        stack.push("// " + item);
+      };
+
+      this.pushPrintStack = function() {
+        stack.push("console.log('stack:', executionContext.executionStack)");
+      };
+
+      this.pushTagComment = function(tag) {
+        var tagString = (tag.tag.tag ? tag.tag.tag : tag.tag);
+        var tagStringAsJs = encodeStringToJsString(tagString);
+        if (args.logTags) stack.push("console.log('{% ' + " + tagStringAsJs + " + ' %}', model, executionContext.executionStack)");
+        stack.push("");
+        stack.push(" /***********************************");
+        stack.push(" * tag: {% " + tagString + " %}");
+        stack.push(" ************************************/");
+        stack.push("___currentTag = " + tagStringAsJs);
+      };
+
+      this.pushBufferEmptyStringIfUndefined = function(item) {
+        var varName = getUncompiledVariableName("v");
+        stack.push("var " + varName + " = " + item);
+        stack.push("r.push(" + varName + " !== undefined ? " + varName + " : '')");
+      };
+
+      this.pushThrow = function(text, tag) {
+        stack.push("throw '" + createThrowMessage(text, tag) + "'");
+      };
+
+      this.pushThrowIf = function(condition, text, tag) {
+        stack.push("if (" + condition + ") throw '" + createThrowMessage(text, tag) + "'");
+      };
+
+      this.pushAll = function(items) {
+        for (var i = 0; i < items.length; i++) {
+          this.push(items[i]);
+        }
+      };
+
+      this.pushCompiledSource = function(cs) {
+        if (cs == undefined) throw "Trying to push CompiledSource content, but it is undefined.";
+        this.pushAll(cs.getStack());
+      };
+
+      this.toString = function() {
+        return stack.join("\n") + "\n";
+      };
+
+      this.indent = function() {
+        for (var i = 0; i < stack.length; i++) {
+          stack[i] = "    " + stack[i];
+        }
+        return this;
+      };
+    };
+
+    var interpret = function(args) {
+      args = $.extend({
+                        tree : []
+                      }, args);
+
+      var result = "";
+
+      for (var i = 0; i < args.tree.length; i++) {
+        var item = args.tree[i];
+        if (item.html) {
+          result += item.html;
+        } else {
+          var tagType = getTagType(item.tagName);
+          if (tagType) {
+            result += tagType.interpretTagInstance(item, executionContext);
+          } else {
+            result += interpretPropertyTag(item);
+          }
+        }
+      }
+
+      return result;
+    };
+
+    /**
+     * Resolves a property on a model. Name can be a path, such as "user.name.first".
+     * The property can be null or undefined, but parent objects may not be.
+     * @param name
+     * @param model
+     */
+    var lookup = function(name, model) {
+      return lookupInObject(name, model, name, "", model);
+    };
+
+    /**
+     * Resolves a property on a model. Name can be a path, such as "user.name.first".
+     * The property can be null or undefined, but parent objects may not be. This method resolves recursively.
+     * @param name
+     * @param model
+     * @param startName
+     * @param fullName
+     * @param startModel
+     */
+    var lookupInObject = function(name, model, startName, fullName, startModel) {
+
+      var msg;
+
+      if (model === undefined || model === null) {
+        var modelStr = fullName ? "'" + fullName + "'" : "the model";
+        msg = "Trying to lookup property '" + startName + "', but " + modelStr + " is undefined.";
+        throw msg;
+      }
+
+      var s = name.split(".");
+
+      var value = undefined;
+
+      if (s.length == 1) {
+        value = model[name];
+      } else {
+        var first = s[0];
+        s.splice(0, 1);
+        var rest = s.join(".");
+        value = lookupInObject(rest, model[first], startName, fullName ? fullName + "." + first : first, startModel);
+      }
+      return value;
+    };
+
+    var interpretPropertyTag = function(tag) {
+      return executionContext.lookup(tag.tag);
+    };
+
+    var listContains = function(list, value) {
+      for (var i = 0; i < list.length; i++) {
+        var b = list[i] == value;
+        if (b) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    init();
+
+    /**************
+     * The object that is returned by $.mcomponent().
+     */
+
+    return {
+
+      setModel : function(model) {
+        _setModel(model);
+      },
+
+      getModel : function() {
+        return _getModel();
+      },
+
+      setViewWithHtml : function(html) {
+        _setViewWithHtml(html);
+      },
+
+      setViewFromComponent : function(component) {
+        _setViewFromComponent(component);
+      },
+
+      getIterator : function(iteratorName) {
+        var i = executionContext.getIteratorWithName(iteratorName);
+        return i ? i.getPublicInterface() : undefined;
+      },
+
+      getGlobals : function() {
+        return executionContext.getGlobals();
+      },
+
+      render : function() {
+        return this.renderWithCompiler();
+      },
+
+      _afterRender : function() {
+        result.node = document.createElement(args.containerType);
+        result.node.innerHTML = result.html;
+        if (args.clearPlaceHolderBeforeRender) $(placeHolder).html("");
+        if (placeHolder) {
+          placeHolder.appendChild(result.node);
+        }
+        return result;
+      },
+
+      renderWithCompiler : function() {
+        if (getView().template) {
+          result.html = getView().template.render();
+        } else {
+          result.html = "";
+        }
+        return this._afterRender();
+      },
+
+      renderWithInterpreter : function() {
+        result.html = interpret({tree : getView().tree});
+        return this._afterRender();
+      },
+
+      getResult : function() {
+        return result;
+      },
+
+      _getNiterParametersFromTagParameter : function(name) {
+        return getNiterParametersFromTagParameter(name);
+      },
+
+      _getContainerType : function() {
+        return args.containerType;
+      },
+
+      _getClipboard : function(name) {
+        return executionContext.getClipboardWithName(name);
+      },
+
+      _pushModel : function(model) {
+        executionContext.pushModel(model);
+        return true;
+      },
+
+      _assertLookup : function(name, model) {
+        return lookup(name, model);
+      },
+
+      _assertGetTagParameters : function(tagContent) {
+        return getTagParameters(tagContent);
+      },
+
+      _getExecutionStackSize : function() {
+        return executionContext.executionStack.length;
+      },
+
+      _assertListSize : function(i) {
+        if (getView().list.length == i) {
+          return true;
+        }
+        else {
+          throw "List size check failed. Expected:" + i + ", but got:" + getView().list.length;
+        }
+      },
+
+      _assertListItemHasHtml : function(i, html) {
+        var item = getView().list[i];
+        if (item && item.html && item.html === html) {
+          return true;
+        }
+        else if (item && item.html) {
+          throw "List item check failed. Expected HTML:" + html + ", but got:" + item.html;
+        }
+        else if (item) {
+          throw "List item check failed. Expected HTML:" + html + ", but element is not of HTML type.";
+        }
+        else {
+          throw "List item check failed. List has no element with index:" + i;
+        }
+      },
+
+      _assertListItemHasTagName : function(i, tagName) {
+        var item = getView().list[i];
+        if (item && item.tagName && item.tagName === tagName) {
+          return true;
+        }
+        else if (item && item.tagName) {
+          throw "List item check failed. Expected tag name:" + tagName + ", but got:" + item.tagName;
+        }
+        else if (item) {
+          throw "List item check failed. Expected tag name:" + tagName + ", but element is not a tag.";
+        }
+        else {
+          throw "List item check failed. List has no element with index:" + i;
+        }
+      },
+
+      _assertBlockEnd : function(i, expected) {
+        var list = getView().list;
+        var r = findBlockEnd(list, i, {}).index;
+        if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
+        return true;
+      },
+
+      _assertInterpret : function() {
+        return interpret({tree : getView().tree});
+      },
+
+      _assertInterpretAndCompile : function() {
+
+        var timing = false;
+        var t, r1, r2;
+
+        if (timing) {
+          var interpretStart = new Date();
+          r1 = interpret({tree : getView().tree});
+          var interpretStop = new Date();
+          var interpretTime = interpretStop.getTime() - interpretStart.getTime();
+
+          t = compile({tree : getView().tree});
+          var compileStart = new Date();
+          r2 = t.render();
+          var compileStop = new Date();
+          var compileTime = compileStop.getTime() - compileStart.getTime();
+
+          if (interpretTime < compileTime) {
+            console.log("Compiled version was too slow! " + compileTime + " ms was slower than " + interpretTime + " ms.", getView());
+            console.log(getView().html);
+            console.log(t.getSource());
+          }
+
+        } else {
+          t = compile({tree : getView().tree});
+          r1 = interpret({tree : getView().tree});
+          r2 = t.render();
+        }
+
+        if (r1 !== r2) {
+          console.error("Interpreter and compiler returned different results. interpreter first.");
+          console.log(r1);
+          console.log(r2);
+          throw "Interpreter and compiler returned different results.";
+        }
+
+        return r2;
+      },
+
+      _assertCompileToSource : function() {
+        return compileToSource({list : getView().tree});
+      },
+
+      _assertCompile : function() {
+        return compile({tree : getView().tree}).render();
+      },
+
+      _assertCompileLogSource : function() {
+        var t = compile({tree : getView().tree, logSource : true});
+        return t.render();
+      },
+
+      _getTemplate : function() {
+        return compile({tree : getView().tree});
+      },
+
+      _assertSetViewAndBuildList : function(html) {
+        var v = getView();
+        v.html = html;
+        if (html) {
+          var r = buildList(view.html);
+          if (r.error) {
+            throw r.message;
+          } else {
+            view.list = r.list;
+            view.tree = {}
+          }
+        } else {
+          v.list = [];
+          v.tree = {};
+        }
+        return true;
+      },
+
+      _findBlockEnd : function(i, args) {
+        var list = getView().list;
+        return findBlockEnd(list, i, args).index;
+      },
+
+      _findBlockEndTag : function(i, args) {
+        var list = getView().list;
+        return findBlockEnd(list, i, args);
+      },
+
+      _getTree : function() {
+        return getView().tree;
+      },
+
+      _getList : function() {
+        return getView().list;
+      },
+
+      _getView : function() {
+        return view;
+      },
+
+      _getSource : function() {
+        return compile({tree : getView().tree}).getSource();
+      }
+    };
+  };
+}(jQuery));
