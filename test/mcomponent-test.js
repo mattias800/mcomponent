@@ -1516,6 +1516,15 @@ test("Clipboard", function() {
 
   equal(c._assertInterpretAndCompile(), "8181", "Copying from inside view, should paste and result in '8080'.");
 
+
+  ok(c = $().mcomponent({
+                          clipboard : {clip1 : "<div>hej</div>"},
+                          model : {age : 80},
+                          viewHtml : "<div>{% paste clip1 %}</div>"
+                        }), "Construction OK!");
+
+  equal(c._assertInterpretAndCompile(), "<div><div>hej</div></div>", "Predefined clipboard");
+
 });
 
 test("Render and result", function() {
@@ -1948,30 +1957,6 @@ test("set view, render, change view, render again", function() {
   equal(c._assertInterpretAndCompile(), "ojoj", "Should contain 'ojoj' after changing view.");
 
 });
-
-/*
-
-test("proper error messages", function() {
-  var c;
-
-  ok(c = $().mcomponent({model : { list : ["mattias", "marcus", "johan"] },
-                          viewHtml : '{% @newImage("image/air/sprite_medium.png", "mediumIcon recommendationIcon"); %}'
-                        }), "Construction OK!");
-
-  equal(c._assertInterpretAndCompile(), "", "Should contain nothing.");
-});
- */
-
-setTimeout(function() {
-  var c;
-
-  c = $().mcomponent({model : { list : ["mattias", "marcus", "johan"] },
-                       viewHtml : '{% @newImage("image/air/sprite_medium.png", "mediumIcon recommendationIcon"); %}'
-                     });
-  //c._assertInterpretAndCompile();
-
-}, 1000);
-
 
 function Timer(name) {
 

@@ -31,18 +31,7 @@
         placeHolder = document.getElementById(args.placeHolderId);
         if (!placeHolder) throw "Unable to find placeholder in DOM with id=" + args.placeHolderId;
       }
-      if (that.length) {
-        var node = that[0];
-        if (node.tagName == "SCRIPT") {
-          _setViewWithHtml($(node)[0].text);
-        } else {
-          throw "Source element is not a script tag.";
-        }
-      } else if (args.viewHtml) {
-        _setViewWithHtml(args.viewHtml);
-      } else if (args.viewFromComponent) {
-        _setViewFromComponent(args.viewFromComponent);
-      }
+
       if (args.model) {
         rootModel = args.model;
         _setModel(rootModel);
@@ -69,6 +58,21 @@
                                                 )
         );
       }
+
+      // Set view, do this last since it also compiles the view!
+      if (that.length) {
+        var node = that[0];
+        if (node.tagName == "SCRIPT") {
+          _setViewWithHtml($(node)[0].text);
+        } else {
+          throw "Source element is not a script tag.";
+        }
+      } else if (args.viewHtml) {
+        _setViewWithHtml(args.viewHtml);
+      } else if (args.viewFromComponent) {
+        _setViewFromComponent(args.viewFromComponent);
+      }
+
     };
 
     /**
@@ -92,7 +96,7 @@
        * Clipboard
        */
 
-      this.getClipboard = function() {
+      this.getClipboards = function() {
         return this.clipboard;
       };
 
@@ -152,7 +156,8 @@
           this.iteratorConfigs[iteratorName].name = iteratorName;
           this.iterators[iteratorName] = new IteratorContext_(this.iteratorConfigs[iteratorName], model);
         } else {
-          // We require the configuration to exist to reduce amount of errors.
+          // We require the configuration to exist. If user wrongly spells the iterator name in config or in view, it can be hard to debug. So we ensure that config exists with the same name to prevent this.
+          console.log("VAFAN! this.iteratorConfigs", this.iteratorConfigs, args);
           throw "Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.";
         }
       };
@@ -352,22 +357,14 @@
           if (this.getStart() == 0 && this.getEnd() >= model.length) {
             if (typeof config.allItemsAreShowingCallback === "function") {
               showingAllItems = true;
-              try {
-                config.allItemsAreShowingCallback(this.getPublicInterface());
-              } catch (e) {
-                throw "Error running callback allItemsAreShowing: " + e.toString();
-              }
+              config.allItemsAreShowingCallback(this.getPublicInterface());
             } else {
               throw "Iterator '" + config.name + "' allItemsAreShowingCallback is not a function.";
             }
           } else {
             if (typeof config.notAllItemsAreShowingCallback === "function") {
               showingAllItems = false;
-              try {
               config.notAllItemsAreShowingCallback(this.getPublicInterface());
-              } catch (e) {
-                throw "Error running callback notAllItemsAreShowing: " + e.toString();
-              }
             } else {
               throw "Iterator '" + config.name + "' notAllItemsAreShowingCallback is not a function.";
             }
@@ -1302,7 +1299,6 @@
             }
           } else {
             try {
-              console.log("item", item);
               result.pushCompiledSource(compilePropertyTag(item));
             } catch (e) {
               throw "Compiling property tag failed.";
