@@ -843,10 +843,18 @@
                     var endVar = getUncompiledVariableName("end");
                     var stackItemVar = getUncompiledVariableName("stackItem");
 
-                    var compiledLookup = _compileLookupFunctionForVariableWithName(name);
-                    var lookupVar = compiledLookup.lookupFunctionName;
+
+                    /*
+                     var compiledLookup = _compileLookupFunctionForVariableWithName(name);
+                     var lookupVar = compiledLookup.lookupFunctionName;
+                     resultOuter.pushCompiledSource(compiledLookup.compiledSource);
+                     resultOuter.push("var " + listVar + " = " + createConditionForValueExists("model", name) + " ? model." + name + " : " + lookupVar + "()");
+                     resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
+                     */
+
+                    var compiledLookup = compileLookup(name);
+                    listVar = compiledLookup.varName;
                     resultOuter.pushCompiledSource(compiledLookup.compiledSource);
-                    resultOuter.push("var " + listVar + " = " + createConditionForValueExists("model", name) + " ? model." + name + " : " + lookupVar + "()");
                     resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
 
                     if (isNiter) {
@@ -1543,12 +1551,17 @@
             var result = new CompiledSource();
             var name = tag.tag;
 
-            // Handle lookup that starts with "model."
-            if (name.substring(0, 6) == "model.") name = name.substring(6);
+            // Handle lookup for "model" only.
+            if (name == "model") {
+                result.pushBuffer("model");
+            } else {
+                // Handle lookup that starts with "model."
+                if (name.substring(0, 6) == "model.") name = name.substring(6);
 
-            var compiledLookup = compileLookup(name);
-            result.pushCompiledSource(compiledLookup.compiledSource);
-            result.pushBuffer(compiledLookup.varName);
+                var compiledLookup = compileLookup(name);
+                result.pushCompiledSource(compiledLookup.compiledSource);
+                result.pushBuffer(compiledLookup.varName);
+            }
             return result;
         };
 

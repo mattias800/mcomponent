@@ -241,17 +241,13 @@ test("Lookup with parent model", function () {
             },
             locations:["BCA", "GOT"]
         },
-        viewHtml:"{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}{% endpush %}"
+        viewHtml:"{% push user %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertInterpretAndCompile(), "PARARN", "Using ../ with iter.");
+    equal(c._assertInterpretAndCompile(), "BCAGOT", "Using ../ with iter.");
 
 
-});
-
-setTimeout(function () {
-    var c;
-    c = $().mcomponent({
+    ok(c = $().mcomponent({
         model:{
             user:{
                 name:{
@@ -261,12 +257,29 @@ setTimeout(function () {
             },
             locations:["BCA", "GOT"]
         },
-        viewHtml:"{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}{% endpush %}"
-    });
+        viewHtml:"{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
 
-    c._assertInterpretAndCompile();
+    equal(c._assertInterpretAndCompile(), "PARARN", "Using ../ with iter.");
 
-}, 2000);
+
+    ok(c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                locations:["PAR", "ARN"]
+            },
+            locations:["BCA", "GOT"]
+        },
+        viewHtml:"{% push user %}{% push name %}{% iter ../../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "BCAGOT", "Using ../../ with iter.");
+
+
+});
 
 test("Util functions", function () {
 
