@@ -46,6 +46,95 @@ test("Lookup", function() {
 
 });
 
+test("Lookup with parent model", function() {
+
+  var c;
+
+  ok(c = $().mcomponent({
+		model : {
+			user : {
+				name : "mattias",
+				awesome : true
+			},
+			location : {
+				country : "Sweden"
+			}
+		},
+		viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
+	}), "Construction is OK.");
+
+  equal(c._assertInterpretAndCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will iterate over the stack and find location and then country.");
+
+	equal(c._assertFindParentPrefixCount("username"), 0, "No parent model prefixes.");
+	equal(c._assertFindParentPrefixName("username"), "username", "No parent model prefixes, name is username.");
+
+	equal(c._assertFindParentPrefixCount("../username"), 1, "Parent prefixes = 1");
+	equal(c._assertFindParentPrefixName("../username"), "username", "No parent model prefixes, name is username.");
+
+	equal(c._assertFindParentPrefixCount("../../username"), 2, "Parent prefixes = 2");
+	equal(c._assertFindParentPrefixName("../username"), "username", "No parent model prefixes, name is username.");
+
+  ok(c = $().mcomponent({
+		model : {
+			user : {
+				name : "mattias",
+				awesome : true,
+				location : {
+					country : "Awesomeland"
+				}
+			},
+			location : {
+				country : "Sweden"
+			}
+		},
+		viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
+	}), "Construction is OK.");
+
+  equal(c._assertInterpretAndCompile(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+
+  ok(c = $().mcomponent({
+		model : {
+			user : {
+				name : "mattias",
+				awesome : true,
+				location : {
+					country : "Awesomeland"
+				}
+			},
+			location : {
+				country : "Sweden"
+			}
+		},
+		viewHtml : "{% push user %}{% name %}{% ../location.country %}{% endpush %}"
+	}), "Construction is OK.");
+
+  equal(c._assertInterpretAndCompile(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+
+
+  ok(c = $().mcomponent({
+		model : {
+			user : {
+				name : "mattias",
+				awesome : true,
+				location : {
+					country : "Awesomeland"
+				}
+			},
+			location : {
+				country : "Sweden"
+			}
+		},
+		viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
+	}), "Construction is OK.");
+
+  raises(function() {
+		c._assertInterpretAndCompile();
+	}, "mattiasAwesomeland", "Should fail since it goes beyond stack.");
+
+
+
+});
+
 test("Util functions", function() {
 
   var c;

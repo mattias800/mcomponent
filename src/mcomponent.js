@@ -1502,12 +1502,27 @@
     var compilePropertyTag = function(tag) {
       var result = new CompiledSource();
       var name = tag.tag;
+
+		// Handle lookup that starts with "model."
       if (name.substring(0, 6) == "model.") name = name.substring(6);
+
       var compiledLookup = compileLookup(name);
       result.pushCompiledSource(compiledLookup.compiledSource);
       result.pushBuffer(compiledLookup.varName);
       return result;
     };
+
+	var findParentPrefix = function(name) {
+		var count = 0;
+		while (name.substring(0, 3) == "../") {
+			name = name.substring(3);
+			count++;
+		}
+		return {
+			count : count,
+			name : name
+		};
+	};
 
     var createModelContextUpdateCompiledSource = function(item) {
       var r = new CompiledSource();
@@ -1855,6 +1870,14 @@
 
         return r2;
       },
+
+		_assertFindParentPrefixCount : function(name) {
+			return findParentPrefix(name).count;
+		}, 
+
+		_assertFindParentPrefixName : function(name) {
+			return findParentPrefix(name).name;
+		}, 
 
       _assertCompileToSource : function() {
         return compileToSource({list : getView().tree});
