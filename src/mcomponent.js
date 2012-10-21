@@ -279,6 +279,9 @@
                             return undefined;
                         }
                     },
+                    getRootModel:function () {
+                        return that.executionStack[0].model;
+                    },
                     getIterator:function (iteratorName) {
                         var i = executionContext.getIteratorWithName(iteratorName);
                         return i ? i.getPublicInterface() : undefined;

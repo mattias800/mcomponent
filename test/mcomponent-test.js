@@ -898,6 +898,18 @@ test("API", function () {
         viewHtml:"{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
     equal(c._assertCompile(), "4444", "itemsShowing = 4 when itemsPerPage is higher than model.length");
 
+    ok(c = $().mcomponent({
+        model:"mattias",
+        viewHtml:"{% showjs api.getRootModel() %}"
+    }), "Construction OK lets go!!");
+    equal(c._assertCompile(), "mattias", "api.getRootModel() should return root model.");
+
+    ok(c = $().mcomponent({
+        model:{ name:"mattias"},
+        viewHtml:"{% showjs api.getRootModel().name %}"
+    }), "Construction OK lets go!!");
+    equal(c._assertCompile(), "mattias", "api.getRootModel() should return root model.");
+
 });
 
 test("large view test", function () {
