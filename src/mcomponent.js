@@ -1343,7 +1343,7 @@
             result.push("var globals = executionContext.getGlobals()");
             result.push("var model = rootModel");
             result.push("var context = {}");
-            result.push("var ___currentTag = ''");
+            result.push("executionContext.currentTag = {}");
             result.push("var r = []");
             var c = compilePartToSource(args);
             if (useTryCatch) {
@@ -1353,9 +1353,9 @@
             result.pushCompiledSource(c);
             if (useTryCatch) {
                 result.push("} catch (e) {");
-                result.push("   r.push('Tag failed: ' + ___currentTag)");
+                result.push("   r.push('Tag failed: ' + executionContext.currentTag.name)");
                 result.push("   r.push('Error: ' + e)");
-                result.push("   throw 'Error: ' + e.toString() + ' at tag: ' + ___currentTag)");
+                result.push("   throw 'Error: ' + e.toString() + ' at tag: ' + executionContext.currentTag.name)");
                 result.push("}");
             }
             result.push("return r.join('')");
@@ -1397,7 +1397,7 @@
                                 console.log(e.toString());
                                 console.log("model", _getModel());
                             }
-                            throw "Error rendering with compiled view: " + e.toString();
+                            throw "Error at tag {% " + executionContext.currentTag.name + " %}: " + e.toString();
                         }
                     }
                     return r;
@@ -1608,7 +1608,7 @@
                 stack.push(" /***********************************");
                 stack.push(" * tag: {% " + tagString + " %}");
                 stack.push(" ************************************/");
-                stack.push("___currentTag = " + tagStringAsJs);
+                stack.push("executionContext.currentTag.name = " + tagStringAsJs);
             };
 
             this.pushBufferEmptyStringIfUndefined = function (item) {
