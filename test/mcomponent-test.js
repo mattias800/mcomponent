@@ -127,23 +127,10 @@ test("Lookup with parent model", function () {
     }), "Construction is OK.");
 
     raises(function () {
-        c._assertInterpretAndCompile();
-    }, "Should fail since it goes beyond stack.");
-
-    raises(function () {
-        c._assertInterpret();
-    }, "Should fail since it goes beyond stack.");
-
-    raises(function () {
         c._assertCompile();
-    }, "Should fail since it goes beyond stack.");
+    }, "Should fail since it goes beyond stack, using compiled code.");
 
-
-});
-
-setTimeout(function () {
-    var c;
-    c = $().mcomponent({
+    ok(c = $().mcomponent({
         model:{
             user:{
                 name:"mattias",
@@ -157,15 +144,14 @@ setTimeout(function () {
             }
         },
         viewHtml:"{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
-    });
+    }), "Construction is OK.");
 
-    console.log("WWW---------------------------------");
-    console.log(c._getSource());
-    console.log("OK GETTING EXCEPTION??")
-    c._assertCompile();
+    raises(function () {
+        c._assertInterpret();
+    }, "Should fail since it goes beyond stack, using interpretation.");
 
-}, 2000);
 
+});
 
 test("Util functions", function () {
 

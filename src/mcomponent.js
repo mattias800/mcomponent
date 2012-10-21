@@ -1508,8 +1508,8 @@
             //var iVar = getUncompiledVariableName("i");
             r.push("var " + lookupVar + " = function() {");
             innerFunction.push("// lookup name=" + name);
-            if (parentPrefix.count > 0 && false) {
-                innerFunction.push("if (executionContext.executionStack.length >= parentPrefix.count) throw 'Trying to lookup \"" + originalName + "\", but stack is smaller than that (' + executionContext.executionStack.length + ').'");
+            if (parentPrefix.count > 0) {
+                innerFunction.push("if (executionContext.executionStack.length <= " + parentPrefix.count + ") throw 'Trying to lookup \"" + originalName + "\", but stack is smaller than that (' + executionContext.executionStack.length + ').'");
             }
             innerFunction.push("var " + tempVar);
             innerFunction.push("var " + iVar + " = executionContext.executionStack.length - 1 - " + parentPrefix.count);
