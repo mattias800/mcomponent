@@ -113,6 +113,66 @@ test("Lookup with parent model", function () {
     ok(c = $().mcomponent({
         model:{
             user:{
+                name:{
+                    first:"mattias"
+                },
+                awesome:true,
+                location:{
+                    country:"Awesomeland"
+                }
+            },
+            location:{
+                country:"Sweden"
+            }
+        },
+        viewHtml:"{% push user %}{% push name %}{% first %}{% ../location.country %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+
+    ok(c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                awesome:true,
+                location:{
+                    country:"Awesomeland"
+                }
+            },
+            location:{
+                country:"Sweden"
+            }
+        },
+        viewHtml:"{% push user %}{% push name %}{% first %}{% ../../location.country %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+
+    ok(c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                awesome:true,
+                location:{
+                    country:"Awesomeland"
+                }
+            },
+            location:{
+                country:"Sweden"
+            }
+        },
+        viewHtml:"{% push user.name %}{% first %}{% ../location.country %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+
+    ok(c = $().mcomponent({
+        model:{
+            user:{
                 name:"mattias",
                 awesome:true,
                 location:{
@@ -150,8 +210,63 @@ test("Lookup with parent model", function () {
         c._assertInterpret();
     }, "Should fail since it goes beyond stack, using interpretation.");
 
+    ok(c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                awesome:true,
+                location:{
+                    country:"Awesomeland"
+                }
+            },
+            location:{
+                country:"Sweden"
+            }
+        },
+        viewHtml:"{% push user %}{% push ../location %}{% country %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "Sweden", "Using ../ with push.");
+
+
+    ok(c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                locations:["PAR", "ARN"]
+            },
+            locations:["BCA", "GOT"]
+        },
+        viewHtml:"{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}{% endpush %}"
+    }), "Construction is OK.");
+
+    equal(c._assertInterpretAndCompile(), "PARARN", "Using ../ with iter.");
+
 
 });
+
+setTimeout(function () {
+    var c;
+    c = $().mcomponent({
+        model:{
+            user:{
+                name:{
+                    first:"mattias"
+                },
+                locations:["PAR", "ARN"]
+            },
+            locations:["BCA", "GOT"]
+        },
+        viewHtml:"{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}{% endpush %}"
+    });
+
+    c._assertInterpretAndCompile();
+
+}, 2000);
 
 test("Util functions", function () {
 
