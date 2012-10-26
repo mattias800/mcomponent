@@ -2205,6 +2205,36 @@ test("set view, render, change view, render again", function() {
 
 });
 
+test("Child components", function() {
+
+    var c;
+    var parent;
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{% username %}"}), "Construction OK!");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
+    ok(parent = $().mcomponent({model : {username : "jenny"}, viewHtml : "{% username %}"}), "Construction OK!");
+    equal(parent._assertRender(), "jenny", "Should contain 'jenny'.");
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{% username %}"}), "Construction OK!");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{% userNumber %} {% component mat %}"}), "Construction OK!");
+    parent.addChild("mat", c);
+    equal(parent._assertRender(), "3 mattias", "Should contain '3 mattias'.");
+
+    ok(c = $().mcomponent({model : {color : "black"}, viewHtml : "{% color %}"}), "Construction OK!");
+    equal(c._assertRender(), "black", "Should contain 'black'.");
+    ok(parent = $().mcomponent({
+        model : {label : "The color : "},
+        viewHtml : "{% label %}{% component testChild %}",
+        children : {
+            "testChild" : c
+        }
+    }), "Construction OK!");
+    equal(parent._assertRender(), "The color : black", "Should contain '3 mattias'.");
+
+
+});
+
 function Timer(name) {
 
     this.name = name;

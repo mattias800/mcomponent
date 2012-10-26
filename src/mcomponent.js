@@ -15,6 +15,7 @@
             viewFromComponent : undefined,
             model : undefined,
             clipboard : {},
+            children : {},
             iter : {},
             maxTagCount : 1000,
             placeHolder : undefined,
@@ -82,6 +83,7 @@
         var ExecutionContext_ = function() {
 
             this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
+            this.children = mainArgs.children;
             this.globals = {};
             this.clipboard = {};
             this.iterators = {};
@@ -112,7 +114,7 @@
                 this.renderResult.push(this.renderErrorToString(error));
 
                 if (args.throwOnError) {
-                    throw this.renderErrorToString(message, this.currentTag.name);
+                    throw this.renderErrorToString(error);
                 }
             };
 
@@ -122,6 +124,18 @@
 
             this.renderErrorToString = function(error) {
                 return "<div>Error at tag {% " + error.tag + " %}: " + error.message + "</div>"
+            };
+
+            /**
+             * Children
+             */
+
+            this.getChildWithId = function(id) {
+                return this.children[id];
+            };
+
+            this.addChild = function(id, child) {
+                this.children[id] = child;
             };
 
             /**
@@ -612,7 +626,6 @@
                         content : args.content,
                         condition : condition,
                         conditions : c.conditions,
-                        conditionFunctions : c.conditionFunctions,
                         contentRoots : c.contentRoots,
                         elseContent : c.elseContent
                     };
@@ -672,6 +685,33 @@
                     var name = tagInstance.tag.parameters;
                     if (!name) name = "default";
                     result.pushCompiledSource(compilePartToSource({tree : executionContext.getClipboardWithName(name)}));
+                    return result;
+                },
+                createTagInstance : function(args) {
+                    return {
+                        tagName : this.token,
+                        tag : args.tag,
+                        content : args.content
+                    };
+                }
+            },
+
+            tag_component : {
+                token : "component",
+                hasBlock : false,
+                compileTagInstance : function(tagInstance, executionContext, args) {
+                    var result = new CompiledSource();
+                    var name = tagInstance.tag.parameters;
+                    var child = executionContext.getChildWithId(name);
+                    if (child) {
+                        var childVar = getUncompiledVariableName("childComponent");
+                        result.push("var " + childVar + " = executionContext.getChildWithId(" + encodeStringToJsString(name) + ")");
+                        result.push("executionContext.pushModel(" + childVar + ".getModel())");
+                        result.pushCompiledSource(child._getView().template.getBodySource());
+                        result.push("executionContext.pop()");
+                    } else {
+                        result.pushRenderError("Has no child component with id=" + name);
+                    }
                     return result;
                 },
                 createTagInstance : function(args) {
@@ -820,6 +860,10 @@
 
         var _getModel = function() {
             return executionContext.getModel();
+        };
+
+        var _addChild = function(id, child) {
+            executionContext.addChild(id, child);
         };
 
         var compileList = function() {
@@ -1029,7 +1073,6 @@
 
             return {
                 conditions : conditions,
-                conditionFunctions : conditionFunctions,
                 contentRoots : contentRoots,
                 elseContent : elseContent
             };
@@ -1213,13 +1256,13 @@
                         try {
                             result.pushCompiledSource(tagType.compileTagInstance(item, executionContext));
                         } catch (e) {
-                            throw "Compiling tag failed.";
+                            throw "Compiling tag failed: " + e.toString();
                         }
                     } else {
                         try {
                             result.pushCompiledSource(compilePropertyTag(item));
                         } catch (e) {
-                            throw "Compiling property tag failed.";
+                            throw "Compiling property tag failed: " + e.toString();
                         }
                     }
                 }
@@ -1231,20 +1274,25 @@
         var compileToSource = function(args) {
 
             var result = new CompiledSource();
-
             // executionContext is available at all times.
             result.push("var globals = executionContext.getGlobals()");
             result.push("var model = rootModel");
             result.push("var context = {}");
-            var c = compilePartToSource(args);
-            result.pushCompiledSource(c);
-            return result;
+            var body = compilePartToSource(args);
+            result.pushCompiledSource(body);
+            return {
+                full : result,
+                body : body
+            };
 
         };
 
         var compile = function(args) {
             var debugEnabled = false;
-            var source = compileToSource(args).toString();
+            var sourceObj = compileToSource(args);
+            var source = sourceObj.full;
+            var bodySource = sourceObj.body;
+
             if (args.logSource) console.log(source);
             var f;
 
@@ -1261,6 +1309,9 @@
             return {
                 getSource : function() {
                     return source;
+                },
+                getBodySource : function() {
+                    return bodySource;
                 },
                 render : function() {
                     var r = {};
@@ -1283,7 +1334,7 @@
                         }
                     }
                     if (executionContext.compileError) {
-                        var msg = "Error compiling view, view is not formatted correctly, please check your tags: " + executionContext.compileError.toString();
+                        var msg = "Error compiling view, view is not formatted correctly, please check your tags: " + executionContext.compileError.toString() + this.getSource().toString();
                         executionContext.renderResult = [msg];
                         if (mainArgs.throwOnError) {
                             throw msg;
@@ -1612,6 +1663,10 @@
 
         return {
 
+            addChild : function(id, child) {
+                _addChild(id, child);
+            },
+
             setModel : function(model) {
                 _setModel(model);
             },
@@ -1753,7 +1808,7 @@
             },
 
             _assertCompileToSource : function() {
-                return compileToSource({list : getView().tree});
+                return compileToSource({list : getView().tree}).full;
             },
 
             _assertRender : function() {
@@ -1810,8 +1865,13 @@
             },
 
             _getSource : function() {
-                return compile({tree : getView().tree}).getSource();
+                return compile({tree : getView().tree}).getSource().toString();
+            },
+
+            _getBodySource : function() {
+                return compile({tree : getView().tree}).getBodySource().toString();
             }
+
         };
     };
 }(jQuery));
