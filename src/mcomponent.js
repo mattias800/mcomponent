@@ -439,16 +439,6 @@
             tag_show : {
                 token : "show",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var name = tagInstance.tag.parameters;
-                    var v;
-                    if (!name) {
-                        v = executionContext.getModel();
-                    } else {
-                        v = executionContext.lookup(name);
-                    }
-                    return v !== undefined ? v : "";
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var name = tagInstance.tag.parameters;
@@ -473,16 +463,6 @@
             tag_context : {
                 token : "context",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var name = tagInstance.tag.parameters;
-                    var v;
-                    if (!name) {
-                        throw "'context' tag requires one parameter, the context property to display.";
-                    } else {
-                        v = executionContext.lookupContextInStack(name);
-                    }
-                    return v !== undefined ? v : "";
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var name = tagInstance.tag.parameters;
@@ -501,13 +481,6 @@
             tag_showjs : {
                 token : "showjs",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var model = executionContext.getModel();
-                    var context = executionContext.getContext();
-                    var f = createExpressionFunction(tagInstance.tag.parameters);
-                    var v = executionContext.runFunction(f);
-                    return v !== undefined ? v : "";
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     result.pushBufferEmptyStringIfUndefined(tagInstance.tag.parameters);
@@ -525,11 +498,6 @@
             tag_js : {
                 token : "js",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var f = createExpressionFunction(tagInstance.tag.parameters);
-                    executionContext.runFunction(f);
-                    return "";
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     result.push(tagInstance.tag.parameters);
@@ -547,11 +515,6 @@
             tag_setglobal : {
                 token : "setglobal",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
-                    executionContext.getGlobals()[p.iterName] = executionContext.lookup(p.variableName);
-                    return "";
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
@@ -570,12 +533,10 @@
             tag_throw : {
                 token : "throw",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    throw executionContext.lookup(tagInstance.tag.parameters);
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
+                    result.push("throw " + encodeStringToJsString(tagInstance.tag.parameters));
                     return result;
                 },
                 createTagInstance : function(args) {
@@ -590,9 +551,6 @@
             tag_log : {
                 token : "log",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    log(executionContext.lookup(tagInstance.tag.parameters));
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
@@ -610,22 +568,6 @@
             tag_if : {
                 token : "if",
                 hasBlock : true,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    // Step over each condition, find the first that is true. If none is true, use else.
-                    for (var i = 0; i < tagInstance.conditions.length; i++) {
-                        var r = executionContext.runFunction(tagInstance.conditionFunctions[i]);
-                        if (r) {
-                            return interpret({tree : tagInstance.contentRoots[i]});
-                        }
-                    }
-                    if (tagInstance.elseContent) {
-                        // Append else statements
-                        return interpret({tree : tagInstance.elseContent});
-                    } else {
-                        return "";
-                    }
-                },
-
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var param = tagInstance.tag.parameters;
@@ -667,19 +609,6 @@
             tag_push : {
                 token : "push",
                 hasBlock : true,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var name = tagInstance.tag.parameters;
-                    if (!name) throw "'push' tag has no parameter. First parameter should be property to push.";
-                    var model = executionContext.lookup(name);
-                    if (model) {
-                        executionContext.pushModel(model);
-                        var result = interpret({tree : tagInstance.content});
-                        executionContext.pop();
-                        return result;
-                    } else {
-                        throw "Trying to push '" + name + "' but there is no such property in the model stack.";
-                    }
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var param = tagInstance.tag.parameters;
@@ -704,9 +633,6 @@
             tag_copy : {
                 token : "copy",
                 hasBlock : true,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    return interpret({tree : tagInstance.content});
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     // Do nothing in compiled tag, we add it at parse time.
                     var result = new CompiledSource();
@@ -728,11 +654,6 @@
             tag_paste : {
                 token : "paste",
                 hasBlock : false,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    var name = tagInstance.tag.parameters;
-                    if (!name) name = "default";
-                    return interpret({tree : executionContext.getClipboardWithName(name)});
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var result = new CompiledSource();
                     var name = tagInstance.tag.parameters;
@@ -752,9 +673,6 @@
             tag_iter : {
                 token : "iter",
                 hasBlock : true,
-                interpretTagInstance : function(tagInstance, executionContext, args) {
-                    return tagTypes.tag_niter.interpretTagInstance(tagInstance, executionContext, args);
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     return tagTypes.tag_niter.compileTagInstance(tagInstance, executionContext, args);
                 },
@@ -770,60 +688,6 @@
             tag_niter : {
                 token : "niter",
                 hasBlock : true,
-                interpretTagInstance : function(tagInstance, executionContext) {
-                    var isNiter = tagInstance.tagName == "niter";
-                    var iterContext;
-                    var niterParameters;
-
-                    var name = tagInstance.tag.parameters;
-
-                    if (isNiter) {
-                        niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
-                        name = niterParameters.variableName;
-                    }
-
-                    var list;
-                    if (!name) {
-                        list = executionContext.getModel();
-                        name = "current model";
-                    } else {
-                        list = executionContext.lookup(name);
-                    }
-
-                    if (isNiter) {
-                        iterContext = executionContext.ensureIterator(niterParameters.iterName, list);
-                    }
-
-                    if (list == undefined) throw "Trying to use '" + name + "' as model for iterator, but there is no such property in the model stack.";
-                    if (!$.isArray(list)) throw "'" + tagInstance.tagName + "' tag parameter '" + name + "' is not a list.";
-
-                    var start = iterContext ? iterContext.getStart() : 0;
-                    var end = iterContext ? Math.min(iterContext.getEnd(), list.length) : list.length;
-
-                    var result = "";
-                    for (var i = start; i < end; i++) {
-                        var model = list[i];
-                        executionContext.push({
-                            model : model,
-                            context : {
-                                index : i,
-                                size : list.length,
-                                isFirst : (i == 0),
-                                isLast : (i == list.length - 1),
-                                isEven : (i % 2 == 0),
-                                isOdd : !(i % 2 == 0),
-                                parity : (i % 2 == 0) ? "even" : "odd"
-                            }
-                        });
-                        result += interpret({tree : tagInstance.content});
-                        executionContext.pop();
-                    }
-                    if (isNiter && iterContext) {
-                        iterContext.renderUpdate(start, end);
-                    }
-                    return result;
-
-                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var resultOuter = new CompiledSource();
                     var result = new CompiledSource();
@@ -859,6 +723,7 @@
                     listVar = compiledLookup.varName;
                     resultOuter.pushCompiledSource(compiledLookup.compiledSource);
                     resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
+                    resultOuter.pushThrowIf("!(" + listVar + " instanceof Array)", "iterator model is not a list.", tagInstance);
 
                     if (isNiter) {
                         resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + niterParameters.iterName + "', " + listVar + ")");
@@ -1664,30 +1529,6 @@
             };
         };
 
-        var interpret = function(args) {
-            args = $.extend({
-                tree : []
-            }, args);
-
-            var result = "";
-
-            for (var i = 0; i < args.tree.length; i++) {
-                var item = args.tree[i];
-                if (item.html) {
-                    result += item.html;
-                } else {
-                    var tagType = getTagType(item.tagName);
-                    if (tagType) {
-                        result += tagType.interpretTagInstance(item, executionContext);
-                    } else {
-                        result += interpretPropertyTag(item);
-                    }
-                }
-            }
-
-            return result;
-        };
-
         /**
          * Resolves a property on a model. Name can be a path, such as "user.name.first".
          * The property can be null or undefined, but parent objects may not be.
@@ -1730,10 +1571,6 @@
                 value = lookupInObject(rest, model[first], startName, fullName ? fullName + "." + first : first, startModel);
             }
             return value;
-        };
-
-        var interpretPropertyTag = function(tag) {
-            return executionContext.lookup(tag.tag);
         };
 
         var listContains = function(list, value) {
@@ -1799,11 +1636,6 @@
                 } else {
                     result.html = "";
                 }
-                return this._afterRender();
-            },
-
-            renderWithInterpreter : function() {
-                result.html = interpret({tree : getView().tree});
                 return this._afterRender();
             },
 
@@ -1886,49 +1718,6 @@
                 var r = findBlockEnd(list, i, {}).index;
                 if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
                 return true;
-            },
-
-            _assertInterpret : function() {
-                return interpret({tree : getView().tree});
-            },
-
-            _assertInterpretAndCompile : function() {
-
-                var timing = false;
-                var t, r1, r2;
-
-                if (timing) {
-                    var interpretStart = new Date();
-                    r1 = interpret({tree : getView().tree});
-                    var interpretStop = new Date();
-                    var interpretTime = interpretStop.getTime() - interpretStart.getTime();
-
-                    t = compile({tree : getView().tree});
-                    var compileStart = new Date();
-                    r2 = t.render();
-                    var compileStop = new Date();
-                    var compileTime = compileStop.getTime() - compileStart.getTime();
-
-                    if (interpretTime < compileTime) {
-                        console.log("Compiled version was too slow! " + compileTime + " ms was slower than " + interpretTime + " ms.", getView());
-                        console.log(getView().html);
-                        console.log(t.getSource());
-                    }
-
-                } else {
-                    t = compile({tree : getView().tree});
-                    r1 = interpret({tree : getView().tree});
-                    r2 = t.render();
-                }
-
-                if (r1 !== r2) {
-                    console.error("Interpreter and compiler returned different results. interpreter first.");
-                    console.log(r1);
-                    console.log(r2);
-                    throw "Interpreter and compiler returned different results.";
-                }
-
-                return r2;
             },
 
             _assertFindParentPrefixCount : function(name) {
