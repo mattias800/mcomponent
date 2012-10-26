@@ -189,7 +189,7 @@
                     this.iterators[iteratorName] = new IteratorContext_(this.iteratorConfigs[iteratorName], model);
                 } else {
                     // We require the configuration to exist. If user wrongly spells the iterator name in config or in view, it can be hard to debug. So we ensure that config exists with the same name to prevent this.
-                    throw "Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.";
+                    this.pushCurrentRenderError("Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.");
                 }
             };
 
