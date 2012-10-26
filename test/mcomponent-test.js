@@ -183,6 +183,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
+        throwOnRenderError : true,
         viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
@@ -203,6 +204,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
+        throwOnRenderError : true,
         viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
@@ -1374,7 +1376,10 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter listaxe %}{% enditer %}"}), "Construction OK!");
+        },
+        viewHtml : "{% iter listaxe %}{% enditer %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
     raises(function() {
         c._assertCompile();
     }, "This should not work, 'lista' property does not exist.");
@@ -1382,7 +1387,9 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : 123
-        }, viewHtml : "{% iter test %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{% iter test %}{% enditer %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
     raises(function() {
         c._assertCompile();
     }, "This should not work, 'test' is not a list.");
@@ -1390,7 +1397,9 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : {age : 80}
-        }, viewHtml : "{% iter test %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{% iter test %}{% enditer %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
     raises(function() {
         c._assertCompile();
     }, "This should not work, 'test' is not a list.");
@@ -1398,7 +1407,9 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : "hejhej"
-        }, viewHtml : "{% iter test %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{% iter test %}{% enditer %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
     raises(function() {
         c._assertCompile();
     }, "This should not work, 'test' is not a list.");
@@ -1412,15 +1423,21 @@ test("niter tag, using show more", function() {
     var a = 3;
     var b = 1;
 
-    ok(c = $().mcomponent({model : {
-        list : ["mattias", "marcus", "johan"]
-    }, viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK!");
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan"]
+        },
+        viewHtml : "{% niter userListIter list %}{% endniter %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
     raises(function() {
         c._assertCompile();
     }, "Should throw error since we haven't declared an iterator configuration.");
 
     ok(c = $().mcomponent({
-        model : {list : ["mattias", "marcus", "johan"]},
+        model : {
+            list : ["mattias", "marcus", "johan"]
+        },
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
@@ -1634,11 +1651,6 @@ test("js and showjs tags", function() {
     ok(c = $().mcomponent({viewHtml : "{% js Math.sqrt(5); %}"}), "Construction OK!");
     equal(c._assertCompile(), "", "Should not throw error.");
 
-    ok(c = $().mcomponent({viewHtml : "{% js throw 'hoho'; %}"}), "Construction OK!");
-    raises(function() {
-        c._assertCompile();
-    }, "Should throw error using 'js' tag.");
-
 });
 
 test("globals", function() {
@@ -1665,22 +1677,6 @@ test("globals", function() {
     equal(c._assertCompile(), "mattias yeah", "setglobal tag and showing globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
-
-});
-
-test("throw", function() {
-
-    var c;
-
-    ok(c = $().mcomponent({viewHtml : "{% throw 'ojoj' %}"}), "Construction OK!");
-    raises(function() {
-        c._assertCompile();
-    }, "Throwing should work.");
-
-    ok(c = $().mcomponent({model : {text : "yay error"}, viewHtml : "{% throw model.text %}"}), "Construction OK!");
-    raises(function() {
-        c._assertCompile();
-    }, "Throwing using model should work.");
 
 });
 
@@ -1946,7 +1942,8 @@ test("js and showjs tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% context name %}"
+        viewHtml : "{% context name %}",
+        throwOnRenderError : true
     }), "Construction OK! But next should fail.");
 
     raises(function() {
@@ -2091,9 +2088,12 @@ test("niter tag", function() {
 
     var c;
 
-    ok(c = $().mcomponent({model : {
-        list : ["mattias", "marcus", "johan"]
-    }, viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK!");
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan"]
+        }, viewHtml : "{% niter userListIter list %}{% endniter %}",
+        throwOnRenderError : true
+    }), "Construction OK!");
 
     raises(function() {
         c._assertCompile();

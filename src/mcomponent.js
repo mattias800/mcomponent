@@ -22,7 +22,7 @@
             containerType : "div",
             clearPlaceHolderBeforeRender : true,
             logTags : false,
-            throwOnRenderError : true
+            throwOnRenderError : false // Used for unit testing.
         }, args);
 
         var init = function() {
@@ -189,7 +189,6 @@
                     this.iterators[iteratorName] = new IteratorContext_(this.iteratorConfigs[iteratorName], model);
                 } else {
                     // We require the configuration to exist. If user wrongly spells the iterator name in config or in view, it can be hard to debug. So we ensure that config exists with the same name to prevent this.
-                    console.log("VAFAN! this.iteratorConfigs", this.iteratorConfigs, args);
                     throw "Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.";
                 }
             };
@@ -562,24 +561,6 @@
                 }
             },
 
-            tag_throw : {
-                token : "throw",
-                hasBlock : false,
-                compileTagInstance : function(tagInstance, executionContext, args) {
-                    var result = new CompiledSource();
-                    result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
-                    result.push("throw " + encodeStringToJsString(tagInstance.tag.parameters));
-                    return result;
-                },
-                createTagInstance : function(args) {
-                    return {
-                        tagName : this.token,
-                        tag : args.tag,
-                        content : args.content
-                    };
-                }
-            },
-
             tag_log : {
                 token : "log",
                 hasBlock : false,
@@ -720,6 +701,14 @@
             tag_niter : {
                 token : "niter",
                 hasBlock : true,
+                createTagInstance : function(args) {
+                    // Cannot lookup iterConfig here, it might change after view has been rendered.
+                    return {
+                        tagName : this.token,
+                        tag : args.tag,
+                        content : args.content
+                    };
+                },
                 compileTagInstance : function(tagInstance, executionContext, args) {
                     var resultOuter = new CompiledSource();
                     var result = new CompiledSource();
@@ -800,14 +789,6 @@
                     resultOuter.push(" **************/");
 
                     return resultOuter;
-                },
-                createTagInstance : function(args) {
-                    // Cannot lookup iterConfig here, it might change after view has been rendered.
-                    return {
-                        tagName : this.token,
-                        tag : args.tag,
-                        content : args.content
-                    };
                 }
             }
         };
@@ -1641,7 +1622,19 @@
             },
 
             render : function() {
-                return this.renderWithCompiler();
+                if (getView().template) {
+                    try {
+                        result.html = getView().template.render();
+                    } catch (e) {
+                        result.html = e.toString();
+                        if (args.throwOnRenderError) throw e;
+                    }
+                } else {
+                    result.html = "";
+                }
+
+                return this._afterRender();
+
             },
 
             _afterRender : function() {
@@ -1652,15 +1645,6 @@
                     placeHolder.appendChild(result.node);
                 }
                 return result;
-            },
-
-            renderWithCompiler : function() {
-                if (getView().template) {
-                    result.html = getView().template.render();
-                } else {
-                    result.html = "";
-                }
-                return this._afterRender();
             },
 
             getResult : function() {
