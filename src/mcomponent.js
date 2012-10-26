@@ -743,8 +743,11 @@
                     var compiledLookup = compileLookup(name);
                     listVar = compiledLookup.varName;
                     resultOuter.pushCompiledSource(compiledLookup.compiledSource);
-                    resultOuter.pushRenderErrorIf(listVar + " == undefined", "Iterator model is undefined.");
-                    resultOuter.pushRenderErrorIf("!(" + listVar + " instanceof Array)", "Iterator model is not a list.");
+                    resultOuter.push("if (" + listVar + " == undefined) {");
+                    resultOuter.pushRenderError("Iterator model is undefined.");
+                    resultOuter.push("} else if (!(" + listVar + " instanceof Array)) {");
+                    resultOuter.pushRenderError("Iterator model is not a list.");
+                    resultOuter.push("} else {");
 
                     if (isNiter) {
                         resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + niterParameters.iterName + "', " + listVar + ")");
@@ -783,6 +786,8 @@
                     if (isNiter) {
                         resultOuter.push(iterContextVar + ".renderUpdate(" + startVar + ", " + endVar + ")");
                     }
+
+                    resultOuter.push("}");
 
                     resultOuter.push("/**************");
                     resultOuter.push(" * End of iter");
@@ -1516,6 +1521,10 @@
 
             this.pushRenderErrorIf = function(condition, text) {
                 stack.push("if (" + condition + ") executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
+            };
+
+            this.pushRenderError = function(text) {
+                stack.push("executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
             };
 
             this.pushAll = function(items) {
