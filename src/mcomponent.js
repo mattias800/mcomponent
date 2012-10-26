@@ -615,7 +615,7 @@
                 },
 
                 createTagInstance : function(args) {
-                    if (!args.tag.parameters) throw "If tag does not include a condition. Ex: {% if model.isNice %}";
+                    if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: {% if model.isNice %}", args.tag);
                     var condition = args.tag.parameters;
                     var conditionFunction = createExpressionFunction(args.tag.parameters);
                     var c = createIfTag(args.subList, condition);
@@ -1045,7 +1045,7 @@
 
                 if (ifCounter == 0 && (isOnLastItem || item.tagName == "else" || item.tagName == "elseif")) {
 
-                    if (lastFoundTagName == "else" && !isOnLastItem) throw createThrowMessage("Found 'else' or 'elseif' tag after 'else' tag.", item);
+                    if (lastFoundTagName == "else" && !isOnLastItem) throw createCompileExceptionMessage("Found 'else' or 'elseif' tag after 'else' tag.", item);
 
                     var endIndex = i + (isOnLastItem ? 1 : 0);
                     var subList = list.slice(startIndex, endIndex);
@@ -1055,7 +1055,7 @@
                         if (isOnLastItem) {
                             elseContent = node;
                         } else {
-                            throw createThrowMessage("If case miss match.", item);
+                            throw createCompileExceptionMessage("If case miss match.", item);
                         }
                     } else {
                         conditions.push(currentCondition);
@@ -1069,7 +1069,7 @@
 
                     startIndex = i + 1;
                 } else if (ifCounter != 0 && isOnLastItem) { // Is on last element
-                    throw createThrowMessage("Not matching if, elseif, else.", item);
+                    throw createCompileExceptionMessage("Not matching if, elseif, else.", item);
                 }
             }
 
@@ -1102,15 +1102,15 @@
             var endTags = args.endTags; // If one of these is found at level 0, the end is found!
             var startItem = list[i];
             if (startItem.html) {
-                throw "The tag that is opening the block is a HTML element and not a tag.";
+                throw createCompileExceptionMessage("The tag that is opening the block is a HTML element and not a tag.", startItem);
             }
             if (list.length < 2) {
-                throw createThrowMessage("Missing end tag for the '" + startItem.tagName + "' tag.", startItem);
+                throw createCompileExceptionMessage("Missing end tag for the '" + startItem.tagName + "' tag.", startItem);
             }
 
             if (args.startIndex !== undefined) i = args.startIndex;
             var startTagType = getTagType(startItem.tagName);
-            if (startTagType && !startTagType.hasBlock) throw "Looking for end tag, but start tag does not open block.";
+            if (startTagType && !startTagType.hasBlock) throw createCompileExceptionMessage("Looking for end tag, but start tag does not open block.", startItem);
             if (startTagType) {
                 var stack = [startItem];
                 for (i++; i < list.length; i++) {
@@ -1137,7 +1137,7 @@
                                     };
                                 }
                             } else {
-                                throw createThrowMessage("Found closing tag '" + tagName + "' without starting tag.", item);
+                                throw createCompileExceptionMessage("Found closing tag '" + tagName + "' without starting tag.", item);
                             }
                         } else {
                             // Something other than end*
@@ -1150,7 +1150,7 @@
                     }
                 }
             }
-            throw createThrowMessage("Found no closing tag to '" + startItem.tag + "'.", startItem);
+            throw createCompileExceptionMessage("Found no closing tag to '" + startItem.tag + "'.", startItem);
         };
 
         var getNiterParametersFromTagParameter = function(tagParameter) {
@@ -1241,8 +1241,9 @@
             return "\"" + s + "\"";
         };
 
-        var createThrowMessage = function(text, tag) {
-            return text + " - tag: {% " + tag.tag.tag + " %}";
+        var createCompileExceptionMessage = function(text, tag) {
+            var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
+            return "Error compiling tag {% " + tagText + " %}: " + text;
         };
 
         var compilePartToSource = function(args) {
@@ -1574,14 +1575,6 @@
                 stack.push("executionContext.renderResult.push(" + varName + " !== undefined ? " + varName + " : '')");
             };
 
-            this.pushThrow = function(text, tag) {
-                stack.push("throw '" + createThrowMessage(text, tag) + "'");
-            };
-
-            this.pushThrowIf = function(condition, text, tag) {
-                stack.push("if (" + condition + ") throw '" + createThrowMessage(text, tag) + "'");
-            };
-
             this.pushRenderErrorIf = function(condition, text) {
                 stack.push("if (" + condition + ") executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
             };
@@ -1713,7 +1706,9 @@
                         if (args.throwOnError) throw e;
                     }
                 } else if (executionContext.compileError) {
-                    result.html = createCompileErrorString(executionContext.compileError);
+                    var msg = createCompileErrorString(executionContext.compileError);
+                    result.html = msg;
+                    if (args.throwOnError) throw msg;
                 } else {
                     result.html = "";
                 }
