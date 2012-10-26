@@ -85,11 +85,21 @@
             this.clipboard = {};
             this.iterators = {};
             this.iteratorConfigs = {};
+            this.renderResult = [];
 
             var that = this;
 
             this.makeReadyForRender = function() {
                 this.globals = {};
+                this.renderResult = [];
+            };
+
+            this.pushRenderResult = function(r) {
+                this.renderResult = [];
+            };
+
+            this.getRenderResult = function() {
+                return this.renderResult.join("\n");
             };
 
             /**
@@ -1220,7 +1230,7 @@
             result.push("var model = rootModel");
             result.push("var context = {}");
             result.push("executionContext.currentTag = {}");
-            result.push("var r = []");
+            result.push("executionContext.renderResult = []");
             var c = compilePartToSource(args);
             if (useTryCatch) {
                 result.push("try {");
@@ -1229,12 +1239,12 @@
             result.pushCompiledSource(c);
             if (useTryCatch) {
                 result.push("} catch (e) {");
-                result.push("   r.push('Tag failed: ' + executionContext.currentTag.name)");
-                result.push("   r.push('Error: ' + e)");
+                result.push("   executionContext.renderResult.push('Tag failed: ' + executionContext.currentTag.name)");
+                result.push("   executionContext.renderResult.push('Error: ' + e)");
                 result.push("   throw 'Error: ' + e.toString() + ' at tag: ' + executionContext.currentTag.name)");
                 result.push("}");
             }
-            result.push("return r.join('')");
+            result.push("return executionContext.renderResult.join('')");
 
             return result;
 
@@ -1470,7 +1480,7 @@
             };
 
             this.pushBuffer = function(item) {
-                stack.push("r.push(" + item + ")");
+                stack.push("executionContext.renderResult.push(" + item + ")");
             };
 
             this.pushComment = function(item) {
@@ -1495,7 +1505,7 @@
             this.pushBufferEmptyStringIfUndefined = function(item) {
                 var varName = getUncompiledVariableName("v");
                 stack.push("var " + varName + " = " + item);
-                stack.push("r.push(" + varName + " !== undefined ? " + varName + " : '')");
+                stack.push("executionContext.renderResult.push(" + varName + " !== undefined ? " + varName + " : '')");
             };
 
             this.pushThrow = function(text, tag) {
