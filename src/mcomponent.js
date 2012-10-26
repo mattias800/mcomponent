@@ -1740,7 +1740,7 @@
                 return compileToSource({list : getView().tree});
             },
 
-            _assertCompile : function() {
+            _assertRender : function() {
                 return compile({tree : getView().tree}).render();
             },
 

@@ -63,7 +63,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will iterate over the stack and find location and then country.");
+    equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will iterate over the stack and find location and then country.");
 
     equal(c._assertFindParentPrefixCount("username"), 0, "No parent model prefixes.");
     equal(c._assertFindParentPrefixName("username"), "username", "No parent model prefixes, name is username.");
@@ -90,7 +90,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+    equal(c._assertRender(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
 
     ok(c = $().mcomponent({
         model : {
@@ -108,7 +108,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% name %}{% ../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+    equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
 
     ok(c = $().mcomponent({
         model : {
@@ -128,7 +128,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% push name %}{% first %}{% ../location.country %}{% endpush %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+    equal(c._assertRender(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
 
     ok(c = $().mcomponent({
         model : {
@@ -148,7 +148,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% push name %}{% first %}{% ../../location.country %}{% endpush %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+    equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
 
     ok(c = $().mcomponent({
         model : {
@@ -168,7 +168,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user.name %}{% first %}{% ../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
+    equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
 
     ok(c = $().mcomponent({
         model : {
@@ -188,7 +188,7 @@ test("Lookup with parent model", function() {
     }), "Construction is OK.");
 
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "Should fail since it goes beyond stack, using compiled code.");
 
     ok(c = $().mcomponent({
@@ -209,7 +209,7 @@ test("Lookup with parent model", function() {
     }), "Construction is OK.");
 
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "Should fail since it goes beyond stack, using compiled code.");
 
     ok(c = $().mcomponent({
@@ -230,7 +230,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% push ../location %}{% country %}{% endpush %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "Sweden", "Using ../ with push.");
+    equal(c._assertRender(), "Sweden", "Using ../ with push.");
 
 
     ok(c = $().mcomponent({
@@ -246,7 +246,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "BCAGOT", "Using ../ with iter.");
+    equal(c._assertRender(), "BCAGOT", "Using ../ with iter.");
 
 
     ok(c = $().mcomponent({
@@ -262,7 +262,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "PARARN", "Using ../ with iter.");
+    equal(c._assertRender(), "PARARN", "Using ../ with iter.");
 
 
     ok(c = $().mcomponent({
@@ -278,7 +278,7 @@ test("Lookup with parent model", function() {
         viewHtml : "{% push user %}{% push name %}{% iter ../../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
     }), "Construction is OK.");
 
-    equal(c._assertCompile(), "BCAGOT", "Using ../../ with iter.");
+    equal(c._assertRender(), "BCAGOT", "Using ../../ with iter.");
 
 
 });
@@ -407,35 +407,35 @@ test("Set view with special characters", function() {
 
     v = "<div class=\"animationContainer loadingMedium\"><img src=\"/v/207/49522/system/image/animation/loading_transparent_medium.gif\" alt=\"Laddar...\" title=\"Laddar...\" hspace=\"0\" vspace=\"0\" ></div>";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\t\t\t";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\n\n";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\r\r";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\r\n\t";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\n''\n";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = '\n"\t"\n';
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
     v = "\\ttt\\";
     ok(c = $().mcomponent({viewHtml : v}));
-    equal(c._assertCompile(), v);
+    equal(c._assertRender(), v);
 
 });
 
@@ -597,7 +597,7 @@ test("lookup from models not on top of stack", function() {
             }},
         viewHtml : "ok{% push photos %}{% length %}{% iter photos.list %}{% show %}{% enditer %}{% endpush %}"
     }), "Construction OK!");
-    equal(c._assertCompile(), "ok2test1test2", "Should contain 'ok2test1test2', all lookups should be ok.");
+    equal(c._assertRender(), "ok2test1test2", "Should contain 'ok2test1test2', all lookups should be ok.");
 
     ok(c = $().mcomponent({
         model : {
@@ -610,7 +610,7 @@ test("lookup from models not on top of stack", function() {
         },
         viewHtml : "ok{% push data %}{% push data.photos %}{% length %}{% iter photos.list %}{% show %}{% enditer %}{% endpush %}{% endpush %}"
     }), "Construction OK!");
-    equal(c._assertCompile(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
+    equal(c._assertRender(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
 
     ok(c = $().mcomponent({
         model : {
@@ -623,7 +623,7 @@ test("lookup from models not on top of stack", function() {
         },
         viewHtml : "ok{% push data %}{% push data.photos %}{% length %}{% iter data.photos.list %}{% show %}{% enditer %}{% endpush %}{% endpush %}"
     }), "Construction OK!");
-    equal(c._assertCompile(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
+    equal(c._assertRender(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
 
 });
 
@@ -632,13 +632,13 @@ test("if tag", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "heyhey"}), "Construction OK!");
-    equal(c._assertCompile(), "heyhey", "Should contain 'heyhey', have no tags.");
+    equal(c._assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (true) %}baibai{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].html, "baibai", "Second level should be HTML 'baibai'.");
-    equal(c._assertCompile(), "baibai", "Should contain 'baibai', since if case is true.");
+    equal(c._assertRender(), "baibai", "Should contain 'baibai', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% if (true) %}2{% endif %}{% endif %}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
@@ -646,7 +646,7 @@ test("if tag", function() {
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 1.");
-    equal(c._assertCompile(), "12", "Should contain '12', since both if cases are true.");
+    equal(c._assertRender(), "12", "Should contain '12', since both if cases are true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% if (false) %}2{% endif %}{% endif %}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
@@ -654,7 +654,7 @@ test("if tag", function() {
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 2.");
-    equal(c._assertCompile(), "1", "Should contain '1', since only first if case is true.");
+    equal(c._assertRender(), "1", "Should contain '1', since only first if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}1{% if (true) %}2{% endif %}{% endif %}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
@@ -662,7 +662,7 @@ test("if tag", function() {
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 3.");
-    equal(c._assertCompile(), "", "Should contain '', since only second if case is true.");
+    equal(c._assertRender(), "", "Should contain '', since only second if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "1{% if (true) %}2{% if (true) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -671,7 +671,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 4.");
-    equal(c._assertCompile(), "12345", "Should contain '12345'.");
+    equal(c._assertRender(), "12345", "Should contain '12345'.");
 
     ok(c = $().mcomponent({viewHtml : "1{% if (true) %}2{% if (false) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -680,7 +680,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag.");
-    equal(c._assertCompile(), "1245", "Should contain '1245'.");
+    equal(c._assertRender(), "1245", "Should contain '1245'.");
 
     ok(c = $().mcomponent({viewHtml : "1{% if (false) %}2{% if (true) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -689,7 +689,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 5.");
-    equal(c._assertCompile(), "15", "Should contain '15'.");
+    equal(c._assertRender(), "15", "Should contain '15'.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (this.model.name == 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -698,7 +698,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 6.");
-    equal(c._assertCompile(), "12345", "Should contain '12345', then if with this.model works.");
+    equal(c._assertRender(), "12345", "Should contain '12345', then if with this.model works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (this.model.name != 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -707,7 +707,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
-    equal(c._assertCompile(), "1245", "Should contain '1245', then if with this.model works.");
+    equal(c._assertRender(), "1245", "Should contain '1245', then if with this.model works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (model.name == 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -716,7 +716,7 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 8.");
-    equal(c._assertCompile(), "12345", "Should contain '12345', then if with model (without this.model) works.");
+    equal(c._assertRender(), "12345", "Should contain '12345', then if with model (without this.model) works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (model.name != 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
@@ -725,13 +725,13 @@ test("if tag", function() {
     equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
     equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 9.");
-    equal(c._assertCompile(), "1245", "Should contain '1245', then if with model (without this.model) works.");
+    equal(c._assertRender(), "1245", "Should contain '1245', then if with model (without this.model) works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (this.model.name == 'mattias') %}2{% endif %}3"}), "Construction OK!");
-    equal(c._assertCompile(), "123", "If with 'this.model.name'.");
+    equal(c._assertRender(), "123", "If with 'this.model.name'.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (model.name == 'mattias') %}2{% endif %}3"}), "Construction OK!");
-    equal(c._assertCompile(), "123", "Same again, but with 'model.name' instead of 'this.model.name'.");
+    equal(c._assertRender(), "123", "Same again, but with 'model.name' instead of 'this.model.name'.");
 
 });
 
@@ -740,42 +740,42 @@ test("else, elseif tags", function() {
 
     ok(c = $().mcomponent({viewHtml : "{% if (true) %}ok{% else %}fail{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}ok{% else %}fail2{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail{% else %}ok{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}{% if (true) %}ok{% else %}innerfail{% endif %}{% else %}fail2{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}{% if (false) %}ok{% else %}innerfail{% endif %}{% else %}fail2{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "innerfail", "Should contain 'innerfail', since if case is true.");
+    equal(c._assertRender(), "innerfail", "Should contain 'innerfail', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (false) %}fail3{% elseif (false) %}fail4{% elseif (false) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (false) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (true) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     // Malformed
     //{% if (this.model.users %}
 
     ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (true) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._assertCompile(), "ok", "Should contain 'ok', since if case is true.");
+    equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
 
 });
@@ -802,14 +802,14 @@ test("API", function() {
     var c;
 
     ok(c = $().mcomponent({model : model, viewHtml : view}), "Construction OK!");
-    equal(c._assertCompile(), "funkar", "api.lookup() should result in 'funkar'.");
+    equal(c._assertRender(), "funkar", "api.lookup() should result in 'funkar'.");
 
     view = "{% push user %}" +
         "{% showjs api.lookup('displaySettings.list.showName') %}" +
         "{% endpush %}";
 
     ok(c = $().mcomponent({model : model, viewHtml : view}), "Construction OK!");
-    equal(c._assertCompile(), "yes", "api.lookup() should find 'yes'.");
+    equal(c._assertRender(), "yes", "api.lookup() should find 'yes'.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"]},
@@ -817,7 +817,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "1", "Should contain 1 one times.");
+    equal(c._assertRender(), "1", "Should contain 1 one times.");
 
 
     ok(c = $().mcomponent({
@@ -826,7 +826,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 2 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "22", "Should contain 2 two times.");
+    equal(c._assertRender(), "22", "Should contain 2 two times.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"]},
@@ -834,7 +834,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 3 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "333", "Should contain 3 three times.");
+    equal(c._assertRender(), "333", "Should contain 3 three times.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"]},
@@ -842,7 +842,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 3 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "333", "Should contain 333.");
+    equal(c._assertRender(), "333", "Should contain 333.");
 
     var i;
 
@@ -852,10 +852,10 @@ test("API", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "1", "Should contain 1 at first.");
+    equal(c._assertRender(), "1", "Should contain 1 at first.");
     ok(i = c.getIterator('userListIter'), "Getting iterator should work, after compiling and running the view at least once.");
     if (i) i.showAllItems();
-    equal(c._assertCompile(), "333", "Should contain 333.");
+    equal(c._assertRender(), "333", "Should contain 333.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"]},
@@ -863,10 +863,10 @@ test("API", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1{% showingAllItems %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "1false", "Should contain false at first.");
+    equal(c._assertRender(), "1false", "Should contain false at first.");
     ok(i = c.getIterator('userListIter'), "Getting iterator should work, after compiling and running the view at least once.");
     if (i) i.showAllItems();
-    equal(c._assertCompile(), "1true1true1true", "Should contain truetruetrue.");
+    equal(c._assertRender(), "1true1true1true", "Should contain truetruetrue.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"]},
@@ -874,7 +874,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1_{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "1_3", "itemsTotal = 3");
+    equal(c._assertRender(), "1_3", "itemsTotal = 3");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan", "prutt"]},
@@ -882,7 +882,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1_{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "1_4", "itemsTotal = 4");
+    equal(c._assertRender(), "1_4", "itemsTotal = 4");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan", "prutt"]},
@@ -890,7 +890,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 10 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "4444", "itemsTotal = 4 when itemsPerPage is higher than model.length");
+    equal(c._assertRender(), "4444", "itemsTotal = 4 when itemsPerPage is higher than model.length");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan", "prutt"]},
@@ -898,19 +898,19 @@ test("API", function() {
             userListIter : { itemsPerPage : 10 }
         },
         viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
-    equal(c._assertCompile(), "4444", "itemsShowing = 4 when itemsPerPage is higher than model.length");
+    equal(c._assertRender(), "4444", "itemsShowing = 4 when itemsPerPage is higher than model.length");
 
     ok(c = $().mcomponent({
         model : "mattias",
         viewHtml : "{% showjs api.getRootModel() %}"
     }), "Construction OK lets go!!");
-    equal(c._assertCompile(), "mattias", "api.getRootModel() should return root model.");
+    equal(c._assertRender(), "mattias", "api.getRootModel() should return root model.");
 
     ok(c = $().mcomponent({
         model : { name : "mattias"},
         viewHtml : "{% showjs api.getRootModel().name %}"
     }), "Construction OK lets go!!");
-    equal(c._assertCompile(), "mattias", "api.getRootModel() should return root model.");
+    equal(c._assertRender(), "mattias", "api.getRootModel() should return root model.");
 
 });
 
@@ -941,7 +941,7 @@ test("large view test", function() {
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
-    ok(result = c._assertCompile(), "Rendering of large view should be OK!");
+    ok(result = c._assertRender(), "Rendering of large view should be OK!");
     equal(result, "yayName:MattiasMale:YesAge:31Name:MustMale:YesAge:28Name:JennyMale:NoAge:27", "And the result should be correct.");
 
     m = {
@@ -980,7 +980,7 @@ test("large view test", function() {
         "{% endif %}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter over user only!");
-    ok(result = c._assertCompile(), "niter over user only");
+    ok(result = c._assertRender(), "niter over user only");
 
     view = "  {% if (this.model) %} yay we have a model!\n" +
         "\n" +
@@ -1005,7 +1005,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction location and city only!");
-    ok(result = c._assertCompile(), "location and city only");
+    ok(result = c._assertRender(), "location and city only");
 
     view = "  {% if (this.model) %} yay we have a model!\n" +
         "\n" +
@@ -1029,7 +1029,7 @@ test("large view test", function() {
         "{% endif %}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction location and country only!");
-    ok(result = c._assertCompile(), "location and country only!");
+    ok(result = c._assertRender(), "location and country only!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
 
@@ -1045,7 +1045,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push!");
-    ok(result = c._assertCompile(), "niter with location and both city and country without output and if cases and push!");
+    ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
 
@@ -1063,7 +1063,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push country!");
-    ok(result = c._assertCompile(), "niter with location and both city and country without output and if cases and push country!");
+    ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push country!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
 
@@ -1081,7 +1081,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push city!");
-    ok(result = c._assertCompile(), "niter with location and both city and country without output and if cases and push city!");
+    ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push city!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
 
@@ -1102,7 +1102,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases!");
-    ok(result = c._assertCompile(), "niter with location and both city and country without output and if cases!");
+    ok(result = c._assertRender(), "niter with location and both city and country without output and if cases!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
 
@@ -1131,7 +1131,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output!");
-    ok(result = c._assertCompile(), "niter with location and both city and country without output!");
+    ok(result = c._assertRender(), "niter with location and both city and country without output!");
 
     view = "{% if (this.model) %} yay we have a model!\n" +
         "    \n" +
@@ -1165,7 +1165,7 @@ test("large view test", function() {
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country!");
-    ok(result = c._assertCompile(), "niter with location and both city and country!");
+    ok(result = c._assertRender(), "niter with location and both city and country!");
 
     view = "  {% if (this.model) %} yay we have a model!\n" +
         "{% if (this.model.users) %}\n" +
@@ -1204,7 +1204,7 @@ test("large view test", function() {
         "{% endif %}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction full view!");
-    ok(result = c._assertCompile(), "full view!");
+    ok(result = c._assertRender(), "full view!");
 
 });
 
@@ -1213,10 +1213,10 @@ test("showing other things than model properties", function() {
     var c;
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show api.lookup('name'); %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should contain 'mattias' after API lookup.");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias' after API lookup.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show Math.floor(1.5); %}"}), "Construction OK!");
-    equal(c._assertCompile(), "1", "Should contain '1' after Math.floor.");
+    equal(c._assertRender(), "1", "Should contain '1' after Math.floor.");
 
 });
 
@@ -1225,31 +1225,31 @@ test("show tag", function() {
     var c;
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show name %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should contain 'mattias'.");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
 
     ok(c = $().mcomponent({model : {user : {name : "marcus"}}, viewHtml : "{% show user.name %}"}), "Construction OK!");
-    equal(c._assertCompile(), "marcus", "Should contain 'marcus'.");
+    equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
     ok(c = $().mcomponent({model : "marcus", viewHtml : "{% show %}"}), "Construction OK!");
-    equal(c._assertCompile(), "marcus", "Should contain 'marcus'.");
+    equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
     ]}, viewHtml : "{% model.list[0].url %}"}), "Construction OK!");
-    equal(c._assertCompile(), "www.google.com", "Should contain 'www.google.com' using lookup with runFunction().");
+    equal(c._assertRender(), "www.google.com", "Should contain 'www.google.com' using lookup with runFunction().");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
     ]}, viewHtml : "{% model.list[1].url %}"}), "Construction OK!");
-    equal(c._assertCompile(), "www.facebook.com", "Should contain 'www.facebook.com' using lookup with runFunction().");
+    equal(c._assertRender(), "www.facebook.com", "Should contain 'www.facebook.com' using lookup with runFunction().");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
     ]}, viewHtml : "{% showjs model.list[0].url %}"}), "Construction OK!");
-    equal(c._assertCompile(), "www.google.com", "Should contain 'www.google.com' using showjs.");
+    equal(c._assertRender(), "www.google.com", "Should contain 'www.google.com' using showjs.");
 
 });
 
@@ -1258,13 +1258,13 @@ test("push tag", function() {
     var c;
 
     ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{% push user %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{% push user %}{% show name %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "marcus", "Should contain 'marcus'.");
+    equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
     ok(c = $().mcomponent({model : {user : {name : "marcus"}, testball : "yeah"}, viewHtml : "{% push user %}{% show testball %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "yeah", "Should contain 'yeah' instead.");
+    equal(c._assertRender(), "yeah", "Should contain 'yeah' instead.");
 
     ok(c = $().mcomponent({model : {
         db : {
@@ -1274,7 +1274,7 @@ test("push tag", function() {
             testyeah : "yeah"
         }
     }, viewHtml : "{% push db.user %}{% show testyeah %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Pushing two level property. Should contain nothing since model stack lookup should fail.");
+    equal(c._assertRender(), "", "Pushing two level property. Should contain nothing since model stack lookup should fail.");
 
     ok(c = $().mcomponent({model : {
         db : {
@@ -1284,10 +1284,10 @@ test("push tag", function() {
         },
         test : "yeah"
     }, viewHtml : "{% push db.user %}{% show test %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "yeah", "Pushing two level property. Should contain 'yeah'.");
+    equal(c._assertRender(), "yeah", "Pushing two level property. Should contain 'yeah'.");
 
     ok(c = $().mcomponent({model : {db : {user : {name : "marcus"}, test : "yeah"}}, viewHtml : "{% push db.user %}{% show name %}{% endpush %}"}), "Construction OK!");
-    equal(c._assertCompile(), "marcus", "Pushing two level property. Should contain 'marcus'.");
+    equal(c._assertRender(), "marcus", "Pushing two level property. Should contain 'marcus'.");
 
 
 });
@@ -1299,79 +1299,79 @@ test("iter tag", function() {
     ok(c = $().mcomponent({model : {
         list : ["mattias", "marcus", "johan"]
     }, viewHtml : "{% iter list %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias"]
         }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should contain 'mattias'.");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain 'mattiasmarcusjohan'.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain 'mattiasmarcusjohan'.");
 
     ok(c = $().mcomponent({
         model : {
             list : []
         }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% context index %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "012", "Iterator context should give us '012' in the result.");
+    equal(c._assertRender(), "012", "Iterator context should give us '012' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% show context.index %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "012", "Iterator context should give us '012' in the result when using show and context.");
+    equal(c._assertRender(), "012", "Iterator context should give us '012' in the result when using show and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% if (context.index == 1) %}{% show context.index %}{% endif %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "1", "If-case with context in condition. Iterator context should give us '1' in the result when using show and context.");
+    equal(c._assertRender(), "1", "If-case with context in condition. Iterator context should give us '1' in the result when using show and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% context.index %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "012", "Iterator context should give us '012' in the result when using no tag, and context.");
+    equal(c._assertRender(), "012", "Iterator context should give us '012' in the result when using no tag, and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% context size %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "333", "Iterator context should give us '333' in the result.");
+    equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% show context.size %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "333", "Iterator context should give us '333' in the result.");
+    equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% context.size %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "333", "Iterator context should give us '333' in the result.");
+    equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% iter list %}{% context parity %}{% enditer %}"}), "Construction OK!");
-    equal(c._assertCompile(), "evenoddeven", "Iterator context parity should give us 'evenoddeven' in the result.");
+    equal(c._assertRender(), "evenoddeven", "Iterator context parity should give us 'evenoddeven' in the result.");
 
     ok(c = $().mcomponent({
         model : {
@@ -1381,7 +1381,7 @@ test("iter tag", function() {
         throwOnRenderError : true
     }), "Construction OK!");
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "This should not work, 'lista' property does not exist.");
 
     ok(c = $().mcomponent({
@@ -1391,7 +1391,7 @@ test("iter tag", function() {
         throwOnRenderError : true
     }), "Construction OK!");
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "This should not work, 'test' is not a list.");
 
     ok(c = $().mcomponent({
@@ -1401,7 +1401,7 @@ test("iter tag", function() {
         throwOnRenderError : true
     }), "Construction OK!");
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "This should not work, 'test' is not a list.");
 
     ok(c = $().mcomponent({
@@ -1411,7 +1411,7 @@ test("iter tag", function() {
         throwOnRenderError : true
     }), "Construction OK!");
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "This should not work, 'test' is not a list.");
 
 });
@@ -1431,7 +1431,7 @@ test("niter tag, using show more", function() {
         throwOnRenderError : true
     }), "Construction OK!");
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "Should throw error since we haven't declared an iterator configuration.");
 
     ok(c = $().mcomponent({
@@ -1442,7 +1442,7 @@ test("niter tag, using show more", function() {
             userListIter : { itemsPerPage : 1 }
         },
         viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {list : ["mattias", "marcus", "johan"]},
@@ -1459,17 +1459,17 @@ test("niter tag, using show more", function() {
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
     equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcus", "Should contain one more element.");
+    equal(c._assertRender(), "mattiasmarcus", "Should contain one more element.");
     equal(a, 3, "a should be 3 first.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain all three elements.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain all three elements.");
     equal(a, 5, "a should now be 5 since callback changed the value.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain all three elements again.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain all three elements again.");
 
     a = 3;
 
@@ -1484,12 +1484,12 @@ test("niter tag, using show more", function() {
             }
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     equal(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
     equal(a, 3, "a should be 3 first.");
     i.showAllItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should show all elements.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should show all elements.");
     equal(a, 5, "a should now be 5 since callback changed the value.");
 
     // TODO: Add variable that flips back and fourth between showing not all/all.
@@ -1511,19 +1511,19 @@ test("niter tag, using pages", function() {
             }
         },
         viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattiasmarcus", "Should show first two element.");
+    equal(c._assertRender(), "mattiasmarcus", "Should show first two element.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 3);
     i.showPrevPage();
-    equal(c._assertCompile(), "mattiasmarcus", "Should show first two again since it is first page.");
+    equal(c._assertRender(), "mattiasmarcus", "Should show first two again since it is first page.");
     i.showNextPage();
-    equal(c._assertCompile(), "johanbutters", "Should show second two elements.");
+    equal(c._assertRender(), "johanbutters", "Should show second two elements.");
     i.showNextPage();
-    equal(c._assertCompile(), "stan", "Should show second two elements.");
+    equal(c._assertRender(), "stan", "Should show second two elements.");
     i.showNextPage();
-    equal(c._assertCompile(), "stan", "Next page should be same, since it is last page.");
+    equal(c._assertRender(), "stan", "Next page should be same, since it is last page.");
     i.showPrevPage();
-    equal(c._assertCompile(), "johanbutters", "And now we go back to previous page.");
+    equal(c._assertRender(), "johanbutters", "And now we go back to previous page.");
 
     ok(c = $().mcomponent({
         model : {
@@ -1536,17 +1536,17 @@ test("niter tag, using pages", function() {
             }
         },
         viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should first element only.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 2);
     i.showPrevPage();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should show first two again since it is first page.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should show first two again since it is first page.");
     i.showNextPage();
-    equal(c._assertCompile(), "buttersstan", "Should show page 2.");
+    equal(c._assertRender(), "buttersstan", "Should show page 2.");
     i.showNextPage();
-    equal(c._assertCompile(), "buttersstan", "Same again.");
+    equal(c._assertRender(), "buttersstan", "Same again.");
     i.showPrevPage();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "And now we go back to previous page.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "And now we go back to previous page.");
 
     ok(c = $().mcomponent({
         model : {
@@ -1559,23 +1559,23 @@ test("niter tag, using pages", function() {
             }
         },
         viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 5);
     i.showPrevPage();
-    equal(c._assertCompile(), "mattias");
+    equal(c._assertRender(), "mattias");
     i.showNextPage();
-    equal(c._assertCompile(), "marcus");
+    equal(c._assertRender(), "marcus");
     i.showNextPage();
-    equal(c._assertCompile(), "johan");
+    equal(c._assertRender(), "johan");
     i.showNextPage();
-    equal(c._assertCompile(), "butters");
+    equal(c._assertRender(), "butters");
     i.showNextPage();
-    equal(c._assertCompile(), "stan");
+    equal(c._assertRender(), "stan");
     i.showNextPage();
-    equal(c._assertCompile(), "stan", "Next page should be same, since it is last page.");
+    equal(c._assertRender(), "stan", "Next page should be same, since it is last page.");
     i.showPrevPage();
-    equal(c._assertCompile(), "butters", "And now we go back to previous page.");
+    equal(c._assertRender(), "butters", "And now we go back to previous page.");
 
     ok(c = $().mcomponent({
         model : {
@@ -1588,21 +1588,21 @@ test("niter tag, using pages", function() {
             }
         },
         viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 1);
     i.showPrevPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan");
     i.showNextPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan");
     i.showNextPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan");
     i.showNextPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan");
     i.showNextPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan");
     i.showPrevPage();
-    equal(c._assertCompile(), "mattiasmarcusjohanbuttersstan", "And now we go back to previous page.");
+    equal(c._assertRender(), "mattiasmarcusjohanbuttersstan", "And now we go back to previous page.");
 
     ok(c = $().mcomponent({
         model : {
@@ -1615,23 +1615,23 @@ test("niter tag, using pages", function() {
             }
         },
         viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should first element only.");
+    equal(c._assertRender(), "", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 0);
     i.showPrevPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showNextPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showNextPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showNextPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showNextPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showNextPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
     i.showPrevPage();
-    equal(c._assertCompile(), "");
+    equal(c._assertRender(), "");
 
 });
 
@@ -1640,16 +1640,16 @@ test("js and showjs tags", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "{% showjs 'mattias'; %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "'showjs' tag should work.");
+    equal(c._assertRender(), "mattias", "'showjs' tag should work.");
 
     ok(c = $().mcomponent({viewHtml : "{% showjs Math.sqrt(9); %}"}), "Construction OK!");
-    equal(c._assertCompile(), "3", "Should not throw error.");
+    equal(c._assertRender(), "3", "Should not throw error.");
 
     ok(c = $().mcomponent({model : {name : "mattias yo"}, viewHtml : "{% showjs model.name; %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias yo", "Should be able to use model.");
+    equal(c._assertRender(), "mattias yo", "Should be able to use model.");
 
     ok(c = $().mcomponent({viewHtml : "{% js Math.sqrt(5); %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Should not throw error.");
+    equal(c._assertRender(), "", "Should not throw error.");
 
 });
 
@@ -1658,23 +1658,23 @@ test("globals", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 'mattias yeah' %}"}), "Construction OK!");
-    equal(c._assertCompile(), "", "Setting globals should work.");
+    equal(c._assertRender(), "", "Setting globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
     ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 'mattias yeah' %}{% globals.testing %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias yeah", "Setting and showing globals should work.");
+    equal(c._assertRender(), "mattias yeah", "Setting and showing globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
     ok(c = $().mcomponent({viewHtml : "{% js globals.testing = true %}{% if (globals.testing) %}ohyeah{% endif %}"}), "Construction OK!");
-    equal(c._assertCompile(), "ohyeah", "Setting and using globals in if condition should work.");
+    equal(c._assertRender(), "ohyeah", "Setting and using globals in if condition should work.");
     equal(c.getGlobals().testing, true, "Setting globals should work.");
 
     ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 666 %}{% if (globals.testing) %}ohyeah{% endif %}"}), "Construction OK!");
-    equal(c._assertCompile(), "ohyeah", "Setting and using globals in if condition should work.");
+    equal(c._assertRender(), "ohyeah", "Setting and using globals in if condition should work.");
     equal(c.getGlobals().testing, 666, "Setting globals should work.");
 
     ok(c = $().mcomponent({viewHtml : "{% setglobal testing 'mattias yeah' %}{% globals.testing %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias yeah", "setglobal tag and showing globals should work.");
+    equal(c._assertRender(), "mattias yeah", "setglobal tag and showing globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
 
@@ -1732,7 +1732,7 @@ test("Clipboard", function() {
         viewHtml : "{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "80", "Predefined clipboard, should paste and result in '80'.");
+    equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         clipboard : {
@@ -1743,21 +1743,21 @@ test("Clipboard", function() {
         viewHtml : "{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
+    equal(c._assertRender(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         model : {age : 85},
         viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "85", "Copying from inside view, copying should not remove the original.");
+    equal(c._assertRender(), "85", "Copying from inside view, copying should not remove the original.");
 
     ok(c = $().mcomponent({
         model : {age : 81},
         viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "8181", "Copying from inside view, should paste and result in '8080'.");
+    equal(c._assertRender(), "8181", "Copying from inside view, should paste and result in '8080'.");
 
 
     ok(c = $().mcomponent({
@@ -1766,7 +1766,7 @@ test("Clipboard", function() {
         viewHtml : "<div>{% paste clip1 %}</div>"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "<div><div>hej</div></div>", "Predefined clipboard");
+    equal(c._assertRender(), "<div><div>hej</div></div>", "Predefined clipboard");
 
 });
 
@@ -1800,7 +1800,7 @@ test("Construction", function() {
         viewHtml : ""
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "", "Empty component code.");
+    equal(c._assertRender(), "", "Empty component code.");
 
 });
 
@@ -1813,28 +1813,28 @@ test("HTML and show tag", function() {
         viewHtml : "hohoho"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "hohoho", "HTML only");
+    equal(c._assertRender(), "hohoho", "HTML only");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "hoho{% name %}haha"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "hohomusthaha", "HTML mixed with tags.");
+    equal(c._assertRender(), "hohomusthaha", "HTML mixed with tags.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "{% name %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "must", "Simple variable output.");
+    equal(c._assertRender(), "must", "Simple variable output.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "{% show name %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "must", "show name is must");
+    equal(c._assertRender(), "must", "show name is must");
 
 });
 
@@ -1847,14 +1847,14 @@ test("push tag", function() {
         viewHtml : "{% push hair %}{% color %}{% endpush %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "black", "Push tag is black.");
+    equal(c._assertRender(), "black", "Push tag is black.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "{% push name %}{% show %}{% endpush %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "must", "show name is must even with push and no specified name.");
+    equal(c._assertRender(), "must", "show name is must even with push and no specified name.");
 
 });
 
@@ -1867,28 +1867,28 @@ test("If tag", function() {
         viewHtml : "oh{% if model.name == 'must' %}yes{% endif %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "ohyes", "if tag, no else, condition true");
+    equal(c._assertRender(), "ohyes", "if tag, no else, condition true");
 
     ok(c = $().mcomponent({
         model : {name : "mattias"},
         viewHtml : "oh{% if model.name == 'must' %}yes{% endif %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "oh", "if tag, no else, condition false");
+    equal(c._assertRender(), "oh", "if tag, no else, condition false");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "oh{% if model.name == 'must' %}yes{% else %}no{% endif %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "ohyes", "if tag");
+    equal(c._assertRender(), "ohyes", "if tag");
 
     ok(c = $().mcomponent({
         model : {name : "mattias"},
         viewHtml : "oh{% if model.name == 'must' %}yes{% else %}no{% endif %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "ohno", "if tag");
+    equal(c._assertRender(), "ohno", "if tag");
 
 });
 
@@ -1901,7 +1901,7 @@ test("log and throw tag", function() {
         viewHtml : "{% log 'hej' %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "", "Outputs only to console.");
+    equal(c._assertRender(), "", "Outputs only to console.");
 
 });
 
@@ -1913,7 +1913,7 @@ test("setglobal tag", function() {
         viewHtml : "{% setglobal aGlobal 'hej' %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "", "Setting global only");
+    equal(c._assertRender(), "", "Setting global only");
 
 });
 
@@ -1926,14 +1926,14 @@ test("js and showjs tag", function() {
         viewHtml : "{% js 'hej' %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "", "Setting global only");
+    equal(c._assertRender(), "", "Setting global only");
 
 
     ok(c = $().mcomponent({
         viewHtml : "{% showjs 'hej' %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "hej", "Setting global only");
+    equal(c._assertRender(), "hej", "Setting global only");
 
 
     /******
@@ -1947,7 +1947,7 @@ test("js and showjs tag", function() {
     }), "Construction OK! But next should fail.");
 
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "Context is empty, should return empty result.");
 
     ok(c = $().mcomponent({
@@ -1956,7 +1956,7 @@ test("js and showjs tag", function() {
         viewHtml : "{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "80", "Predefined clipboard, should paste and result in '80'.");
+    equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
 
 
 });
@@ -1972,7 +1972,7 @@ test("Compiled clipboard", function() {
         viewHtml : "{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "80", "Predefined clipboard, should paste and result in '80'.");
+    equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         clipboard : {
@@ -1983,21 +1983,21 @@ test("Compiled clipboard", function() {
         viewHtml : "{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
+    equal(c._assertRender(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         model : {age : 85},
         viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "85", "Copying from inside view, copying should not remove the original.");
+    equal(c._assertRender(), "85", "Copying from inside view, copying should not remove the original.");
 
     ok(c = $().mcomponent({
         model : {age : 81},
         viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}{% paste clip1 %}"
     }), "Construction OK!");
 
-    equal(c._assertCompile(), "8181", "Copying from inside view, should paste and result in '8080'.");
+    equal(c._assertRender(), "8181", "Copying from inside view, should paste and result in '8080'.");
 
 });
 
@@ -2011,14 +2011,14 @@ test("iter tag", function() {
         viewHtml : "{% iter list %}{% enditer %}"})
         , "Construction OK!");
 
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"] },
         viewHtml : "{% iter list %}{% show %}{% enditer %}"})
         , "Construction OK!");
 
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain mattiasmarcusjohan.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain mattiasmarcusjohan.");
 
 
     ok(c = $().mcomponent({
@@ -2030,7 +2030,7 @@ test("iter tag", function() {
         viewHtml : "{% iter list %}{% show name %}{% iter nums %}{% show %}{% enditer %}{% enditer %}"})
         , "Construction OK!");
 
-    equal(c._assertCompile(), "mattias123marcus456johan987", "Should contain mattiasmarcusjohan.");
+    equal(c._assertRender(), "mattias123marcus456johan987", "Should contain mattiasmarcusjohan.");
 
     /***
      * Larger view
@@ -2053,7 +2053,7 @@ test("iter tag", function() {
         },
         iter : {users : {}}}), "Construction OK!");
 
-    ok(result = c._assertCompile(), "Rendering of large view should be OK!");
+    ok(result = c._assertRender(), "Rendering of large view should be OK!");
     equal(result, "yay1yay2", "And the result should be correct.");
 
     ok(c = $().mcomponent({viewHtml : "{% if (this.model) %}yay1" +
@@ -2078,7 +2078,7 @@ test("iter tag", function() {
         },
         iter : {users : {}}}), "Construction OK!");
 
-    ok(result = c._assertCompile(), "Rendering of large view should be OK!");
+    ok(result = c._assertRender(), "Rendering of large view should be OK!");
     equal(result, "yay1yay2Name:MattiasMale:YesAge:31Name:MustMale:YesAge:28Name:JennyMale:NoAge:27", "And the result should be correct.");
 
 });
@@ -2096,7 +2096,7 @@ test("niter tag", function() {
     }), "Construction OK!");
 
     raises(function() {
-        c._assertCompile();
+        c._assertRender();
     }, "Should throw error since we haven't declared an iterator configuration.");
 
     ok(c = $().mcomponent({
@@ -2106,7 +2106,7 @@ test("niter tag", function() {
         },
         viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK lets go!!");
 
-    equal(c._assertCompile(), "", "Should contain nothing.");
+    equal(c._assertRender(), "", "Should contain nothing.");
 
     var a, b, i;
 
@@ -2118,7 +2118,7 @@ test("niter tag", function() {
             }
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should first element only since itemsPerPage is 1.");
+    equal(c._assertRender(), "mattias", "Should first element only since itemsPerPage is 1.");
 
     ok(c = $().mcomponent({
         model : {list : ["mattias", "marcus", "johan"]},
@@ -2131,14 +2131,14 @@ test("niter tag", function() {
             }
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
 
     a = 3;
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     equal(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
     equal(a, 3, "a should be 3 first.");
     i.showAllItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should show all elements.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should show all elements.");
     equal(a, 5, "a should now be 5 since callback changed the value.");
 
     a = 3;
@@ -2158,17 +2158,17 @@ test("niter tag", function() {
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
     equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcus", "Should contain one more element.");
+    equal(c._assertRender(), "mattiasmarcus", "Should contain one more element.");
     equal(a, 3, "a should be 3 first.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain all three elements.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain all three elements.");
     equal(a, 5, "a should now be 5 since callback changed the value.");
     i.showMoreItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should contain all three elements again.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should contain all three elements again.");
 
     a = 3;
 
@@ -2183,12 +2183,12 @@ test("niter tag", function() {
             }
         },
         viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
-    equal(c._assertCompile(), "mattias", "Should first element only.");
+    equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     equal(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
     equal(a, 3, "a should be 3 first.");
     i.showAllItems();
-    equal(c._assertCompile(), "mattiasmarcusjohan", "Should show all elements.");
+    equal(c._assertRender(), "mattiasmarcusjohan", "Should show all elements.");
     equal(a, 5, "a should now be 5 since callback changed the value.");
 
 });
@@ -2199,9 +2199,9 @@ test("set view, render, change view, render again", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "heyhey"}), "Construction OK!");
-    equal(c._assertCompile(), "heyhey", "Should contain 'heyhey', have no tags.");
+    equal(c._assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
     c.setViewWithHtml("ojoj");
-    equal(c._assertCompile(), "ojoj", "Should contain 'ojoj' after changing view.");
+    equal(c._assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
 
 });
 
