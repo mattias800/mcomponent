@@ -615,7 +615,7 @@
                 },
 
                 createTagInstance : function(args) {
-                    if (!args.tag.parameters) throw "If tag does not include a condition. Ex: {% if this.model.isNice %}";
+                    if (!args.tag.parameters) throw "If tag does not include a condition. Ex: {% if model.isNice %}";
                     var condition = args.tag.parameters;
                     var conditionFunction = createExpressionFunction(args.tag.parameters);
                     var c = createIfTag(args.subList, condition);
@@ -889,7 +889,15 @@
         var _setViewWithHtml = function(html) {
             view.html = html;
             if (html) {
-                compileView();
+                try {
+                    compileView();
+                    executionContext.compileError = undefined;
+                } catch (e) {
+                    executionContext.compileError = e;
+                    if (mainArgs.throwOnError) {
+                        throw e;
+                    }
+                }
             } else {
                 view.list = [];
                 view.tree = {};
@@ -1334,7 +1342,7 @@
                         }
                     }
                     if (executionContext.compileError) {
-                        var msg = "Error compiling view, view is not formatted correctly, please check your tags: " + executionContext.compileError.toString() + this.getSource().toString();
+                        var msg = createCompileErrorString(executionContext.compileError);
                         executionContext.renderResult = [msg];
                         if (mainArgs.throwOnError) {
                             throw msg;
@@ -1358,6 +1366,10 @@
                     };
                 }
             };
+        };
+
+        var createCompileErrorString = function(e) {
+            return "Error compiling view, view is not formatted correctly, please check your tags: " + e.toString();
         };
 
         var compileLookup = function(name) {
@@ -1700,6 +1712,8 @@
                         result.html = e.toString();
                         if (args.throwOnError) throw e;
                     }
+                } else if (executionContext.compileError) {
+                    result.html = createCompileErrorString(executionContext.compileError);
                 } else {
                     result.html = "";
                 }

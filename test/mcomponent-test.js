@@ -468,7 +468,10 @@ test("Find block end", function() {
 
 
     raises(function() {
-        c = $().mcomponent({viewHtml : "{% if name %}"});
+        c = $().mcomponent({
+            viewHtml : "{% if name %}",
+            throwOnError : true
+        });
     }, "Throws error since template is malformed.");
 
     ok(c._assertListSize(1), "List size is 1.");
