@@ -21,7 +21,8 @@
             placeHolderId : undefined,
             containerType : "div",
             clearPlaceHolderBeforeRender : true,
-            logTags : false
+            logTags : false,
+            throwOnRenderError : true
         }, args);
 
         var init = function() {
@@ -86,20 +87,41 @@
             this.iterators = {};
             this.iteratorConfigs = {};
             this.renderResult = [];
+            this.renderErrors = [];
+            this.currentTag = {};
 
             var that = this;
 
             this.makeReadyForRender = function() {
                 this.globals = {};
                 this.renderResult = [];
+                this.renderErrors = [];
+                this.currentTag = {};
             };
 
-            this.pushRenderResult = function(r) {
-                this.renderResult = [];
+            this.pushCurrentRenderError = function(message) {
+                this.addRenderError(message, this.currentTag.name);
             };
 
-            this.getRenderResult = function() {
-                return this.renderResult.join("\n");
+            this.addRenderError = function(message, tagName) {
+                var error = {
+                    message : message,
+                    tag : tagName
+                };
+                this.renderErrors.push(error);
+                this.renderResult.push(this.renderErrorToString(error));
+
+                if (args.throwOnRenderError) {
+                    throw this.renderErrorToString(message, this.currentTag.name);
+                }
+            };
+
+            this.hasRenderError = function() {
+                return this.renderErrors.length ? true : false;
+            };
+
+            this.renderErrorToString = function(error) {
+                return "<div>Error at tag {% " + error.tag + " %}: " + error.message + "</div>"
             };
 
             /**
@@ -732,8 +754,8 @@
                     var compiledLookup = compileLookup(name);
                     listVar = compiledLookup.varName;
                     resultOuter.pushCompiledSource(compiledLookup.compiledSource);
-                    resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
-                    resultOuter.pushThrowIf("!(" + listVar + " instanceof Array)", "iterator model is not a list.", tagInstance);
+                    resultOuter.pushRenderErrorIf(listVar + " == undefined", "Iterator model is undefined.");
+                    resultOuter.pushRenderErrorIf("!(" + listVar + " instanceof Array)", "Iterator model is not a list.");
 
                     if (isNiter) {
                         resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + niterParameters.iterName + "', " + listVar + ")");
@@ -1223,35 +1245,19 @@
         var compileToSource = function(args) {
 
             var result = new CompiledSource();
-            var useTryCatch = false;
 
             // executionContext is available at all times.
             result.push("var globals = executionContext.getGlobals()");
             result.push("var model = rootModel");
             result.push("var context = {}");
-            result.push("executionContext.currentTag = {}");
-            result.push("executionContext.renderResult = []");
             var c = compilePartToSource(args);
-            if (useTryCatch) {
-                result.push("try {");
-                c.indent();
-            }
             result.pushCompiledSource(c);
-            if (useTryCatch) {
-                result.push("} catch (e) {");
-                result.push("   executionContext.renderResult.push('Tag failed: ' + executionContext.currentTag.name)");
-                result.push("   executionContext.renderResult.push('Error: ' + e)");
-                result.push("   throw 'Error: ' + e.toString() + ' at tag: ' + executionContext.currentTag.name)");
-                result.push("}");
-            }
-            result.push("return executionContext.renderResult.join('')");
-
             return result;
 
         };
 
         var compile = function(args) {
-            var debugEnabled = true;
+            var debugEnabled = false;
             var source = compileToSource(args).toString();
             if (args.logSource) console.log(source);
             var f;
@@ -1283,10 +1289,14 @@
                                 console.log(e.toString());
                                 console.log("model", _getModel());
                             }
-                            throw "Error at tag {% " + executionContext.currentTag.name + " %}: " + e.toString();
+                            if (args.throwOnRenderError) {
+                                throw "Error at tag {% " + executionContext.currentTag.name + " %}: " + e.toString();
+                            } else {
+                                executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
+                            }
                         }
                     }
-                    return r;
+                    return executionContext.renderResult.join("");
                 },
                 process : function() {
                     var html = "";
@@ -1514,6 +1524,10 @@
 
             this.pushThrowIf = function(condition, text, tag) {
                 stack.push("if (" + condition + ") throw '" + createThrowMessage(text, tag) + "'");
+            };
+
+            this.pushRenderErrorIf = function(condition, text) {
+                stack.push("if (" + condition + ") executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
             };
 
             this.pushAll = function(items) {
