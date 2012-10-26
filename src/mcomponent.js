@@ -10,7 +10,7 @@
 
         var rootModel;
 
-        args = $.extend({
+        var mainArgs = args = $.extend({
             viewHtml : undefined,
             viewFromComponent : undefined,
             model : undefined,
@@ -22,7 +22,7 @@
             containerType : "div",
             clearPlaceHolderBeforeRender : true,
             logTags : false,
-            throwOnRenderError : false // Used for unit testing.
+            throwOnError : false // Used for unit testing.
         }, args);
 
         var init = function() {
@@ -111,7 +111,7 @@
                 this.renderErrors.push(error);
                 this.renderResult.push(this.renderErrorToString(error));
 
-                if (args.throwOnRenderError) {
+                if (args.throwOnError) {
                     throw this.renderErrorToString(message, this.currentTag.name);
                 }
             };
@@ -1251,7 +1251,7 @@
                     console.log(e);
                     console.log(e.toString());
                 }
-                throw "View is not formatted correctly, please check your tags: " + e.toString();
+                executionContext.compileError = e;
             }
             return {
                 getSource : function() {
@@ -1270,11 +1270,18 @@
                                 console.log(e.toString());
                                 console.log("model", _getModel());
                             }
-                            if (args.throwOnRenderError) {
+                            if (mainArgs.throwOnError) {
                                 throw "Error at tag {% " + executionContext.currentTag.name + " %}: " + e.toString();
                             } else {
                                 executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
                             }
+                        }
+                    }
+                    if (executionContext.compileError) {
+                        var msg = "Error compiling view, view is not formatted correctly, please check your tags: " + executionContext.compileError.toString();
+                        executionContext.renderResult = [msg];
+                        if (mainArgs.throwOnError) {
+                            throw msg;
                         }
                     }
                     return executionContext.renderResult.join("");
@@ -1627,7 +1634,7 @@
                         result.html = getView().template.render();
                     } catch (e) {
                         result.html = e.toString();
-                        if (args.throwOnRenderError) throw e;
+                        if (args.throwOnError) throw e;
                     }
                 } else {
                     result.html = "";

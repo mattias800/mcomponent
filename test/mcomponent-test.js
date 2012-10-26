@@ -183,7 +183,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        throwOnRenderError : true,
+        throwOnError : true,
         viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
@@ -204,7 +204,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        throwOnRenderError : true,
+        throwOnError : true,
         viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
     }), "Construction is OK.");
 
@@ -1378,7 +1378,7 @@ test("iter tag", function() {
             list : ["mattias", "marcus", "johan"]
         },
         viewHtml : "{% iter listaxe %}{% enditer %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
     raises(function() {
         c._assertRender();
@@ -1388,7 +1388,7 @@ test("iter tag", function() {
         model : {
             test : 123
         }, viewHtml : "{% iter test %}{% enditer %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
     raises(function() {
         c._assertRender();
@@ -1398,7 +1398,7 @@ test("iter tag", function() {
         model : {
             test : {age : 80}
         }, viewHtml : "{% iter test %}{% enditer %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
     raises(function() {
         c._assertRender();
@@ -1408,7 +1408,7 @@ test("iter tag", function() {
         model : {
             test : "hejhej"
         }, viewHtml : "{% iter test %}{% enditer %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
     raises(function() {
         c._assertRender();
@@ -1428,7 +1428,7 @@ test("niter tag, using show more", function() {
             list : ["mattias", "marcus", "johan"]
         },
         viewHtml : "{% niter userListIter list %}{% endniter %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
     raises(function() {
         c._assertRender();
@@ -1943,7 +1943,7 @@ test("js and showjs tag", function() {
     ok(c = $().mcomponent({
         model : {name : "must"},
         viewHtml : "{% context name %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK! But next should fail.");
 
     raises(function() {
@@ -2092,7 +2092,7 @@ test("niter tag", function() {
         model : {
             list : ["mattias", "marcus", "johan"]
         }, viewHtml : "{% niter userListIter list %}{% endniter %}",
-        throwOnRenderError : true
+        throwOnError : true
     }), "Construction OK!");
 
     raises(function() {
