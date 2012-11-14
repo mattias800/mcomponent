@@ -9,12 +9,12 @@ test("Construction", function() {
 
     var e;
     ok(e = $(document.createElement("script")), "Creating tag should work.");
-    e.text = "{% name %}";
+    e.text = "{{ name }}";
     ok($(e).mcomponent(), "Should not cause problems with simple view in the script.");
 
     ok($().mcomponent(), "Should allow no source.");
 
-    ok($().mcomponent({viewHtml : "{% name %}"}), "Should allow no source, but view in args.");
+    ok($().mcomponent({viewHtml : "{{ name }}"}), "Should allow no source, but view in args.");
 
 
 });
@@ -60,7 +60,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ name }}{{ location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will iterate over the stack and find location and then country.");
@@ -87,7 +87,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% name %}{% location.country %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ name }}{{ location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
@@ -105,7 +105,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% name %}{% ../location.country %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ name }}{{ ../location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
@@ -125,7 +125,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% push name %}{% first %}{% ../location.country %}{% endpush %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ push name }}{{ first }}{{ ../location.country }}{{ endpush }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasAwesomeland", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
@@ -145,7 +145,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% push name %}{% first %}{% ../../location.country %}{% endpush %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ push name }}{{ first }}{{ ../../location.country }}{{ endpush }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
@@ -165,7 +165,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user.name %}{% first %}{% ../location.country %}{% endpush %}"
+        viewHtml : "{{ push user.name }}{{ first }}{{ ../location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "mattiasSweden", "Should lookup 'name' and 'location.country' properly since it will find location on user.");
@@ -184,7 +184,7 @@ test("Lookup with parent model", function() {
             }
         },
         throwOnError : true,
-        viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ name }}{{ ../../location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     raises(function() {
@@ -205,7 +205,7 @@ test("Lookup with parent model", function() {
             }
         },
         throwOnError : true,
-        viewHtml : "{% push user %}{% name %}{% ../../location.country %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ name }}{{ ../../location.country }}{{ endpush }}"
     }), "Construction is OK.");
 
     raises(function() {
@@ -227,7 +227,7 @@ test("Lookup with parent model", function() {
                 country : "Sweden"
             }
         },
-        viewHtml : "{% push user %}{% push ../location %}{% country %}{% endpush %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ push ../location }}{{ country }}{{ endpush }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "Sweden", "Using ../ with push.");
@@ -243,7 +243,7 @@ test("Lookup with parent model", function() {
             },
             locations : ["BCA", "GOT"]
         },
-        viewHtml : "{% push user %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ iter ../locations }}{{ model }}{{ enditer }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "BCAGOT", "Using ../ with iter.");
@@ -259,7 +259,7 @@ test("Lookup with parent model", function() {
             },
             locations : ["BCA", "GOT"]
         },
-        viewHtml : "{% push user %}{% push name %}{% iter ../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ push name }}{{ iter ../locations }}{{ model }}{{ enditer }}{{ endpush }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "PARARN", "Using ../ with iter.");
@@ -275,7 +275,7 @@ test("Lookup with parent model", function() {
             },
             locations : ["BCA", "GOT"]
         },
-        viewHtml : "{% push user %}{% push name %}{% iter ../../locations %}{% model %}{% enditer %}{% endpush %}{% endpush %}"
+        viewHtml : "{{ push user }}{{ push name }}{{ iter ../../locations }}{{ model }}{{ enditer }}{{ endpush }}{{ endpush }}"
     }), "Construction is OK.");
 
     equal(c._assertRender(), "BCAGOT", "Using ../../ with iter.");
@@ -323,7 +323,7 @@ test("Building list", function() {
     var t, e;
 
     var e = document.createElement("script");
-    e.text = "{% name %}";
+    e.text = "{{ name }}";
 
     ok(t = $(e).mcomponent(), "Creating component.");
     ok(t._assertListSize(1), "One tag should result in one list item.");
@@ -337,7 +337,7 @@ test("Building list", function() {
     ok(t._assertListItemHasHtml(0, "abc"), "HTML tag should be 'abc'.");
 
     e = document.createElement("script");
-    e.text = "hej{% name %}";
+    e.text = "hej{{ name }}";
     ok(t = $(e).mcomponent());
 
     ok(t._assertListSize(2), "One tag prefixed with HTML should result in two list items.");
@@ -345,7 +345,7 @@ test("Building list", function() {
     ok(t._assertListItemHasTagName(1, "name"), "Tag name should be 'name'.");
 
     e = document.createElement("script");
-    e.text = "heja{% name %}hejaa";
+    e.text = "heja{{ name }}hejaa";
     ok(t = $(e).mcomponent());
 
     ok(t._assertListSize(3), "One tag prefixed and postfixed with HTML should result in three list items.");
@@ -354,7 +354,7 @@ test("Building list", function() {
     ok(t._assertListItemHasHtml(2, "hejaa"), "Tag name should be 'hejaa'.");
 
     e = document.createElement("script");
-    e.text = "{% username %}hejsan";
+    e.text = "{{ username }}hejsan";
     ok(t = $(e).mcomponent());
 
     ok(t._assertListSize(2), "One tag postfixed with HTML should result in two list items.");
@@ -373,21 +373,21 @@ test("Set view", function() {
     t.setViewWithHtml();
     ok(t._assertListSize(0), "List should be empty after setViewWithHtml(undefined).");
 
-    t.setViewWithHtml("{% name %}");
-    ok(t._assertListSize(1), "List should contain one element after setViewWithHtml('{% name %}').");
+    t.setViewWithHtml("{{ name }}");
+    ok(t._assertListSize(1), "List should contain one element after setViewWithHtml('{{ name }}').");
 
-    t = $().mcomponent({viewHtml : "{% name %}"});
-    ok(t._assertListSize(1), "List should contain one element after args.viewHtml = '{% name %}'.");
+    t = $().mcomponent({viewHtml : "{{ name }}"});
+    ok(t._assertListSize(1), "List should contain one element after args.viewHtml = '{{ name }}'.");
 
-    t = $().mcomponent({viewHtml : "tsa{% name %}ast"});
-    ok(t._assertListSize(3), "List should contain three element after args.viewHtml = 'tsa{% name %}ast'.");
+    t = $().mcomponent({viewHtml : "tsa{{ name }}ast"});
+    ok(t._assertListSize(3), "List should contain three element after args.viewHtml = 'tsa{{ name }}ast'.");
 
-    t = $().mcomponent({viewHtml : "{% if (this.model.name) %}{% name %}{% endif %}"});
-    ok(t._assertListSize(3), "List should contain three element after args.viewHtml = '{% if (this.model.name) %}{% name %}{% endif %}'.");
+    t = $().mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
+    ok(t._assertListSize(3), "List should contain three element after args.viewHtml = '{{ if (this.model.name) }}{{ name }}{{ endif }}'.");
 
     var t2;
 
-    t2 = $().mcomponent({viewHtml : "{% firstName %}"});
+    t2 = $().mcomponent({viewHtml : "{{ firstName }}"});
 
     t.setViewFromComponent(t2);
 
@@ -444,12 +444,12 @@ test("Execution context", function() {
 
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% name %}"}));
+    ok(c = $().mcomponent({viewHtml : "{{ name }}"}));
     equal(c._getExecutionStackSize(), 0, "No model, execution stack should start empty.");
     ok(c._pushModel({test : "test"}));
     equal(c._getExecutionStackSize(), 1, "Pushed model, execution stack should now have one element.");
 
-    c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% name %}"});
+    c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ name }}"});
 
     equal(c._getExecutionStackSize(), 1, "Model should be pushed to execution stack.");
 
@@ -459,7 +459,7 @@ test("Find block end", function() {
 
     var c;
 
-    c = $().mcomponent({viewHtml : "{% name %}"});
+    c = $().mcomponent({viewHtml : "{{ name }}"});
 
     ok(c._assertListSize(1), "List size is 1.");
     raises(function() {
@@ -469,7 +469,7 @@ test("Find block end", function() {
 
     raises(function() {
         c = $().mcomponent({
-            viewHtml : "{% if name %}",
+            viewHtml : "{{ if name }}",
             throwOnError : true
         });
     }, "Throws error since template is malformed.");
@@ -479,33 +479,33 @@ test("Find block end", function() {
         c._findBlockEnd(0)
     }, "Exception, list is too short.");
 
-    ok(c = $().mcomponent({viewHtml : "before{% if aaaname %}inside{% endif %}after"}), "Construction should be OK!");
+    ok(c = $().mcomponent({viewHtml : "before{{ if aaaname }}inside{{ endif }}after"}), "Construction should be OK!");
     ok(c._assertListSize(5), "List size is 5.");
     equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
-    c = $().mcomponent({viewHtml : "{% if supername %}test{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if supername }}test{{ endif }}"});
     ok(c._assertListSize(3), "List size is 3.");
     equal(c._findBlockEnd(0), 2, "Should find ending tag on index 2.");
 
     ok(c = $().mcomponent(), "Construction should be ok...");
-    ok(c._assertSetViewAndBuildList("{% if thename %}{% if age %}test{% endif %}"));
+    ok(c._assertSetViewAndBuildList("{{ if thename }}{{ if age }}test{{ endif }}"));
     ok(c._assertListSize(4), "List size is 4.");
     raises(function() {
         c._findBlockEnd(0);
     }, "Should not find a closing endif.");
     equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
-    c = $().mcomponent({viewHtml : "{% if name %}{% if age %}test{% endif %}{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if name }}{{ if age }}test{{ endif }}{{ endif }}"});
     ok(c._assertListSize(5), "List size is 5.");
     equal(c._findBlockEnd(0), 4, "Should find ending tag on index 4.");
     equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
-    c = $().mcomponent({viewHtml : "{% if name %}{% push age %}test{% endpush %}{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if name }}{{ push age }}test{{ endpush }}{{ endif }}"});
     ok(c._assertListSize(5), "List size is 5.");
     equal(c._findBlockEnd(0), 4, "Should find ending tag on index 4.");
     equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
-    c = $().mcomponent({viewHtml : "{% if (this.model.name) %}{% name %}{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
     ok(c._assertListSize(3), "List size is 3.");
     equal(c._findBlockEnd(0), 2, "Should find ending tag on index 2.");
 
@@ -517,23 +517,23 @@ test("Find block end, for if cases", function() {
 
     var c;
 
-    c = $().mcomponent({viewHtml : "{% if (test) %}{% else %}{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if (test) }}{{ else }}{{ endif }}"});
     ok(c._assertListSize(3), "List size is 3.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'else' tag on index 1.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'endif' tag on index 2.");
 
-    c = $().mcomponent({viewHtml : "{% if (test) %}testtrue{% else %}testfalse{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if (test) }}testtrue{{ else }}testfalse{{ endif }}"});
     ok(c._assertListSize(5), "List size is 5.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'else' tag on index 1.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'endif' tag on index 2.");
 
-    c = $().mcomponent({viewHtml : "{% if (test) %}{% elseif (test2) %}{% else %}{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if (test) }}{{ elseif (test2) }}{{ else }}{{ endif }}"});
     ok(c._assertListSize(4), "List size is 4.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'elseif' tag on index 1.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'else' tag on index 2.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 3, "Should find 'endif' tag on index 3.");
 
-    c = $().mcomponent({viewHtml : "{% if (test) %}testIsTrue{% elseif (test2) %}test2IsTrue{% else %}neitherIsTrue{% endif %}"});
+    c = $().mcomponent({viewHtml : "{{ if (test) }}testIsTrue{{ elseif (test2) }}test2IsTrue{{ else }}neitherIsTrue{{ endif }}"});
     ok(c._assertListSize(7), "List size is 7.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'elseif' tag on index 2.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'else' tag on index 1.");
@@ -547,12 +547,12 @@ test("General", function() {
 
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% push age %}test{% endpush %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ push age }}test{{ endpush }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._getTree()[0].tagName, "push", "First root tag should be push tag.");
     equal(c._getTree()[0].content[0].html, "test", "Second level should be HTML 'test'.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (name) %}{% push age %}test{% endpush %}{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (name) }}{{ push age }}test{{ endpush }}{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].tagName, "push", "Second level should be a push.");
@@ -564,7 +564,7 @@ test("if, elseif, else tags", function() {
 
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% else %}2{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ else }}2{{ endif }}"}), "Construction OK!");
     ok(c._assertListSize(5), "List size is 5.");
     equal(c._getTree()[0].conditions.length, 1, "Only one condition in if case.");
     equal(c._getTree()[0].contentRoots.length, 1, "Only one conditioned root.");
@@ -573,7 +573,7 @@ test("if, elseif, else tags", function() {
     equal(c._getTree()[0].elseContent.length, 1, "Else contains one element");
     equal(c._getTree()[0].elseContent[0].html, "2", "Else contains '2'.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% if (false) %}2{% endif %}{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c._assertListSize(6), "List size is 6.");
     equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 5, "Should find outer 'endif' tag on index 5.");
     equal(c._findBlockEnd(2, {endTags : ["else", "elseif"]}), 4, "Should find inner 'endif' tag on index 4.");
@@ -598,7 +598,7 @@ test("lookup from models not on top of stack", function() {
                 list : ["test1", "test2"],
                 length : 2
             }},
-        viewHtml : "ok{% push photos %}{% length %}{% iter photos.list %}{% show %}{% enditer %}{% endpush %}"
+        viewHtml : "ok{{ push photos }}{{ length }}{{ iter photos.list }}{{ show }}{{ enditer }}{{ endpush }}"
     }), "Construction OK!");
     equal(c._assertRender(), "ok2test1test2", "Should contain 'ok2test1test2', all lookups should be ok.");
 
@@ -611,7 +611,7 @@ test("lookup from models not on top of stack", function() {
                 }
             }
         },
-        viewHtml : "ok{% push data %}{% push data.photos %}{% length %}{% iter photos.list %}{% show %}{% enditer %}{% endpush %}{% endpush %}"
+        viewHtml : "ok{{ push data }}{{ push data.photos }}{{ length }}{{ iter photos.list }}{{ show }}{{ enditer }}{{ endpush }}{{ endpush }}"
     }), "Construction OK!");
     equal(c._assertRender(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
 
@@ -624,7 +624,7 @@ test("lookup from models not on top of stack", function() {
                 }
             }
         },
-        viewHtml : "ok{% push data %}{% push data.photos %}{% length %}{% iter data.photos.list %}{% show %}{% enditer %}{% endpush %}{% endpush %}"
+        viewHtml : "ok{{ push data }}{{ push data.photos }}{{ length }}{{ iter data.photos.list }}{{ show }}{{ enditer }}{{ endpush }}{{ endpush }}"
     }), "Construction OK!");
     equal(c._assertRender(), "ok2test1test2", "Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.");
 
@@ -637,13 +637,13 @@ test("if tag", function() {
     ok(c = $().mcomponent({viewHtml : "heyhey"}), "Construction OK!");
     equal(c._assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}baibai{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}baibai{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
     equal(c._getTree()[0].content[0].html, "baibai", "Second level should be HTML 'baibai'.");
     equal(c._assertRender(), "baibai", "Should contain 'baibai', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% if (true) %}2{% endif %}{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (true) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
     equal(c._getTree().length, 1, "Root contains 1 elements.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
@@ -651,7 +651,7 @@ test("if tag", function() {
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 1.");
     equal(c._assertRender(), "12", "Should contain '12', since both if cases are true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}1{% if (false) %}2{% endif %}{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
     equal(c._getTree().length, 1, "Root contains 1 elements.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
@@ -659,7 +659,7 @@ test("if tag", function() {
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 2.");
     equal(c._assertRender(), "1", "Should contain '1', since only first if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}1{% if (true) %}2{% endif %}{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}1{{ if (true) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c._assertListSize(6), "Root contains 6 elements.");
     equal(c._getTree().length, 1, "Root contains 1 elements.");
     equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
@@ -667,7 +667,7 @@ test("if tag", function() {
     equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 3.");
     equal(c._assertRender(), "", "Should contain '', since only second if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "1{% if (true) %}2{% if (true) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "1{{ if (true) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -676,7 +676,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 4.");
     equal(c._assertRender(), "12345", "Should contain '12345'.");
 
-    ok(c = $().mcomponent({viewHtml : "1{% if (true) %}2{% if (false) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "1{{ if (true) }}2{{ if (false) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -685,7 +685,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag.");
     equal(c._assertRender(), "1245", "Should contain '1245'.");
 
-    ok(c = $().mcomponent({viewHtml : "1{% if (false) %}2{% if (true) %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "1{{ if (false) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -694,7 +694,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 5.");
     equal(c._assertRender(), "15", "Should contain '15'.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (this.model.name == 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -703,7 +703,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 6.");
     equal(c._assertRender(), "12345", "Should contain '12345', then if with this.model works.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (this.model.name != 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -712,7 +712,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
     equal(c._assertRender(), "1245", "Should contain '1245', then if with this.model works.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (model.name == 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -721,7 +721,7 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 8.");
     equal(c._assertRender(), "12345", "Should contain '12345', then if with model (without this.model) works.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (true) %}2{% if (model.name != 'mattias') %}3{% endif %}4{% endif %}5"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c._assertListSize(9), "Root contains 9 elements.");
     equal(c._getTree().length, 3, "Root contains 3 elements.");
     equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
@@ -730,10 +730,10 @@ test("if tag", function() {
     equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 9.");
     equal(c._assertRender(), "1245", "Should contain '1245', then if with model (without this.model) works.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (this.model.name == 'mattias') %}2{% endif %}3"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (this.model.name == 'mattias') }}2{{ endif }}3"}), "Construction OK!");
     equal(c._assertRender(), "123", "If with 'this.model.name'.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{% if (model.name == 'mattias') %}2{% endif %}3"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (model.name == 'mattias') }}2{{ endif }}3"}), "Construction OK!");
     equal(c._assertRender(), "123", "Same again, but with 'model.name' instead of 'this.model.name'.");
 
 });
@@ -741,42 +741,42 @@ test("if tag", function() {
 test("else, elseif tags", function() {
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% if (true) %}ok{% else %}fail{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (true) }}ok{{ else }}fail{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}ok{% else %}fail2{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}ok{{ else }}fail2{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail{% else %}ok{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail{{ else }}ok{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}{% if (true) %}ok{% else %}innerfail{% endif %}{% else %}fail2{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (true) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (true) %}{% if (false) %}ok{% else %}innerfail{% endif %}{% else %}fail2{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (false) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "innerfail", "Should contain 'innerfail', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (false) %}fail3{% elseif (false) %}fail4{% elseif (false) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (false) }}fail3{{ elseif (false) }}fail4{{ elseif (false) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (false) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (false) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (true) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     // Malformed
-    //{% if (this.model.users %}
+    //{{ if (this.model.users }}
 
-    ok(c = $().mcomponent({viewHtml : "{% if (false) %}fail1{% elseif (false) %}fail2{% elseif (true) %}ok{% elseif (true) %}fail4{% elseif (true) %}fail5{% else %}ok{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
     equal(c._getTree().length, 1, "Root contains only one element.");
     equal(c._assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
@@ -794,22 +794,22 @@ test("API", function() {
             name : "mattias"
         }
     };
-    var view = "{% push user %}" +
-        "{% if api.lookup('displaySettings.list.showName') == 'yes' %}" +
+    var view = "{{ push user }}" +
+        "{{ if api.lookup('displaySettings.list.showName') == 'yes' }}" +
         "funkar" +
-        "{% else %}" +
+        "{{ else }}" +
         "funkar inte" +
-        "{% endif %}" +
-        "{% endpush %}";
+        "{{ endif }}" +
+        "{{ endpush }}";
 
     var c;
 
     ok(c = $().mcomponent({model : model, viewHtml : view}), "Construction OK!");
     equal(c._assertRender(), "funkar", "api.lookup() should result in 'funkar'.");
 
-    view = "{% push user %}" +
-        "{% showjs api.lookup('displaySettings.list.showName') %}" +
-        "{% endpush %}";
+    view = "{{ push user }}" +
+        "{{ showjs api.lookup('displaySettings.list.showName') }}" +
+        "{{ endpush }}";
 
     ok(c = $().mcomponent({model : model, viewHtml : view}), "Construction OK!");
     equal(c._assertRender(), "yes", "api.lookup() should find 'yes'.");
@@ -819,7 +819,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "1", "Should contain 1 one times.");
 
 
@@ -828,7 +828,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 2 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "22", "Should contain 2 two times.");
 
     ok(c = $().mcomponent({
@@ -836,7 +836,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 3 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsPerPage %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "333", "Should contain 3 three times.");
 
     ok(c = $().mcomponent({
@@ -844,7 +844,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 3 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "333", "Should contain 333.");
 
     var i;
@@ -854,7 +854,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "1", "Should contain 1 at first.");
     ok(i = c.getIterator('userListIter'), "Getting iterator should work, after compiling and running the view at least once.");
     if (i) i.showAllItems();
@@ -865,7 +865,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1{% showingAllItems %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1{{ showingAllItems }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "1false", "Should contain false at first.");
     ok(i = c.getIterator('userListIter'), "Getting iterator should work, after compiling and running the view at least once.");
     if (i) i.showAllItems();
@@ -876,7 +876,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1_{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1_{{ itemsTotal }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "1_3", "itemsTotal = 3");
 
     ok(c = $().mcomponent({
@@ -884,7 +884,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}1_{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1_{{ itemsTotal }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "1_4", "itemsTotal = 4");
 
     ok(c = $().mcomponent({
@@ -892,7 +892,7 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 10 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsTotal %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsTotal }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "4444", "itemsTotal = 4 when itemsPerPage is higher than model.length");
 
     ok(c = $().mcomponent({
@@ -900,18 +900,18 @@ test("API", function() {
         iter : {
             userListIter : { itemsPerPage : 10 }
         },
-        viewHtml : "{% niter userListIter list %}{% push api.getIterator('userListIter') %}{% itemsShowing %}{% endpush %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
     equal(c._assertRender(), "4444", "itemsShowing = 4 when itemsPerPage is higher than model.length");
 
     ok(c = $().mcomponent({
         model : "mattias",
-        viewHtml : "{% showjs api.getRootModel() %}"
+        viewHtml : "{{ showjs api.getRootModel() }}"
     }), "Construction OK lets go!!");
     equal(c._assertRender(), "mattias", "api.getRootModel() should return root model.");
 
     ok(c = $().mcomponent({
         model : { name : "mattias"},
-        viewHtml : "{% showjs api.getRootModel().name %}"
+        viewHtml : "{{ showjs api.getRootModel().name }}"
     }), "Construction OK lets go!!");
     equal(c._assertRender(), "mattias", "api.getRootModel() should return root model.");
 
@@ -920,15 +920,15 @@ test("API", function() {
 test("large view test", function() {
     var view, m, c, result;
 
-    view = "{% if (this.model) %}yay" +
-        "{% if (this.model.users) %}" +
-        "{% niter users users %}" +
-        "Name:{% name %}" +
-        "Male:{% if (this.model.isMale) %}Yes{% else %}No{% endif %}" +
-        "Age:{% age %}" +
-        "{% endniter %}" +
-        "{% endif %}" +
-        "{% endif %}";
+    view = "{{ if (this.model) }}yay" +
+        "{{ if (this.model.users) }}" +
+        "{{ niter users users }}" +
+        "Name:{{ name }}" +
+        "Male:{{ if (this.model.isMale) }}Yes{{ else }}No{{ endif }}" +
+        "Age:{{ age }}" +
+        "{{ endniter }}" +
+        "{{ endif }}" +
+        "{{ endif }}";
 
     m = {
         users : [
@@ -972,239 +972,239 @@ test("large view test", function() {
         }
     };
 
-    view = "  {% if (this.model) %} yay we have a model!\n" +
-        "{% if (this.model.users) %}\n" +
-        "{% niter users users %}\n" +
-        "Name:{% name %}<br/>\n" +
-        "Male:{% if (this.model.isMale) %}Yes{% else %}No{% endif %}<br/>\n" +
-        "Age:{% age %}\n" +
-        "{% endniter %}\n" +
-        "{% endif %}\n" +
-        "{% endif %}\n";
+    view = "  {{ if (this.model) }} yay we have a model!\n" +
+        "{{ if (this.model.users) }}\n" +
+        "{{ niter users users }}\n" +
+        "Name:{{ name }}<br/>\n" +
+        "Male:{{ if (this.model.isMale) }}Yes{{ else }}No{{ endif }}<br/>\n" +
+        "Age:{{ age }}\n" +
+        "{{ endniter }}\n" +
+        "{{ endif }}\n" +
+        "{{ endif }}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter over user only!");
     ok(result = c._assertRender(), "niter over user only");
 
-    view = "  {% if (this.model) %} yay we have a model!\n" +
+    view = "  {{ if (this.model) }} yay we have a model!\n" +
         "\n" +
-        "{% if (this.model.location) %}\n" +
-        "{% push location %}\n" +
+        "{{ if (this.model.location) }}\n" +
+        "{{ push location }}\n" +
         "\n" +
-        "{% push city %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push city }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "City has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% endpush %}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% else %}\n" +
+        "{{ else }}\n" +
         "No location\n" +
-        "{% endif %}\n" +
+        "{{ endif }}\n" +
         "\n" +
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction location and city only!");
     ok(result = c._assertRender(), "location and city only");
 
-    view = "  {% if (this.model) %} yay we have a model!\n" +
+    view = "  {{ if (this.model) }} yay we have a model!\n" +
         "\n" +
-        "{% if (this.model.location) %}\n" +
-        "{% push location %}\n" +
+        "{{ if (this.model.location) }}\n" +
+        "{{ push location }}\n" +
         "\n" +
-        "{% push country %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push country }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "Country has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% endpush %}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% else %}\n" +
+        "{{ else }}\n" +
         "No location\n" +
-        "{% endif %}\n" +
+        "{{ endif }}\n" +
         "\n" +
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction location and country only!");
     ok(result = c._assertRender(), "location and country only!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
 
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
-        "        {% endpush %}\n" +
+        "        {{ push location }}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
-        "    {% endif %}\n" +
+        "    {{ else }}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push!");
     ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
 
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
-        "            {% push city %}\n" +
-        "            {% endpush %}\n" +
-        "        {% endpush %}\n" +
+        "        {{ push location }}\n" +
+        "            {{ push city }}\n" +
+        "            {{ endpush }}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
-        "    {% endif %}\n" +
+        "    {{ else }}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push country!");
     ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push country!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
 
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
-        "            {% push country %}\n" +
-        "            {% endpush %}\n" +
-        "        {% endpush %}\n" +
+        "        {{ push location }}\n" +
+        "            {{ push country }}\n" +
+        "            {{ endpush }}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
-        "    {% endif %}\n" +
+        "    {{ else }}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases and push city!");
     ok(result = c._assertRender(), "niter with location and both city and country without output and if cases and push city!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
 
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
-        "            {% push city %}\n" +
-        "            {% endpush %}\n" +
+        "        {{ push location }}\n" +
+        "            {{ push city }}\n" +
+        "            {{ endpush }}\n" +
 
-        "            {% push country %}\n" +
-        "            {% endpush %}\n" +
-        "        {% endpush %}\n" +
+        "            {{ push country }}\n" +
+        "            {{ endpush }}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
-        "    {% endif %}\n" +
+        "    {{ else }}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output and if cases!");
     ok(result = c._assertRender(), "niter with location and both city and country without output and if cases!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
 
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
+        "        {{ push location }}\n" +
 
-        "            {% push city %}\n" +
-        "                {% if (this.model.name) %}\n" +
-        "                {% else %}\n" +
-        "                {% endif %}\n" +
-        "            {% endpush %}\n" +
+        "            {{ push city }}\n" +
+        "                {{ if (this.model.name) }}\n" +
+        "                {{ else }}\n" +
+        "                {{ endif }}\n" +
+        "            {{ endpush }}\n" +
 
-        "            {% push country %}\n" +
-        "                {% if (this.model.name) %}\n" +
-        "                {% else %}\n" +
-        "                {% endif %}\n" +
-        "            {% endpush %}\n" +
+        "            {{ push country }}\n" +
+        "                {{ if (this.model.name) }}\n" +
+        "                {{ else }}\n" +
+        "                {{ endif }}\n" +
+        "            {{ endpush }}\n" +
 
-        "        {% endpush %}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
-        "    {% endif %}\n" +
+        "    {{ else }}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country without output!");
     ok(result = c._assertRender(), "niter with location and both city and country without output!");
 
-    view = "{% if (this.model) %} yay we have a model!\n" +
+    view = "{{ if (this.model) }} yay we have a model!\n" +
         "    \n" +
-        "    {% if (this.model.location) %}\n" +
+        "    {{ if (this.model.location) }}\n" +
 
-        "        {% push location %}\n" +
+        "        {{ push location }}\n" +
 
-        "            {% push city %}\n" +
-        "                {% if (this.model.name) %}\n" +
-        "                    {% name %}\n" +
-        "                {% else %}\n" +
+        "            {{ push city }}\n" +
+        "                {{ if (this.model.name) }}\n" +
+        "                    {{ name }}\n" +
+        "                {{ else }}\n" +
         "                    City has no name\n" +
-        "                {% endif %}\n" +
-        "            {% endpush %}\n" +
+        "                {{ endif }}\n" +
+        "            {{ endpush }}\n" +
 
-        "            {% push country %}\n" +
-        "                {% if (this.model.name) %}\n" +
-        "                    {% name %}\n" +
-        "                {% else %}\n" +
+        "            {{ push country }}\n" +
+        "                {{ if (this.model.name) }}\n" +
+        "                    {{ name }}\n" +
+        "                {{ else }}\n" +
         "                    Country has no name\n" +
-        "                {% endif %}\n" +
-        "            {% endpush %}\n" +
+        "                {{ endif }}\n" +
+        "            {{ endpush }}\n" +
 
-        "        {% endpush %}\n" +
+        "        {{ endpush }}\n" +
 
-        "    {% else %}\n" +
+        "    {{ else }}\n" +
         "        No location\n" +
-        "    {% endif %}\n" +
+        "    {{ endif }}\n" +
 
-        "{% endif %}\n";
+        "{{ endif }}\n";
 
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction niter with location and both city and country!");
     ok(result = c._assertRender(), "niter with location and both city and country!");
 
-    view = "  {% if (this.model) %} yay we have a model!\n" +
-        "{% if (this.model.users) %}\n" +
-        "{% niter users users %}\n" +
-        "Name:{% name %}<br/>\n" +
-        "Male:{% if (this.model.isMale) %}Yes{% else %}No{% endif %}<br/>\n" +
-        "Age:{% age %}\n" +
-        "{% endniter %}\n" +
+    view = "  {{ if (this.model) }} yay we have a model!\n" +
+        "{{ if (this.model.users) }}\n" +
+        "{{ niter users users }}\n" +
+        "Name:{{ name }}<br/>\n" +
+        "Male:{{ if (this.model.isMale) }}Yes{{ else }}No{{ endif }}<br/>\n" +
+        "Age:{{ age }}\n" +
+        "{{ endniter }}\n" +
         "\n" +
-        "{% if (this.model.location) %}\n" +
-        "{% push location %}\n" +
+        "{{ if (this.model.location) }}\n" +
+        "{{ push location }}\n" +
         "\n" +
-        "{% push city %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push city }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "City has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% push country %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push country }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "Country has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% endpush %}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% else %}\n" +
+        "{{ else }}\n" +
         "No location\n" +
-        "{% endif %}\n" +
+        "{{ endif }}\n" +
         "\n" +
-        "{% endif %}\n" +
-        "{% endif %}\n";
+        "{{ endif }}\n" +
+        "{{ endif }}\n";
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction full view!");
     ok(result = c._assertRender(), "full view!");
@@ -1215,10 +1215,10 @@ test("showing other things than model properties", function() {
 
     var c;
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show api.lookup('name'); %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ show api.lookup('name'); }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should contain 'mattias' after API lookup.");
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show Math.floor(1.5); %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ show Math.floor(1.5); }}"}), "Construction OK!");
     equal(c._assertRender(), "1", "Should contain '1' after Math.floor.");
 
 });
@@ -1227,31 +1227,31 @@ test("show tag", function() {
 
     var c;
 
-    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{% show name %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ show name }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
 
-    ok(c = $().mcomponent({model : {user : {name : "marcus"}}, viewHtml : "{% show user.name %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {user : {name : "marcus"}}, viewHtml : "{{ show user.name }}"}), "Construction OK!");
     equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
-    ok(c = $().mcomponent({model : "marcus", viewHtml : "{% show %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : "marcus", viewHtml : "{{ show }}"}), "Construction OK!");
     equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
-    ]}, viewHtml : "{% model.list[0].url %}"}), "Construction OK!");
+    ]}, viewHtml : "{{ model.list[0].url }}"}), "Construction OK!");
     equal(c._assertRender(), "www.google.com", "Should contain 'www.google.com' using lookup with runFunction().");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
-    ]}, viewHtml : "{% model.list[1].url %}"}), "Construction OK!");
+    ]}, viewHtml : "{{ model.list[1].url }}"}), "Construction OK!");
     equal(c._assertRender(), "www.facebook.com", "Should contain 'www.facebook.com' using lookup with runFunction().");
 
     ok(c = $().mcomponent({model : { list : [
         {url : "www.google.com" },
         {url : "www.facebook.com"}
-    ]}, viewHtml : "{% showjs model.list[0].url %}"}), "Construction OK!");
+    ]}, viewHtml : "{{ showjs model.list[0].url }}"}), "Construction OK!");
     equal(c._assertRender(), "www.google.com", "Should contain 'www.google.com' using showjs.");
 
 });
@@ -1260,13 +1260,13 @@ test("push tag", function() {
 
     var c;
 
-    ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{% push user %}{% endpush %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{{ push user }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should contain nothing.");
 
-    ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{% push user %}{% show name %}{% endpush %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {user : {name : "marcus"}, test : "yeah"}, viewHtml : "{{ push user }}{{ show name }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "marcus", "Should contain 'marcus'.");
 
-    ok(c = $().mcomponent({model : {user : {name : "marcus"}, testball : "yeah"}, viewHtml : "{% push user %}{% show testball %}{% endpush %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {user : {name : "marcus"}, testball : "yeah"}, viewHtml : "{{ push user }}{{ show testball }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "yeah", "Should contain 'yeah' instead.");
 
     ok(c = $().mcomponent({model : {
@@ -1276,7 +1276,7 @@ test("push tag", function() {
             },
             testyeah : "yeah"
         }
-    }, viewHtml : "{% push db.user %}{% show testyeah %}{% endpush %}"}), "Construction OK!");
+    }, viewHtml : "{{ push db.user }}{{ show testyeah }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Pushing two level property. Should contain nothing since model stack lookup should fail.");
 
     ok(c = $().mcomponent({model : {
@@ -1286,10 +1286,10 @@ test("push tag", function() {
             }
         },
         test : "yeah"
-    }, viewHtml : "{% push db.user %}{% show test %}{% endpush %}"}), "Construction OK!");
+    }, viewHtml : "{{ push db.user }}{{ show test }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "yeah", "Pushing two level property. Should contain 'yeah'.");
 
-    ok(c = $().mcomponent({model : {db : {user : {name : "marcus"}, test : "yeah"}}, viewHtml : "{% push db.user %}{% show name %}{% endpush %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {db : {user : {name : "marcus"}, test : "yeah"}}, viewHtml : "{{ push db.user }}{{ show name }}{{ endpush }}"}), "Construction OK!");
     equal(c._assertRender(), "marcus", "Pushing two level property. Should contain 'marcus'.");
 
 
@@ -1301,86 +1301,86 @@ test("iter tag", function() {
 
     ok(c = $().mcomponent({model : {
         list : ["mattias", "marcus", "johan"]
-    }, viewHtml : "{% iter list %}{% enditer %}"}), "Construction OK!");
+    }, viewHtml : "{{ iter list }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias"]
-        }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "mattiasmarcusjohan", "Should contain 'mattiasmarcusjohan'.");
 
     ok(c = $().mcomponent({
         model : {
             list : []
-        }, viewHtml : "{% iter list %}{% show %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% context index %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ context index }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "012", "Iterator context should give us '012' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% show context.index %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ show context.index }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "012", "Iterator context should give us '012' in the result when using show and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% if (context.index == 1) %}{% show context.index %}{% endif %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ if (context.index == 1) }}{{ show context.index }}{{ endif }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "1", "If-case with context in condition. Iterator context should give us '1' in the result when using show and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% context.index %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ context.index }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "012", "Iterator context should give us '012' in the result when using no tag, and context.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% context size %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ context size }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% show context.size %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ show context.size }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% context.size %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ context.size }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "333", "Iterator context should give us '333' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% iter list %}{% context parity %}{% enditer %}"}), "Construction OK!");
+        }, viewHtml : "{{ iter list }}{{ context parity }}{{ enditer }}"}), "Construction OK!");
     equal(c._assertRender(), "evenoddeven", "Iterator context parity should give us 'evenoddeven' in the result.");
 
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
         },
-        viewHtml : "{% iter listaxe %}{% enditer %}",
+        viewHtml : "{{ iter listaxe }}{{ enditer }}",
         throwOnError : true
     }), "Construction OK!");
     raises(function() {
@@ -1390,7 +1390,7 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : 123
-        }, viewHtml : "{% iter test %}{% enditer %}",
+        }, viewHtml : "{{ iter test }}{{ enditer }}",
         throwOnError : true
     }), "Construction OK!");
     raises(function() {
@@ -1400,7 +1400,7 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : {age : 80}
-        }, viewHtml : "{% iter test %}{% enditer %}",
+        }, viewHtml : "{{ iter test }}{{ enditer }}",
         throwOnError : true
     }), "Construction OK!");
     raises(function() {
@@ -1410,7 +1410,7 @@ test("iter tag", function() {
     ok(c = $().mcomponent({
         model : {
             test : "hejhej"
-        }, viewHtml : "{% iter test %}{% enditer %}",
+        }, viewHtml : "{{ iter test }}{{ enditer }}",
         throwOnError : true
     }), "Construction OK!");
     raises(function() {
@@ -1430,7 +1430,7 @@ test("niter tag, using show more", function() {
         model : {
             list : ["mattias", "marcus", "johan"]
         },
-        viewHtml : "{% niter userListIter list %}{% endniter %}",
+        viewHtml : "{{ niter userListIter list }}{{ endniter }}",
         throwOnError : true
     }), "Construction OK!");
     raises(function() {
@@ -1444,7 +1444,7 @@ test("niter tag, using show more", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
@@ -1460,7 +1460,7 @@ test("niter tag, using show more", function() {
                 }
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
     equal(c._assertRender(), "mattias", "Should first element only.");
     equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
@@ -1486,7 +1486,7 @@ test("niter tag, using show more", function() {
                 }
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     equal(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
@@ -1513,7 +1513,7 @@ test("niter tag, using pages", function() {
                 usePages : true
             }
         },
-        viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattiasmarcus", "Should show first two element.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 3);
@@ -1538,7 +1538,7 @@ test("niter tag, using pages", function() {
                 usePages : true
             }
         },
-        viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 2);
@@ -1561,7 +1561,7 @@ test("niter tag, using pages", function() {
                 usePages : true
             }
         },
-        viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 5);
@@ -1590,7 +1590,7 @@ test("niter tag, using pages", function() {
                 usePages : true
             }
         },
-        viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 1);
@@ -1617,7 +1617,7 @@ test("niter tag, using pages", function() {
                 usePages : true
             }
         },
-        viewHtml : "{% niter userListIter list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 0);
@@ -1642,16 +1642,16 @@ test("js and showjs tags", function() {
 
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% showjs 'mattias'; %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ showjs 'mattias'; }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "'showjs' tag should work.");
 
-    ok(c = $().mcomponent({viewHtml : "{% showjs Math.sqrt(9); %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ showjs Math.sqrt(9); }}"}), "Construction OK!");
     equal(c._assertRender(), "3", "Should not throw error.");
 
-    ok(c = $().mcomponent({model : {name : "mattias yo"}, viewHtml : "{% showjs model.name; %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {name : "mattias yo"}, viewHtml : "{{ showjs model.name; }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias yo", "Should be able to use model.");
 
-    ok(c = $().mcomponent({viewHtml : "{% js Math.sqrt(5); %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ js Math.sqrt(5); }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Should not throw error.");
 
 });
@@ -1660,23 +1660,23 @@ test("globals", function() {
 
     var c;
 
-    ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 'mattias yeah' %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ js globals.testing = 'mattias yeah' }}"}), "Construction OK!");
     equal(c._assertRender(), "", "Setting globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
-    ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 'mattias yeah' %}{% globals.testing %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ js globals.testing = 'mattias yeah' }}{{ globals.testing }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias yeah", "Setting and showing globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
-    ok(c = $().mcomponent({viewHtml : "{% js globals.testing = true %}{% if (globals.testing) %}ohyeah{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ js globals.testing = true }}{{ if (globals.testing) }}ohyeah{{ endif }}"}), "Construction OK!");
     equal(c._assertRender(), "ohyeah", "Setting and using globals in if condition should work.");
     equal(c.getGlobals().testing, true, "Setting globals should work.");
 
-    ok(c = $().mcomponent({viewHtml : "{% js globals.testing = 666 %}{% if (globals.testing) %}ohyeah{% endif %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ js globals.testing = 666 }}{{ if (globals.testing) }}ohyeah{{ endif }}"}), "Construction OK!");
     equal(c._assertRender(), "ohyeah", "Setting and using globals in if condition should work.");
     equal(c.getGlobals().testing, 666, "Setting globals should work.");
 
-    ok(c = $().mcomponent({viewHtml : "{% setglobal testing 'mattias yeah' %}{% globals.testing %}"}), "Construction OK!");
+    ok(c = $().mcomponent({viewHtml : "{{ setglobal testing 'mattias yeah' }}{{ globals.testing }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias yeah", "setglobal tag and showing globals should work.");
     equal(c.getGlobals().testing, "mattias yeah", "Setting globals should work.");
 
@@ -1730,34 +1730,34 @@ test("Clipboard", function() {
     var c;
 
     ok(c = $().mcomponent({
-        clipboard : {clip1 : "{% if (model.age) %}{% show age %}{% endif %}"},
+        clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
         model : {age : 80},
-        viewHtml : "{% paste clip1 %}"
+        viewHtml : "{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         clipboard : {
-            clip1 : "{% if (model.age) %}{% paste clip2 %}{% endif %}",
-            clip2 : "{% show age %}"
+            clip1 : "{{ if (model.age) }}{{ paste clip2 }}{{ endif }}",
+            clip2 : "{{ show age }}"
         },
         model : {age : 80},
-        viewHtml : "{% paste clip1 %}"
+        viewHtml : "{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         model : {age : 85},
-        viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}"
+        viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "85", "Copying from inside view, copying should not remove the original.");
 
     ok(c = $().mcomponent({
         model : {age : 81},
-        viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}{% paste clip1 %}"
+        viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "8181", "Copying from inside view, should paste and result in '8080'.");
@@ -1766,7 +1766,7 @@ test("Clipboard", function() {
     ok(c = $().mcomponent({
         clipboard : {clip1 : "<div>hej</div>"},
         model : {age : 80},
-        viewHtml : "<div>{% paste clip1 %}</div>"
+        viewHtml : "<div>{{ paste clip1 }}</div>"
     }), "Construction OK!");
 
     equal(c._assertRender(), "<div><div>hej</div></div>", "Predefined clipboard");
@@ -1820,21 +1820,21 @@ test("HTML and show tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "hoho{% name %}haha"
+        viewHtml : "hoho{{ name }}haha"
     }), "Construction OK!");
 
     equal(c._assertRender(), "hohomusthaha", "HTML mixed with tags.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% name %}"
+        viewHtml : "{{ name }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "must", "Simple variable output.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% show name %}"
+        viewHtml : "{{ show name }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "must", "show name is must");
@@ -1847,14 +1847,14 @@ test("push tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must", hair : {color : "black", styling : "awesome"}},
-        viewHtml : "{% push hair %}{% color %}{% endpush %}"
+        viewHtml : "{{ push hair }}{{ color }}{{ endpush }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "black", "Push tag is black.");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% push name %}{% show %}{% endpush %}"
+        viewHtml : "{{ push name }}{{ show }}{{ endpush }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "must", "show name is must even with push and no specified name.");
@@ -1867,28 +1867,28 @@ test("If tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "oh{% if model.name == 'must' %}yes{% endif %}"
+        viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "ohyes", "if tag, no else, condition true");
 
     ok(c = $().mcomponent({
         model : {name : "mattias"},
-        viewHtml : "oh{% if model.name == 'must' %}yes{% endif %}"
+        viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "oh", "if tag, no else, condition false");
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "oh{% if model.name == 'must' %}yes{% else %}no{% endif %}"
+        viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "ohyes", "if tag");
 
     ok(c = $().mcomponent({
         model : {name : "mattias"},
-        viewHtml : "oh{% if model.name == 'must' %}yes{% else %}no{% endif %}"
+        viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "ohno", "if tag");
@@ -1901,7 +1901,7 @@ test("log and throw tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% log 'hej' %}"
+        viewHtml : "{{ log 'hej' }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "", "Outputs only to console.");
@@ -1913,7 +1913,7 @@ test("setglobal tag", function() {
     var c;
 
     ok(c = $().mcomponent({
-        viewHtml : "{% setglobal aGlobal 'hej' %}"
+        viewHtml : "{{ setglobal aGlobal 'hej' }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "", "Setting global only");
@@ -1926,14 +1926,14 @@ test("js and showjs tag", function() {
 
 
     ok(c = $().mcomponent({
-        viewHtml : "{% js 'hej' %}"
+        viewHtml : "{{ js 'hej' }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "", "Setting global only");
 
 
     ok(c = $().mcomponent({
-        viewHtml : "{% showjs 'hej' %}"
+        viewHtml : "{{ showjs 'hej' }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "hej", "Setting global only");
@@ -1945,7 +1945,7 @@ test("js and showjs tag", function() {
 
     ok(c = $().mcomponent({
         model : {name : "must"},
-        viewHtml : "{% context name %}",
+        viewHtml : "{{ context name }}",
         throwOnError : true
     }), "Construction OK! But next should fail.");
 
@@ -1954,9 +1954,9 @@ test("js and showjs tag", function() {
     }, "Context is empty, should return empty result.");
 
     ok(c = $().mcomponent({
-        clipboard : {clip1 : "{% if (model.age) %}{% show age %}{% endif %}"},
+        clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
         model : {age : 80},
-        viewHtml : "{% paste clip1 %}"
+        viewHtml : "{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
@@ -1970,34 +1970,34 @@ test("Compiled clipboard", function() {
     var c;
 
     ok(c = $().mcomponent({
-        clipboard : {clip1 : "{% if (model.age) %}{% show age %}{% endif %}"},
+        clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
         model : {age : 80},
-        viewHtml : "{% paste clip1 %}"
+        viewHtml : "{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         clipboard : {
-            clip1 : "{% if (model.age) %}{% paste clip2 %}{% endif %}",
-            clip2 : "{% show age %}"
+            clip1 : "{{ if (model.age) }}{{ paste clip2 }}{{ endif }}",
+            clip2 : "{{ show age }}"
         },
         model : {age : 80},
-        viewHtml : "{% paste clip1 %}"
+        viewHtml : "{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
 
     ok(c = $().mcomponent({
         model : {age : 85},
-        viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}"
+        viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "85", "Copying from inside view, copying should not remove the original.");
 
     ok(c = $().mcomponent({
         model : {age : 81},
-        viewHtml : "{% copy clip1 %}{% show age %}{% endcopy %}{% paste clip1 %}"
+        viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}{{ paste clip1 }}"
     }), "Construction OK!");
 
     equal(c._assertRender(), "8181", "Copying from inside view, should paste and result in '8080'.");
@@ -2011,14 +2011,14 @@ test("iter tag", function() {
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"] },
-        viewHtml : "{% iter list %}{% enditer %}"})
+        viewHtml : "{{ iter list }}{{ enditer }}"})
         , "Construction OK!");
 
     equal(c._assertRender(), "", "Should contain nothing.");
 
     ok(c = $().mcomponent({
         model : { list : ["mattias", "marcus", "johan"] },
-        viewHtml : "{% iter list %}{% show %}{% enditer %}"})
+        viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"})
         , "Construction OK!");
 
     equal(c._assertRender(), "mattiasmarcusjohan", "Should contain mattiasmarcusjohan.");
@@ -2030,7 +2030,7 @@ test("iter tag", function() {
             {name : "marcus", nums : [4, 5, 6]},
             {name : "johan", nums : [9, 8, 7]}
         ] },
-        viewHtml : "{% iter list %}{% show name %}{% iter nums %}{% show %}{% enditer %}{% enditer %}"})
+        viewHtml : "{{ iter list }}{{ show name }}{{ iter nums }}{{ show }}{{ enditer }}{{ enditer }}"})
         , "Construction OK!");
 
     equal(c._assertRender(), "mattias123marcus456johan987", "Should contain mattiasmarcusjohan.");
@@ -2039,10 +2039,10 @@ test("iter tag", function() {
      * Larger view
      */
 
-    ok(c = $().mcomponent({viewHtml : "{% if (this.model) %}yay1" +
-        "{% if (this.model.users) %}yay2" +
-        "{% endif %}" +
-        "{% endif %}",
+    ok(c = $().mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
+        "{{ if (this.model.users) }}yay2" +
+        "{{ endif }}" +
+        "{{ endif }}",
         model : {
             users : [
                 {name : "Mattias", isMale : true, age : 31},
@@ -2059,15 +2059,15 @@ test("iter tag", function() {
     ok(result = c._assertRender(), "Rendering of large view should be OK!");
     equal(result, "yay1yay2", "And the result should be correct.");
 
-    ok(c = $().mcomponent({viewHtml : "{% if (this.model) %}yay1" +
-        "{% if (this.model.users) %}yay2" +
-        "{% iter users %}" +
-        "Name:{% name %}" +
-        "Male:{% if (this.model.isMale) %}Yes{% else %}No{% endif %}" +
-        "Age:{% age %}" +
-        "{% enditer %}" +
-        "{% endif %}" +
-        "{% endif %}",
+    ok(c = $().mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
+        "{{ if (this.model.users) }}yay2" +
+        "{{ iter users }}" +
+        "Name:{{ name }}" +
+        "Male:{{ if (this.model.isMale) }}Yes{{ else }}No{{ endif }}" +
+        "Age:{{ age }}" +
+        "{{ enditer }}" +
+        "{{ endif }}" +
+        "{{ endif }}",
         model : {
             users : [
                 {name : "Mattias", isMale : true, age : 31},
@@ -2094,7 +2094,7 @@ test("niter tag", function() {
     ok(c = $().mcomponent({
         model : {
             list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{% niter userListIter list %}{% endniter %}",
+        }, viewHtml : "{{ niter userListIter list }}{{ endniter }}",
         throwOnError : true
     }), "Construction OK!");
 
@@ -2107,7 +2107,7 @@ test("niter tag", function() {
         iter : {
             userListIter : { itemsPerPage : 1 }
         },
-        viewHtml : "{% niter userListIter list %}{% endniter %}"}), "Construction OK lets go!!");
+        viewHtml : "{{ niter userListIter list }}{{ endniter }}"}), "Construction OK lets go!!");
 
     equal(c._assertRender(), "", "Should contain nothing.");
 
@@ -2120,7 +2120,7 @@ test("niter tag", function() {
                 itemsPerPage : 1
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should first element only since itemsPerPage is 1.");
 
     ok(c = $().mcomponent({
@@ -2133,7 +2133,7 @@ test("niter tag", function() {
                 }
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should first element only.");
 
     a = 3;
@@ -2159,7 +2159,7 @@ test("niter tag", function() {
                 }
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
     equal(c._assertRender(), "mattias", "Should first element only.");
     equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
@@ -2185,7 +2185,7 @@ test("niter tag", function() {
                 }
             }
         },
-        viewHtml : "{% niter userListIterYeah list %}{% show %}{% endniter %}"}), "Construction OK!");
+        viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should first element only.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     equal(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
@@ -2213,22 +2213,22 @@ test("Child components", function() {
     var c;
     var parent;
 
-    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{% username %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
-    ok(parent = $().mcomponent({model : {username : "jenny"}, viewHtml : "{% username %}"}), "Construction OK!");
+    ok(parent = $().mcomponent({model : {username : "jenny"}, viewHtml : "{{ username }}"}), "Construction OK!");
     equal(parent._assertRender(), "jenny", "Should contain 'jenny'.");
 
-    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{% username %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Construction OK!");
     equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
-    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{% userNumber %} {% component mat %}"}), "Construction OK!");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mat }}"}), "Construction OK!");
     parent.addChild("mat", c);
     equal(parent._assertRender(), "3 mattias", "Should contain '3 mattias'.");
 
-    ok(c = $().mcomponent({model : {color : "black"}, viewHtml : "{% color %}"}), "Construction OK!");
+    ok(c = $().mcomponent({model : {color : "black"}, viewHtml : "{{ color }}"}), "Construction OK!");
     equal(c._assertRender(), "black", "Should contain 'black'.");
     ok(parent = $().mcomponent({
         model : {label : "The color : "},
-        viewHtml : "{% label %}{% component testChild %}",
+        viewHtml : "{{ label }}{{ component testChild }}",
         children : {
             "testChild" : c
         }
@@ -2289,41 +2289,41 @@ Timer.prototype.toString = function() {
 var doMcomponentProfiling = function() {
 
     var c;
-    var view = "  {% if (this.model) %} yay we have a model!\n" +
-        "{% if (this.model.users) %}\n" +
-        "{% niter users users %}\n" +
-        "Name:{% name %}<br/>\n" +
-        "Male:{% if (this.model.isMale) %}Yes{% else %}No{% endif %}<br/>\n" +
-        "Age:{% age %}\n" +
-        "{% endniter %}\n" +
+    var view = "  {{ if (this.model) }} yay we have a model!\n" +
+        "{{ if (this.model.users) }}\n" +
+        "{{ niter users users }}\n" +
+        "Name:{{ name }}<br/>\n" +
+        "Male:{{ if (this.model.isMale) }}Yes{{ else }}No{{ endif }}<br/>\n" +
+        "Age:{{ age }}\n" +
+        "{{ endniter }}\n" +
         "\n" +
-        "{% if (this.model.location) %}\n" +
-        "{% push location %}\n" +
+        "{{ if (this.model.location) }}\n" +
+        "{{ push location }}\n" +
         "\n" +
-        "{% push city %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push city }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "City has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% push country %}\n" +
-        "{% if (this.model.name) %}\n" +
-        "{% name %}\n" +
-        "{% else %}\n" +
+        "{{ push country }}\n" +
+        "{{ if (this.model.name) }}\n" +
+        "{{ name }}\n" +
+        "{{ else }}\n" +
         "Country has no name\n" +
-        "{% endif %}\n" +
-        "{% endpush %}\n" +
+        "{{ endif }}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% endpush %}\n" +
+        "{{ endpush }}\n" +
         "\n" +
-        "{% else %}\n" +
+        "{{ else }}\n" +
         "No location\n" +
-        "{% endif %}\n" +
+        "{{ endif }}\n" +
         "\n" +
-        "{% endif %}\n" +
-        "{% endif %}\n";
+        "{{ endif }}\n" +
+        "{{ endif }}\n";
 
     var m = {
         users : [
@@ -2382,8 +2382,8 @@ setTimeout(function() {
 
 /*
 
- {% context.index %}
- {% show context.index %}
- {% if (context.index) %}
+ {{ context.index }}
+ {{ show context.index }}
+ {{ if (context.index) }}
 
  */

@@ -1,8 +1,7 @@
 (function($) {
     $.fn.mcomponent = function(args) {
-
-        var startTag = "{%";
-        var endTag = "%}";
+        var startTag = "{{";
+        var endTag = "}}";
         var that = this;
         var list;
         var result = {};
