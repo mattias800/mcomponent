@@ -1870,6 +1870,98 @@ test("niter tag, filter function", function() {
 
   equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
 
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 3,
+                              filter : function(user) {
+                                return user.age > 18;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 4,
+                              filter : function(user) {
+                                return user.age > 18;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 40,
+                              filter : function(user) {
+                                return user.age > 18;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 40,
+                              filter : function(user) {
+                                return user.age < 18;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "buttersstan", "Should first element only.");
+
 });
 
 test("js and showjs tags", function() {

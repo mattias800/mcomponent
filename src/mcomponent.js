@@ -870,10 +870,6 @@
 
             resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + iterId + "', " + listVar + ")");
 
-            if (iterId == "filteredUserListIter") {
-              console.log("iterConfig", iterId, iterConfig);
-            }
-
             if (iterConfig && iterConfig.filter) {
               // Apply filter function to list.
               if (typeof iterConfig.filter !== "function") throw "Iterator config '" + iterId + "' has a filter, but it is not a function.";
