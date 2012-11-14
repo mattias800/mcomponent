@@ -1844,6 +1844,34 @@ test("niter tag, pages callbacks", function() {
 
 });
 
+test("niter tag, filter function", function() {
+  var c;
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 2,
+                              filter : function(user) {
+                                return user.age > 18;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
+
+});
+
 test("js and showjs tags", function() {
 
   var c;

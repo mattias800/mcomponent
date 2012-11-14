@@ -37,15 +37,7 @@
         rootModel = args.model;
         _setModel(rootModel);
       }
-      for (var id in args.clipboard) {
-        var html = args.clipboard[id];
-        var r = buildList(html);
-        if (r.error) {
-          throw "Failed to add clipboard with id='" + id + "':" + r.message;
-        } else {
-          executionContext.setClipboardWithName(id, buildTree(r.list));
-        }
-      }
+
       for (var iterId in args.iter) {
         executionContext.setIteratorConfigForId(iterId,
                                                 $.extend({
@@ -68,6 +60,16 @@
                                                          }, args.iter[iterId]
                                                 )
         );
+      }
+
+      for (var id in args.clipboard) {
+        var html = args.clipboard[id];
+        var r = buildList(html);
+        if (r.error) {
+          throw "Failed to add clipboard with id='" + id + "':" + r.message;
+        } else {
+          executionContext.setClipboardWithName(id, buildTree(r.list));
+        }
       }
 
       // Set view, do this last since it also compiles the view!
@@ -408,6 +410,10 @@
       var itemsShowing = iterConfig.itemsPerPage;
       var currentPage = 0;
       var showingAllItems = false;
+
+      this.getConfig = function() {
+        return config;
+      };
 
       this.getStart = function() {
         if (config.usePages) {
@@ -830,29 +836,26 @@
           var isNiter = tagInstance.tagName == "niter";
           var iterContext;
           var niterParameters;
+          var iterId = undefined;
+          var iterConfig = undefined;
 
           var name = tagInstance.tag.parameters;
 
           if (isNiter) {
             niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
             name = niterParameters.variableName;
+            iterId = niterParameters.iterName;
+            iterConfig = executionContext.getIteratorConfigForId(iterId);
           }
 
-          var listVar = getUncompiledVariableName("list");
+          var listVar;
+          var filteredListVar = getUncompiledVariableName("filteredList");
+          var filterFunctionVar = getUncompiledVariableName("filter");
           var iVar = getUncompiledVariableName("i");
           var iterContextVar = getUncompiledVariableName("iterContext");
           var startVar = getUncompiledVariableName("start");
           var endVar = getUncompiledVariableName("end");
           var stackItemVar = getUncompiledVariableName("stackItem");
-
-
-          /*
-           var compiledLookup = _compileLookupFunctionForVariableWithName(name);
-           var lookupVar = compiledLookup.lookupFunctionName;
-           resultOuter.pushCompiledSource(compiledLookup.compiledSource);
-           resultOuter.push("var " + listVar + " = " + createConditionForValueExists("model", name) + " ? model." + name + " : " + lookupVar + "()");
-           resultOuter.pushThrowIf(listVar + " == undefined", "iterator model is undefined.", tagInstance);
-           */
 
           var compiledLookup = compileLookup(name);
           listVar = compiledLookup.varName;
@@ -864,7 +867,24 @@
           resultOuter.push("} else {");
 
           if (isNiter) {
-            resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + niterParameters.iterName + "', " + listVar + ")");
+
+            resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + iterId + "', " + listVar + ")");
+
+            if (iterId == "filteredUserListIter") {
+              console.log("iterConfig", iterId, iterConfig);
+            }
+
+            if (iterConfig && iterConfig.filter) {
+              // Apply filter function to list.
+              if (typeof iterConfig.filter !== "function") throw "Iterator config '" + iterId + "' has a filter, but it is not a function.";
+              resultOuter.push("var " + filteredListVar + " = []");
+              resultOuter.push("var " + filterFunctionVar + " = " + iterContextVar + ".getConfig().filter");
+              resultOuter.push("for (var " + iVar + " = 0; " + iVar + " < " + listVar + ".length; " + iVar + "++) {");
+              resultOuter.push("  if (" + filterFunctionVar + "(" + listVar + "[" + iVar + "])) " + filteredListVar + ".push(" + listVar + "[" + iVar + "])");
+              resultOuter.push("}");
+              resultOuter.push(listVar + " = " + filteredListVar);
+            }
+
             resultOuter.push("var " + startVar + " = " + iterContextVar + ".getStart()");
             resultOuter.push("var " + endVar + " = Math.min(" + iterContextVar + ".getEnd(), " + listVar + ".length)");
           } else {
