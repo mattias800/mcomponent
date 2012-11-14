@@ -1824,7 +1824,6 @@ test("niter tag, pages callbacks", function() {
                               itemsPerPage : 2,
                               usePages : true,
                               whenNotFirstOrLastPageIsShowing : function(api) {
-                                alert("whenNotFirstOrLastPageIsShowing");
                                 a = 77;
                               }
                             }
@@ -1837,6 +1836,7 @@ test("niter tag, pages callbacks", function() {
   equal(i.getCurrentPage(), 0, "Should be on page 0.");
   equal(a, 22, "Should be 22.");
   i.showNextPage();
+  c._assertRender();
   equal(i.getCurrentPage(), 1, "Should be on page 1.");
   equal(i.getPageCount(), 3);
   ok(!i.isOnFirstOrLastPage(), "Should not be isOnFirstOrLastPage");
