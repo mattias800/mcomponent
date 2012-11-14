@@ -56,7 +56,8 @@
                                                            whenFirstPageIsShowing : function() {
                                                            },
                                                            whenLastPageIsShowing : function() {
-                                                           }
+                                                           },
+                                                           where : undefined
                                                          }, args.iter[iterId]
                                                 )
         );
@@ -870,11 +871,11 @@
 
             resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + iterId + "', " + listVar + ")");
 
-            if (iterConfig && iterConfig.filter) {
+            if (iterConfig && iterConfig.where) {
               // Apply filter function to list.
-              if (typeof iterConfig.filter !== "function") throw "Iterator config '" + iterId + "' has a filter, but it is not a function.";
+              if (typeof iterConfig.where !== "function") throw "Iterator config '" + iterId + "' has a filter, but it is not a function.";
               resultOuter.push("var " + filteredListVar + " = []");
-              resultOuter.push("var " + filterFunctionVar + " = " + iterContextVar + ".getConfig().filter");
+              resultOuter.push("var " + filterFunctionVar + " = " + iterContextVar + ".getConfig().where");
               resultOuter.push("for (var " + iVar + " = 0; " + iVar + " < " + listVar + ".length; " + iVar + "++) {");
               resultOuter.push("  if (" + filterFunctionVar + "(" + listVar + "[" + iVar + "])) " + filteredListVar + ".push(" + listVar + "[" + iVar + "])");
               resultOuter.push("}");

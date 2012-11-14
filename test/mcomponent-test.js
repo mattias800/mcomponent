@@ -1861,7 +1861,7 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 2,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age > 18;
                               }
                             }
@@ -1884,7 +1884,7 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 3,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age > 18;
                               }
                             }
@@ -1907,7 +1907,7 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 4,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age > 18;
                               }
                             }
@@ -1930,7 +1930,7 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 40,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age > 18;
                               }
                             }
@@ -1953,7 +1953,7 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 40,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age < 18;
                               }
                             }
@@ -1976,14 +1976,37 @@ test("niter tag, filter function", function() {
                             filteredUserListIter : {
                               usePages : true,
                               itemsPerPage : 40,
-                              filter : function(user) {
+                              where : function(user) {
                                 return user.age == 9;
                               }
                             }
                           },
                           viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
 
-  equal(c._assertRender(), "stan", "Should first element only.");
+  equal(c._assertRender(), "stan", "Should contain stan only.");
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 40,
+                              where : function(user) {
+                                return user.age == 1;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "", "Should be empty.");
 
 });
 
