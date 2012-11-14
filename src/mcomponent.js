@@ -1137,7 +1137,7 @@
                                     };
                                 }
                             } else {
-                                throw createCompileExceptionMessage("Found closing tag '" + tagName + "' without starting tag.", item);
+                                throw createCompileExceptionMessage("Found closing tag without starting '" + tagName + "' tag.", item);
                             }
                         } else {
                             // Something other than end*
