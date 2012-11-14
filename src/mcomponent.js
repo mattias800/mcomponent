@@ -445,43 +445,56 @@
             }
           }
         } else {
-          // Using pages, run pages callbacks.
-          var isFirstPage = this.currentPage == 0;
-          var isLastPage = this.currentPage == getPageCount();
-          var isFirstOrLast = isFirstPage || isLastPage;
-          var isFirstAndLast = isFirstPage && isLastPage;
 
-          if (isFirstOrLast && typeof config.whenFirstOrLastPageIsShowing === "function") {
-            config.whenFirstOrLastPageIsShowing(this.getPublicInterface());
+          // Using pages, run pages callbacks.
+
+          if (typeof config.whenFirstOrLastPageIsShowing === "function") {
+            if (isOnFirstOrLastPage()) config.whenFirstOrLastPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenFirstOrLastPageIsShowing is not a function.";
           }
 
-          if (!isFirstOrLast && typeof config.whenNotFirstOrLastPageIsShowing === "function") {
-            config.whenNotFirstOrLastPageIsShowing(this.getPublicInterface());
+          if (typeof config.whenNotFirstOrLastPageIsShowing === "function") {
+            if (!isOnFirstOrLastPage()) config.whenNotFirstOrLastPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenNotFirstOrLastPageIsShowing is not a function.";
           }
 
-          if (isFirstAndLast && typeof config.whenFirstAndLastPageIsShowing === "function") {
-            config.whenFirstAndLastPageIsShowing(this.getPublicInterface());
+          if (typeof config.whenFirstAndLastPageIsShowing === "function") {
+            if (isOnFirstAndLastPage()) config.whenFirstAndLastPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenFirstAndLastPageIsShowing is not a function.";
           }
 
-          if (isFirstPage && typeof config.whenFirstPageIsShowing === "function") {
-            config.whenFirstPageIsShowing(this.getPublicInterface());
+          if (typeof config.whenFirstPageIsShowing === "function") {
+            if (isOnFirstPage()) config.whenFirstPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenFirstPageIsShowing is not a function.";
           }
 
-          if (isLastPage && typeof config.whenLastPageIsShowing === "function") {
-            config.whenLastPageIsShowing(this.getPublicInterface());
+          if (typeof config.whenLastPageIsShowing === "function") {
+            if (isOnLastPage()) config.whenLastPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenLastPageIsShowing is not a function.";
           }
 
         }
+      };
+
+      var isOnFirstPage = function() {
+        return currentPage == 0;
+      };
+
+      var isOnLastPage = function() {
+        return currentPage == getPageCount() - 1;
+      };
+
+      var isOnFirstOrLastPage = function() {
+        return isOnFirstPage() || isOnLastPage();
+      };
+
+      var isOnFirstAndLastPage = function() {
+        return isOnFirstPage() && isOnLastPage();
       };
 
       var getPageCount = function() {
@@ -508,6 +521,9 @@
             itemsShowing = model.length;
             showingAllItems = true;
           },
+          getCurrentPage : function() {
+            return currentPage;
+          },
           getPageCount : function() {
             return getPageCount();
           },
@@ -520,6 +536,18 @@
             if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
             currentPage--;
             if (currentPage < 0) currentPage = 0;
+          },
+          isOnFirstPage : function() {
+            return isOnFirstPage();
+          },
+          isOnLastPage : function() {
+            return isOnLastPage();
+          },
+          isOnFirstOrLastPage : function() {
+            return isOnFirstOrLastPage();
+          },
+          isOnFirstAndLastPage : function() {
+            return isOnFirstAndLastPage();
           }
         }
 
