@@ -1452,10 +1452,10 @@ test("niter tag, using show more", function() {
         iter : {
             userListIterYeah : {
                 itemsPerPage : 1,
-                allItemsAreShowingCallback : function() {
+                whenAllItemsAreShowing : function() {
                     a = 5;
                 },
-                notAllItemsAreShowingCallback : function() {
+                whenNotAllItemsAreShowing : function() {
                     b = 2;
                 }
             }
@@ -1463,7 +1463,7 @@ test("niter tag, using show more", function() {
         viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
     equal(c._assertRender(), "mattias", "Should first element only.");
-    equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
+    equal(b, 2, "b should be 2 after whenNotAllItemsAreShowing has been run.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     i.showMoreItems();
     equal(c._assertRender(), "mattiasmarcus", "Should contain one more element.");
@@ -1481,7 +1481,7 @@ test("niter tag, using show more", function() {
         iter : {
             userListIterYeah : {
                 itemsPerPage : 1,
-                allItemsAreShowingCallback : function() {
+                whenAllItemsAreShowing : function() {
                     a = 5;
                 }
             }
@@ -2128,7 +2128,7 @@ test("niter tag", function() {
         iter : {
             userListIterYeah : {
                 itemsPerPage : 1,
-                allItemsAreShowingCallback : function() {
+                whenAllItemsAreShowing : function() {
                     a = 5;
                 }
             }
@@ -2151,10 +2151,10 @@ test("niter tag", function() {
         iter : {
             userListIterYeah : {
                 itemsPerPage : 1,
-                allItemsAreShowingCallback : function() {
+                whenAllItemsAreShowing : function() {
                     a = 5;
                 },
-                notAllItemsAreShowingCallback : function() {
+                whenNotAllItemsAreShowing : function() {
                     b = 2;
                 }
             }
@@ -2162,7 +2162,7 @@ test("niter tag", function() {
         viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     equal(b, 1, "b should be 1 first.");
     equal(c._assertRender(), "mattias", "Should first element only.");
-    equal(b, 2, "b should be 2 after notAllItemsAreShowingCallback has been run.");
+    equal(b, 2, "b should be 2 after whenNotAllItemsAreShowing has been run.");
     ok(i = c.getIterator("userListIterYeah"), "Should be able to get iterator context.");
     i.showMoreItems();
     equal(c._assertRender(), "mattiasmarcus", "Should contain one more element.");
@@ -2180,7 +2180,7 @@ test("niter tag", function() {
         iter : {
             userListIterYeah : {
                 itemsPerPage : 1,
-                allItemsAreShowingCallback : function() {
+                whenAllItemsAreShowing : function() {
                     a = 5;
                 }
             }
