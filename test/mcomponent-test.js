@@ -1641,6 +1641,7 @@ test("niter tag, using pages", function() {
 test("niter tag, pages callbacks", function() {
   var c;
   var a = 1;
+  var i;
 
   ok(c = $().mcomponent({
                           model : {
@@ -1661,6 +1662,89 @@ test("niter tag, pages callbacks", function() {
   ok(i = c.getIterator("userListIter"));
   equal(i.getPageCount(), 5);
   equal(a, 2, "Should be 2 after callback has run.");
+
+  a = 1;
+  ok(c = $().mcomponent({
+                          model : {
+                            list : ["mattias", "marcus", "johan", "butters", "stan"]
+                          },
+                          iter : {
+                            userListIter : {
+                              itemsPerPage : 1,
+                              usePages : true,
+                              whenNotFirstPageIsShowing : function(api) {
+                                a = 2;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+  equal(a, 1, "Should be 1 first.");
+  equal(c._assertRender(), "mattias", "Should first element only.");
+  ok(i = c.getIterator("userListIter"));
+  equal(i.getPageCount(), 5);
+  equal(a, 1, "Should be 1 after callback has run.");
+  i.showNextPage();
+  equal(c._assertRender(), "marcus", "Should first element only.");
+  equal(a, 2, "Should be 2 after callback has run.");
+
+
+  a = 1;
+  ok(c = $().mcomponent({
+                          model : {
+                            list : ["mattias", "marcus", "johan", "butters", "stan"]
+                          },
+                          iter : {
+                            userListIter : {
+                              itemsPerPage : 3,
+                              usePages : true,
+                              whenNotLastPageIsShowing : function(api) {
+                                a = 2;
+                              },
+                              whenLastPageIsShowing : function(api) {
+                                a = 3;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}),
+     "Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!");
+
+  equal(a, 1, "Should be 1 first.");
+  equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
+  ok(i = c.getIterator("userListIter"));
+  equal(i.getPageCount(), 2);
+  equal(a, 2, "Should be 2 after callback has run.");
+  i.showNextPage();
+  equal(c._assertRender(), "buttersstan", "Should first element only.");
+  equal(a, 3, "Should be 3 after callback has run.");
+
+  a = 1;
+  ok(c = $().mcomponent({
+                          model : {
+                            list : ["mattias", "marcus", "johan", "butters", "stan"]
+                          },
+                          iter : {
+                            iterBeforeRender : {
+                              itemsPerPage : 3,
+                              usePages : true,
+                              whenNotLastPageIsShowing : function(api) {
+                                a = 2;
+                              },
+                              whenLastPageIsShowing : function(api) {
+                                a = 3;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter iterBeforeRender list }}{{ show }}{{ endniter }}"}),
+     "Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!");
+
+  ok(i = c.getIterator("userListIter"), "Should be able to use iterator before rendering the component.");
+  equal(a, 1, "Should be 1 first.");
+  equal(c._assertRender(), "mattiasmarcusjohan", "Should first element only.");
+  equal(i.getPageCount(), 2);
+  equal(a, 2, "Should be 2 after callback has run.");
+  i.showNextPage();
+  equal(c._assertRender(), "buttersstan", "Should first element only.");
+  equal(a, 3, "Should be 3 after callback has run.");
 
 
   a = 2;
@@ -2009,6 +2093,63 @@ test("niter tag, filter function", function() {
   equal(c._assertRender(), "", "Should be empty.");
 
 });
+
+test("niter tag, filter function and getPageCount() in iterator", function() {
+  var c, i;
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 1,
+                              where : function(user) {
+                                return user.age > 30;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "mattias", "Should be empty.");
+  ok(i = c.getIterator("filteredUserListIter"), "Iterator should exist");
+  equal(i.getPageCount(), 3, "3 pages when there are 3 items after where has been applied.");
+
+  ok(c = $().mcomponent({
+                          model : {
+                            list : [
+                              {age : 32, name : "mattias"},
+                              {age : 8, name : "butters"},
+                              {age : 32, name : "marcus"},
+                              {age : 31, name : "johan"},
+                              {age : 9, name : "stan"}
+                            ]
+                          },
+                          iter : {
+                            filteredUserListIter : {
+                              usePages : true,
+                              itemsPerPage : 1,
+                              where : function(user) {
+                                return user.age == 1;
+                              }
+                            }
+                          },
+                          viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+  equal(c._assertRender(), "", "Should be empty.");
+  ok(i = c.getIterator("filteredUserListIter"), "Iterator should exist");
+  equal(i.getPageCount(), 0, "0 page when there are 0 items.");
+
+
+});
+
 
 test("js and showjs tags", function() {
 

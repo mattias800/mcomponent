@@ -438,6 +438,7 @@
       var itemsShowing = iterConfig.itemsPerPage;
       var currentPage = 0;
       var showingAllItems = false;
+      var whereFunction = config.where;
 
       this.getConfig = function() {
         return config;
@@ -544,7 +545,15 @@
       };
 
       var getPageCount = function() {
-        return Math.ceil(model.length / config.itemsPerPage);
+        var s;
+        if (whereFunction) {
+          // We have a where-function, we need to use it when counting pages.
+          s = 0;
+          for (var i = 0; i < model.length; i++) if (whereFunction(model[i])) s++;
+        } else {
+          s = model.length;
+        }
+        return Math.ceil(s / config.itemsPerPage);
       };
 
       this.getPublicInterface = function() {
