@@ -125,6 +125,7 @@
       this.renderResult = [];
       this.renderErrors = [];
       this.currentTag = {};
+      this.iteratorsToUpdateAfterRender = [];
 
       var that = this;
 
@@ -133,6 +134,14 @@
         this.renderResult = [];
         this.renderErrors = [];
         this.currentTag = {};
+      };
+
+      this.afterRender = function() {
+        // Update iterators. This was previously done while rendering, but we want to render, place result in DOM and finally run this.
+        for (var i = 0; i < this.iteratorsToUpdateAfterRender.length; i++) {
+          var iterObj = this.iteratorsToUpdateAfterRender[i];
+          iterObj.iterator.renderUpdate(iterObj.start, iterObj.end);
+        }
       };
 
       this.pushCurrentRenderError = function(message) {
@@ -170,6 +179,8 @@
 
       this.addChild = function(id, child) {
         this.children[id] = child;
+        // Must recompile the view, with the new child included.
+        compileView();
       };
 
       /**
@@ -963,7 +974,7 @@
           resultOuter.pushCompiledSource(createModelContextUpdateCompiledSource());
 
           if (isNiter) {
-            resultOuter.push(iterContextVar + ".renderUpdate(" + startVar + ", " + endVar + ")");
+            resultOuter.push("executionContext.iteratorsToUpdateAfterRender.push({ iterator : " + iterContextVar + ", start : " + startVar + ", end : " + endVar + " })");
           }
 
           resultOuter.push("}");
@@ -1015,6 +1026,18 @@
     };
 
     var compileView = function() {
+      try {
+        compileViewInner();
+        compilationContext.compileError = undefined;
+      } catch (e) {
+        compilationContext.compileError = e;
+        if (mainArgs.throwOnError) {
+          throw e;
+        }
+      }
+    };
+
+    var compileViewInner = function() {
       var r = buildList(view.html);
       if (r.error) {
         throw r.message;
@@ -1028,15 +1051,7 @@
     var _setViewWithHtml = function(html) {
       view.html = html;
       if (html) {
-        try {
-          compileView();
-          compilationContext.compileError = undefined;
-        } catch (e) {
-          compilationContext.compileError = e;
-          if (mainArgs.throwOnError) {
-            throw e;
-          }
-        }
+        compileView();
       } else {
         view.list = [];
         view.tree = {};
@@ -1876,6 +1891,9 @@
         if (placeHolder) {
           placeHolder.appendChild(result.node);
         }
+
+        executionContext.afterRender();
+
         return result;
       },
 
@@ -1973,7 +1991,7 @@
       },
 
       _assertRender : function() {
-        return compile({tree : getView().tree}).render();
+        return this.render().html;
       },
 
       _assertCompileLogSource : function() {
