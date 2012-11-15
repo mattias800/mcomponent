@@ -1,7 +1,7 @@
 (function($) {
   $.fn.mcomponent = function(args) {
-    var startTag = "{{";
-    var endTag = "}}";
+    var startTagToken = "{{";
+    var endTagToken = "}}";
     var that = this;
     var list;
     var result = {};
@@ -56,6 +56,10 @@
                                                            whenFirstPageIsShowing : function() {
                                                            },
                                                            whenLastPageIsShowing : function() {
+                                                           },
+                                                           whenNotFirstPageIsShowing : function() {
+                                                           },
+                                                           whenNotLastPageIsShowing : function() {
                                                            },
                                                            where : undefined
                                                          }, args.iter[iterId]
@@ -135,7 +139,7 @@
       };
 
       this.renderErrorToString = function(error) {
-        return "<div>Error at tag {% " + error.tag + " %}: " + error.message + "</div>"
+        return "<div>Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message + "</div>"
       };
 
       /**
@@ -340,6 +344,11 @@
             return that.executionStack[0].model;
           },
           getIterator : function(iteratorName) {
+            if (iteratorName == "iterBeforeRender") {
+              console.log("OK VAFAN!");
+              console.log("iteratorName", iteratorName);
+            }
+            executionContext.ensureIterator(iteratorName);
             var i = executionContext.getIteratorWithName(iteratorName);
             return i ? i.getPublicInterface() : undefined;
           }
@@ -483,6 +492,18 @@
             if (isOnLastPage()) config.whenLastPageIsShowing(this.getPublicInterface());
           } else {
             throw "Iterator '" + config.name + "' whenLastPageIsShowing is not a function.";
+          }
+
+          if (typeof config.whenNotFirstPageIsShowing === "function") {
+            if (!isOnFirstPage()) config.whenNotFirstPageIsShowing(this.getPublicInterface());
+          } else {
+            throw "Iterator '" + config.name + "' whenNotFirstPageIsShowing is not a function.";
+          }
+
+          if (typeof config.whenNotLastPageIsShowing === "function") {
+            if (!isOnLastPage()) config.whenNotLastPageIsShowing(this.getPublicInterface());
+          } else {
+            throw "Iterator '" + config.name + "' whenNotLastPageIsShowing is not a function.";
           }
 
         }
@@ -696,7 +717,7 @@
         },
 
         createTagInstance : function(args) {
-          if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: {% if model.isNice %}", args.tag);
+          if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: " + startTagToken + " if model.isNice " + endTagToken, args.tag);
           var condition = args.tag.parameters;
           var conditionFunction = createExpressionFunction(args.tag.parameters);
           var c = createIfTag(args.subList, condition);
@@ -1015,7 +1036,7 @@
     var buildList = function(viewHtml) {
       var list = [];
       for (var i = 0; i < args.maxTagCount; i++) {
-        var startIndex = viewHtml.indexOf(startTag);
+        var startIndex = viewHtml.indexOf(startTagToken);
 
         if (startIndex < 0) {
           // No tags left, just add rest as HTML.
@@ -1027,7 +1048,7 @@
           if (html) list.push({html : html});
         }
 
-        var endIndex = viewHtml.indexOf(endTag);
+        var endIndex = viewHtml.indexOf(endTagToken);
 
         if (endIndex < 0) {
           return {error : true, message : "Missing end tag."};
@@ -1035,11 +1056,11 @@
           return {error : true, message : "Too many end tags."};
         }
 
-        var tagContent = $.trim(viewHtml.substring(startIndex + startTag.length, endIndex));
+        var tagContent = $.trim(viewHtml.substring(startIndex + startTagToken.length, endIndex));
 
         list.push(createTagObject(tagContent));
 
-        viewHtml = viewHtml.substring(endIndex + endTag.length);
+        viewHtml = viewHtml.substring(endIndex + endTagToken.length);
 
       }
       return {
@@ -1334,7 +1355,7 @@
 
     var createCompileExceptionMessage = function(text, tag) {
       var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
-      return "Error compiling tag {% " + tagText + " %}: " + text;
+      return "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
     };
 
     var compilePartToSource = function(args) {
@@ -1427,7 +1448,7 @@
                 console.log("model", _getModel());
               }
               if (mainArgs.throwOnError) {
-                throw "Error at tag {% " + executionContext.currentTag.name + " %}: " + e.toString();
+                throw "Error at tag " + startTagToken + " " + executionContext.currentTag.name + " " + endTagToken + ": " + e.toString();
               } else {
                 executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
               }
@@ -1652,10 +1673,10 @@
       this.pushTagComment = function(tag) {
         var tagString = (tag.tag.tag ? tag.tag.tag : tag.tag);
         var tagStringAsJs = encodeStringToJsString(tagString);
-        if (args.logTags) stack.push("console.log('{% ' + " + tagStringAsJs + " + ' %}', model, executionContext.executionStack)");
+        if (args.logTags) stack.push("console.log('" + startTagToken + " ' + " + tagStringAsJs + " + ' " + endTagToken + "', model, executionContext.executionStack)");
         stack.push("");
         stack.push(" /***********************************");
-        stack.push(" * tag: {% " + tagString + " %}");
+        stack.push(" * tag: " + startTagToken + " " + tagString + " " + endTagToken);
         stack.push(" ************************************/");
         stack.push("executionContext.currentTag.name = " + tagStringAsJs);
       };
