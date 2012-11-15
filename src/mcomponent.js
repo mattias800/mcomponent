@@ -93,6 +93,24 @@
 
     };
 
+    var CompilationContext_ = function() {
+
+      var that = this;
+
+      this.successfullyCompiledTags = [];
+      this.compileError = undefined;
+
+      this.addSuccessfullyCompiledTag = function(tag) {
+        this.successfullyCompiledTags.push(tag);
+      };
+
+      this.getSuccessfullyCompiledTags = function() {
+        return this.successfullyCompiledTags;
+      }
+    };
+
+    var compilationContext = new CompilationContext_();
+
     /**
      * @constructor
      */
@@ -1003,9 +1021,9 @@
       if (html) {
         try {
           compileView();
-          executionContext.compileError = undefined;
+          compilationContext.compileError = undefined;
         } catch (e) {
-          executionContext.compileError = e;
+          compilationContext.compileError = e;
           if (mainArgs.throwOnError) {
             throw e;
           }
@@ -1120,6 +1138,8 @@
             //throw "No such tag type: " + item.tagName;
           }
         }
+
+        compilationContext.addSuccessfullyCompiledTag(item);
       }
       return root;
     };
@@ -1355,7 +1375,8 @@
 
     var createCompileExceptionMessage = function(text, tag) {
       var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
-      return "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
+      var msg = "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
+      return msg;
     };
 
     var compilePartToSource = function(args) {
@@ -1410,22 +1431,31 @@
 
     var compile = function(args) {
       var debugEnabled = false;
-      var sourceObj = compileToSource(args);
-      var source = sourceObj.full;
-      var bodySource = sourceObj.body;
-
-      if (args.logSource) console.log(source);
-      var f;
+      var sourceObj;
 
       try {
-        f = new Function("executionContext", "api", "rootModel", source);
+        sourceObj = compileToSource(args);
       } catch (e) {
-        if (debugEnabled && typeof console == "object") {
-          console.log(source);
-          console.log(e);
-          console.log(e.toString());
+        compilationContext.compileError = e;
+      }
+
+      if (sourceObj) {
+        var source = sourceObj.full;
+        var bodySource = sourceObj.body;
+
+        if (args.logSource) console.log(source);
+        var f;
+
+        try {
+          f = new Function("executionContext", "api", "rootModel", source);
+        } catch (e) {
+          if (debugEnabled && typeof console == "object") {
+            console.log(source);
+            console.log(e);
+            console.log(e.toString());
+          }
+          compilationContext.compileError = e;
         }
-        executionContext.compileError = e;
       }
       return {
         getSource : function() {
@@ -1454,9 +1484,10 @@
               }
             }
           }
-          if (executionContext.compileError) {
-            var msg = createCompileErrorString(executionContext.compileError);
+          if (compilationContext.compileError) {
+            var msg = createCompileErrorString(compilationContext.compileError);
             executionContext.renderResult = [msg];
+
             if (mainArgs.throwOnError) {
               throw msg;
             }
@@ -1817,8 +1848,8 @@
             result.html = e.toString();
             if (args.throwOnError) throw e;
           }
-        } else if (executionContext.compileError) {
-          var msg = createCompileErrorString(executionContext.compileError);
+        } else if (compilationContext.compileError) {
+          var msg = createCompileErrorString(compilationContext.compileError);
           result.html = msg;
           if (args.throwOnError) throw msg;
         } else {
