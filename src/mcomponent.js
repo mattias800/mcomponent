@@ -8,21 +8,22 @@ function mcomponent(args) {
 
     var rootModel;
 
-    var mainArgs = args = $.extend({
-        viewHtml : undefined,
-        viewFromComponent : undefined,
-        model : undefined,
-        clipboard : {},
-        children : {},
-        iter : {},
-        maxTagCount : 1000,
-        placeHolder : undefined,
-        placeHolderId : undefined,
-        clearPlaceHolderBeforeRender : true,
-        logTags : false,
-        afterRender : undefined,
-        throwOnError : false // Used for unit testing.
-    }, args);
+    var mainArgs = args;
+
+    // Set default values.
+    args.viewHtml = args.viewHtml || undefined;
+    args.viewFromComponent = args.viewFromComponent || undefined;
+    args.model = args.model || undefined;
+    args.clipboard = args.clipboard || {};
+    args.children = args.children || {};
+    args.iter = args.iter || {};
+    args.maxTagCount = args.maxTagCount || 1000;
+    args.placeHolder = args.placeHolder || undefined;
+    args.placeHolderId = args.placeHolderId || undefined;
+    args.clearPlaceHolderBeforeRender = args.clearPlaceHolderBeforeRender !== undefined ? args.clearPlaceHolderBeforeRender : true;
+    args.logTags = args.logTags !== undefined ? args.logTags : false;
+    args.afterRender = args.afterRender || undefined;
+    args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false; // Used for unit testing.
 
     var init = function() {
         if (args.placeHolder) {
@@ -38,32 +39,29 @@ function mcomponent(args) {
         }
 
         for (var iterId in args.iter) {
-            executionContext.setIteratorConfigForId(iterId,
-                $.extend({
-                        usePages : false,
-                        itemsPerPage : 10,
-                        whenAllItemsAreShowing : function() {
-                        },
-                        whenNotAllItemsAreShowing : function() {
-                        },
-                        whenFirstOrLastPageIsShowing : function() {
-                        },
-                        whenNotFirstOrLastPageIsShowing : function() {
-                        },
-                        whenFirstAndLastPageIsShowing : function() {
-                        },
-                        whenFirstPageIsShowing : function() {
-                        },
-                        whenLastPageIsShowing : function() {
-                        },
-                        whenNotFirstPageIsShowing : function() {
-                        },
-                        whenNotLastPageIsShowing : function() {
-                        },
-                        where : undefined
-                    }, args.iter[iterId]
-                )
-            );
+            var config = args.iter[iterId];
+            config.usePages = config.usePages !== undefined ? config.usePages : false;
+            config.itemsPerPage = config.itemsPerPage || 10;
+            config.whenAllItemsAreShowing = config.whenAllItemsAreShowing || function() {
+            };
+            config.whenNotAllItemsAreShowing = config.whenNotAllItemsAreShowing || function() {
+            };
+            config.whenFirstOrLastPageIsShowing = config.whenFirstOrLastPageIsShowing || function() {
+            };
+            config.whenNotFirstOrLastPageIsShowing = config.whenNotFirstOrLastPageIsShowing || function() {
+            };
+            config.whenFirstAndLastPageIsShowing = config.whenFirstAndLastPageIsShowing || function() {
+            };
+            config.whenFirstPageIsShowing = config.whenFirstPageIsShowing || function() {
+            };
+            config.whenLastPageIsShowing = config.whenLastPageIsShowing || function() {
+            };
+            config.whenNotFirstPageIsShowing = config.whenNotFirstPageIsShowing || function() {
+            };
+            config.whenNotLastPageIsShowing = config.whenNotLastPageIsShowing || function() {
+            };
+            config.where = config.where || undefined;
+            executionContext.setIteratorConfigForId(iterId, config);
         }
 
         for (var id in args.clipboard) {
@@ -77,17 +75,12 @@ function mcomponent(args) {
         }
 
         // Set view, do this last since it also compiles the view!
-        if (that.length) {
-            var node = that[0];
-            if (node.tagName == "SCRIPT") {
-                _setViewWithHtml($(node)[0].text);
-            } else {
-                throw "Source element is not a script tag.";
-            }
-        } else if (args.viewHtml) {
+        if (args.viewHtml) {
             _setViewWithHtml(args.viewHtml);
         } else if (args.viewFromComponent) {
             _setViewFromComponent(args.viewFromComponent);
+        } else {
+            // No view specified in constructor args.
         }
 
     };
@@ -1097,7 +1090,16 @@ function mcomponent(args) {
                 return {error : true, message : "Too many end tags."};
             }
 
-            var tagContent = $.trim(viewHtml.substring(startIndex + startTagToken.length, endIndex));
+            var trim = function(s) {
+                if (typeof String.prototype.trim !== 'function') {
+                    // IE has no support for String.trim(), this code ensures that IE works properly.
+                    return s.replace(/^\s+|\s+$/g, '');
+                } else {
+                    return s.trim();
+                }
+            };
+
+            var tagContent = trim(viewHtml.substring(startIndex + startTagToken.length, endIndex));
 
             list.push(createTagObject(tagContent));
 
@@ -1246,14 +1248,14 @@ function mcomponent(args) {
     };
 
     var findBlockEnd = function(list, i, args) {
-        args = $.extend(
-            {
-                endTags : [], // If set, standard "end*" will be overridden.
-                startIndex : i // The index to start searching. If undefined, starts at i.
-            }, args);
-        if (!$.isArray(args.endTags)) {
+        args = args || {};
+        args.endTags = args.endTags || []; // If set, standard "end*" will be overridden.
+        args.startIndex = args.startIndex || i; // The index to start searching. If undefined, starts at i.
+
+        if (typeof args.endTags.length !== "number") {
             throw "Argument endTags to findBlockEnd() must be a list.";
         }
+
         var endTags = args.endTags; // If one of these is found at level 0, the end is found!
         var startItem = list[i];
         if (startItem.html) {
@@ -1406,9 +1408,8 @@ function mcomponent(args) {
 
         var result = new CompiledSource();
 
-        args = $.extend({
-            tree : []
-        }, args);
+        args = args || {};
+        args.tree = args.tree || [];
 
         for (var i = 0; i < args.tree.length; i++) {
             var item = args.tree[i];
@@ -1829,7 +1830,7 @@ function mcomponent(args) {
     init();
 
     /**************
-     * The object that is returned by $.mcomponent().
+     * The object that is returned by mcomponent().
      */
 
     return {
