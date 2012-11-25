@@ -18,9 +18,9 @@ function mcomponent(args) {
         maxTagCount : 1000,
         placeHolder : undefined,
         placeHolderId : undefined,
-        containerType : "div",
         clearPlaceHolderBeforeRender : true,
         logTags : false,
+        afterRender : undefined,
         throwOnError : false // Used for unit testing.
     }, args);
 
@@ -1884,14 +1884,16 @@ function mcomponent(args) {
         },
 
         _afterRender : function() {
-            result.node = document.createElement(args.containerType);
-            result.node.innerHTML = result.html;
-            if (args.clearPlaceHolderBeforeRender) $(placeHolder).html("");
-            if (placeHolder) {
-                placeHolder.appendChild(result.node);
-            }
 
             executionContext.afterRender();
+
+            if (mainArgs.afterRender) {
+                if (typeof mainArgs.afterRender == "function") {
+                    mainArgs.afterRender();
+                } else {
+                    throw "afterRender argument must be a function or not defined.";
+                }
+            }
 
             return result;
         },

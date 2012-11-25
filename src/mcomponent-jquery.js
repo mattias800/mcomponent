@@ -6,20 +6,14 @@
         var mainArgs = args = $.extend({
             placeHolder : undefined,
             placeHolderId : undefined,
-            clearPlaceHolderBeforeRender : true
+            clearPlaceHolderBeforeRender : true,
+            containerType : "div",
+            afterRender : undefined
         }, args);
 
-        if (that.length) {
-            var node = that[0];
-            if (node.tagName == "SCRIPT") {
-                args.viewHtml = $(node)[0].text;
-            } else {
-                throw "Source element is not a script tag.";
-            }
-        }
-
-        var component = mcomponent(args);
-        var placeHolder = $(args.placeHolder) || $("#" + args.placeHolderId);
+        var externalAfterRender = args.afterRender;
+        var placeHolder = $(args.placeHolder)[0] || $("#" + args.placeHolderId)[0];
+        var component;
 
         var afterRender = function() {
             var result = component.getResult();
@@ -31,6 +25,29 @@
             }
 
         };
+
+        args.afterRender = function() {
+            afterRender();
+            if (externalAfterRender) {
+                if (typeof externalAfterRender == "function") {
+                    externalAfterRender();
+                } else {
+                    throw "afterRender argument must be a function or not defined.";
+                }
+            }
+        };
+
+        if (that.length) {
+            var node = that[0];
+            if (node.tagName == "SCRIPT") {
+                args.viewHtml = $(node)[0].text;
+            } else {
+                throw "Source element is not a script tag.";
+            }
+        }
+        component = mcomponent(args);
+
+        return component;
 
     };
 }(jQuery));
