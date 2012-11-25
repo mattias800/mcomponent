@@ -19,7 +19,7 @@
             var result = component.getResult();
             result.node = document.createElement(args.containerType);
             result.node.innerHTML = result.html;
-            if (args.clearPlaceHolderBeforeRender) $(placeHolder).html("");
+            if (args.clearPlaceHolderBeforeRender) $(placeHolder).empty();
             if (placeHolder) {
                 placeHolder.appendChild(result.node);
             }

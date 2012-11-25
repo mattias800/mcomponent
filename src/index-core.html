@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+				"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<script type="text/javascript" src="mcomponent.js"></script>
+</head>
+
+<body>
+
+<div>
+	Testing core, with no jQuery, or any other lib, included.
+</div>
+<div>
+	Result: <span id="result"></span>
+</div>
+
+<script type="text/javascript">
+	try {
+		mcomponent({viewHtml : "hej {{name}}", model : { name : "mattias"}}).render().html;
+		document.getElementById("result").innerHTML = "All OK!";
+	} catch (e) {
+		document.getElementById("result").innerHTML = "Failed!";
+	}
+
+</script>
+
+</body>
+
+</html>
