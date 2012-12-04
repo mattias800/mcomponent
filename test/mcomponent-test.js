@@ -2770,6 +2770,14 @@ test("Child components", function() {
         parent.addChild("mat tias", c);
     }, "Should raise exception since id contains space.");
 
+    raises(function() {
+        parent.addChild("mat!tias", c);
+    }, "Should raise exception since id contains space.");
+
+    raises(function() {
+        parent.addChild("mat#tias", c);
+    }, "Should raise exception since id contains space.");
+
 
 });
 

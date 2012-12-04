@@ -26,7 +26,11 @@ function mcomponent(args) {
     args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false; // Used for unit testing.
 
     var validateChild = function(id, child) {
-        if (id.indexOf(" ") >= 0) return { result : false, message : "Child id contains space. Must be alphanumeric. id=" + id };
+        if (id.indexOf(" ") >= 0) {
+            return { result : false, message : "Child id contains space. Must be alphanumeric. id=" + id };
+        } else if (/[^a-zA-Z0-9]/.test(id)) {
+            return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id=" + id };
+        }
         return { result : true };
     };
 
