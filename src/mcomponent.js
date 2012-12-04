@@ -190,8 +190,6 @@ function mcomponent(args) {
             var v = validateChild(id, child);
             if (v.result) {
                 this.children[id] = child;
-                // Must recompile the view, with the new child included.
-                compileView();
             } else {
                 throw v.message;
             }
