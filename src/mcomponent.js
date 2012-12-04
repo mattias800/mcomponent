@@ -860,9 +860,7 @@ function mcomponent(args) {
                 if (child) {
                     var childVar = getUncompiledVariableName("childComponent");
                     result.push("var " + childVar + " = executionContext.getChildWithId(" + encodeStringToJsString(name) + ")");
-                    result.push("executionContext.pushModel(" + childVar + ".getModel())");
-                    result.pushCompiledSource(child._getView().template.getBodySource());
-                    result.push("executionContext.pop()");
+                    result.pushBuffer(childVar + ".render().html");
                 } else {
                     result.pushRenderError("Has no child component with id=" + name);
                 }
