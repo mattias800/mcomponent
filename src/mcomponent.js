@@ -170,7 +170,7 @@ function mcomponent(args) {
             }
         };
 
-        this.hasRenderError = function() {
+        this.hasRenderErrors = function() {
             return this.renderErrors.length ? true : false;
         };
 
@@ -853,14 +853,31 @@ function mcomponent(args) {
             hasBlock : false,
             compileTagInstance : function(tagInstance, executionContext, args) {
                 var result = new CompiledSource();
-                var name = tagInstance.tag.parameters;
-                var childVar = getUncompiledVariableName("childComponent");
-                result.push("var " + childVar + " = executionContext.getChildWithId('" + name + "')");
-                result.push("if (" + childVar + ") {");
-                result.pushBuffer(childVar + ".render().html");
-                result.push("} else {");
-                result.pushRenderError("Has no child component with id = '" + name + "'");
-                result.push("}");
+                var ss = tagInstance.tag.parameters.split(" ");
+                var name = ss[0];
+                var required = true;
+                var invalidParameter = false;
+                var parameter;
+                if (ss.length > 0) {
+                    parameter = ss[1];
+                    if (parameter) {
+                        if (parameter == "notrequired") required = false;
+                        else invalidParameter = true;
+                    }
+                }
+                if (invalidParameter) {
+                    result.pushRenderError("Invalid parameter = '" + parameter + "'");
+                } else {
+                    var childVar = getUncompiledVariableName("childComponent");
+                    result.push("var " + childVar + " = executionContext.getChildWithId('" + name + "')");
+                    result.push("if (" + childVar + ") {");
+                    result.pushBuffer(childVar + ".render().html");
+                    if (required) {
+                        result.push("} else {");
+                        result.pushRenderError("Has no child component with id = '" + name + "'");
+                    }
+                    result.push("}");
+                }
                 return result;
             },
             createTagInstance : function(args) {
@@ -1899,6 +1916,10 @@ function mcomponent(args) {
 
             return this._afterRender();
 
+        },
+
+        hasRenderErrors : function() {
+            return executionContext.hasRenderErrors();
         },
 
         _afterRender : function() {

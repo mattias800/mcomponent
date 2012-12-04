@@ -2781,6 +2781,32 @@ test("Child components", function() {
 
 });
 
+test("Child components - notrequired", function() {
+
+    var c;
+    var parent;
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Creating child.");
+    equal(c._assertRender(), "mattias", "Child render result should be 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}), "Creating parent.");
+    parent.addChild("mata", c);
+    equal(parent._assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Creating child.");
+    equal(c._assertRender(), "mattias", "Child render result should be 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata notrequired }}"}), "Creating parent.");
+    equal(parent._assertRender(), "3 ", "Parent, with child, should contain '3 ', no error message since component is not required.");
+
+    // Test notrequired misspelled
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Creating child.");
+    equal(c._assertRender(), "mattias", "Child render result should be 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata notrequiredd }}"}), "Creating parent.");
+    parent.addChild("mata", c);
+    parent._assertRender();
+    ok(parent.hasRenderErrors(), "Parent should now have render errors, given by the misspelled notrequired parameter.");
+
+});
+
 function Timer(name) {
 
     this.name = name;
