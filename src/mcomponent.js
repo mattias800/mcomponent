@@ -1901,6 +1901,10 @@ function mcomponent(args) {
             return executionContext.getChildren();
         },
 
+        getChild : function(id) {
+            return executionContext.getChildWithId(id);
+        },
+
         setModel : function(model) {
             _setModel(model);
         },
