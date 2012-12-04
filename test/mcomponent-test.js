@@ -2736,11 +2736,11 @@ test("Child components", function() {
     ok(parent = $().mcomponent({model : {username : "jenny"}, viewHtml : "{{ username }}"}), "Construction OK!");
     equal(parent._assertRender(), "jenny", "Should contain 'jenny'.");
 
-    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Construction OK!");
-    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
-    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mat }}"}), "Construction OK!");
-    parent.addChild("mat", c);
-    equal(parent._assertRender(), "3 mattias", "Should contain '3 mattias'.");
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Creating child.");
+    equal(c._assertRender(), "mattias", "Child render result should be 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}), "Creating parent.");
+    parent.addChild("mata", c);
+    equal(parent._assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
 
     ok(c = $().mcomponent({model : {color : "black"}, viewHtml : "{{ color }}"}), "Construction OK!");
     equal(c._assertRender(), "black", "Should contain 'black'.");

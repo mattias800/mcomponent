@@ -27,9 +27,9 @@ function mcomponent(args) {
 
     var validateChild = function(id, child) {
         if (id.indexOf(" ") >= 0) {
-            return { result : false, message : "Child id contains space. Must be alphanumeric. id=" + id };
+            return { result : false, message : "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
         } else if (/[^a-zA-Z0-9]/.test(id)) {
-            return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id=" + id };
+            return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
         }
         return { result : true };
     };
@@ -39,7 +39,7 @@ function mcomponent(args) {
             placeHolder = args.placeHolder;
         } else if (args.placeHolderId) {
             placeHolder = document.getElementById(args.placeHolderId);
-            if (!placeHolder) throw "Unable to find placeholder in DOM with id=" + args.placeHolderId;
+            if (!placeHolder) throw "Unable to find placeholder in DOM with id = '" + args.placeHolderId + "'";
         }
 
         if (args.model) {
@@ -77,7 +77,7 @@ function mcomponent(args) {
             var html = args.clipboard[id];
             var r = buildList(html);
             if (r.error) {
-                throw "Failed to add clipboard with id='" + id + "':" + r.message;
+                throw "Failed to add clipboard with id = '" + id + "':" + r.message;
             } else {
                 executionContext.setClipboardWithName(id, buildTree(r.list));
             }
@@ -854,14 +854,13 @@ function mcomponent(args) {
             compileTagInstance : function(tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
-                var child = executionContext.getChildWithId(name);
-                if (child) {
-                    var childVar = getUncompiledVariableName("childComponent");
-                    result.push("var " + childVar + " = executionContext.getChildWithId(" + encodeStringToJsString(name) + ")");
-                    result.pushBuffer(childVar + ".render().html");
-                } else {
-                    result.pushRenderError("Has no child component with id=" + name);
-                }
+                var childVar = getUncompiledVariableName("childComponent");
+                result.push("var " + childVar + " = executionContext.getChildWithId('" + name + "')");
+                result.push("if (" + childVar + ") {");
+                result.pushBuffer(childVar + ".render().html");
+                result.push("} else {");
+                result.pushRenderError("Has no child component with id = '" + name + "'");
+                result.push("}");
                 return result;
             },
             createTagInstance : function(args) {
