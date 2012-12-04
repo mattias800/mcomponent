@@ -1062,6 +1062,10 @@ function mcomponent(args) {
         executionContext.removeChildWithId(id);
     };
 
+    var _hasChildWithId = function(id) {
+        executionContext.hasChildWithId(id);
+    };
+
     var compileList = function() {
         var r = buildList(view.html);
         if (r.error) {
@@ -1899,6 +1903,10 @@ function mcomponent(args) {
 
         removeChild : function(id) {
             _removeChildWithId(id);
+        },
+
+        hasChild : function(id) {
+            _hasChildWithId(id);
         },
 
         setModel : function(model) {
