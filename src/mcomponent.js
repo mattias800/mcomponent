@@ -207,6 +207,10 @@ function mcomponent(args) {
             this.children = {};
         };
 
+        this.getChildren = function() {
+            return this.children;
+        };
+
         /**
          * Clipboard
          */
@@ -1050,22 +1054,6 @@ function mcomponent(args) {
         return executionContext.getModel();
     };
 
-    var _addChild = function(id, child) {
-        executionContext.addChild(id, child);
-    };
-
-    var _removeAllChildren = function() {
-        executionContext.removeAllChildren();
-    };
-
-    var _removeChildWithId = function(id) {
-        executionContext.removeChildWithId(id);
-    };
-
-    var _hasChildWithId = function(id) {
-        executionContext.hasChildWithId(id);
-    };
-
     var compileList = function() {
         var r = buildList(view.html);
         if (r.error) {
@@ -1894,19 +1882,23 @@ function mcomponent(args) {
     return {
 
         addChild : function(id, child) {
-            _addChild(id, child);
+            executionContext.addChild(id, child);
         },
 
         removeAllChildren : function(id) {
-            _removeAllChildren();
+            executionContext.removeAllChildren();
         },
 
         removeChild : function(id) {
-            _removeChildWithId(id);
+            executionContext.removeChildWithId(id);
         },
 
         hasChild : function(id) {
-            _hasChildWithId(id);
+            return executionContext.hasChildWithId(id);
+        },
+
+        getChildren : function() {
+            return executionContext.getChildren();
         },
 
         setModel : function(model) {
