@@ -195,6 +195,18 @@ function mcomponent(args) {
             }
         };
 
+        this.hasChildWithId = function(id) {
+            return this.children[id] ? true : false;
+        };
+
+        this.removeChildWithId = function(id) {
+            this.children[id] = undefined;
+        };
+
+        this.removeAllChildren = function() {
+            this.children = {};
+        };
+
         /**
          * Clipboard
          */
@@ -1042,6 +1054,14 @@ function mcomponent(args) {
         executionContext.addChild(id, child);
     };
 
+    var _removeAllChildren = function() {
+        executionContext.removeAllChildren();
+    };
+
+    var _removeChildWithId = function(id) {
+        executionContext.removeChildWithId(id);
+    };
+
     var compileList = function() {
         var r = buildList(view.html);
         if (r.error) {
@@ -1871,6 +1891,14 @@ function mcomponent(args) {
 
         addChild : function(id, child) {
             _addChild(id, child);
+        },
+
+        removeAllChildren : function(id) {
+            _removeAllChildren();
+        },
+
+        removeChild : function(id) {
+            _removeChildWithId(id);
         },
 
         setModel : function(model) {

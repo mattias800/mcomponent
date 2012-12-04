@@ -2781,6 +2781,25 @@ test("Child components", function() {
 
 });
 
+test("Child components - adding and removing children and rerendering", function() {
+    var parent, c;
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Creating child.");
+    equal(c._assertRender(), "mattias", "Child render result should be 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}), "Creating parent.");
+    parent.addChild("mata", c);
+    equal(parent._assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
+    parent.removeChild("mata");
+    parent._assertRender();
+    ok(parent.hasRenderErrors(), "Should have a render error since child no longer exists.");
+    equal(parent.hasRenderErrors(), true, "Should have a render error.");
+
+    parent.addChild("mata", c);
+    equal(parent._assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
+    equal(parent.hasRenderErrors(), false, "Should NOT have a render error since child exists again.");
+
+});
+
 test("Child components - notrequired", function() {
 
     var c;
