@@ -2753,6 +2753,23 @@ test("Child components", function() {
     }), "Construction OK!");
     equal(parent._assertRender(), "The color : black", "Should contain '3 mattias'.");
 
+    raises(function() {
+        parent = $().mcomponent({
+            model : {label : "The color : "},
+            viewHtml : "{{ label }}{{ component testChild }}",
+            children : {
+                "test Child" : c
+            }
+        });
+    }, "Id with space should fail at construction.");
+
+    ok(c = $().mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}), "Construction OK!");
+    equal(c._assertRender(), "mattias", "Should contain 'mattias'.");
+    ok(parent = $().mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mat }}"}), "Construction OK!");
+    raises(function() {
+        parent.addChild("mat tias", c);
+    }, "Should raise exception since id contains space.");
+
 
 });
 

@@ -25,6 +25,11 @@ function mcomponent(args) {
     args.afterRender = args.afterRender || undefined;
     args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false; // Used for unit testing.
 
+    var validateChild = function(id, child) {
+        if (id.indexOf(" ") >= 0) return { result : false, message : "Child id contains space. Must be alphanumeric. id=" + id };
+        return { result : true };
+    };
+
     var init = function() {
         if (args.placeHolder) {
             placeHolder = args.placeHolder;
@@ -71,6 +76,14 @@ function mcomponent(args) {
                 throw "Failed to add clipboard with id='" + id + "':" + r.message;
             } else {
                 executionContext.setClipboardWithName(id, buildTree(r.list));
+            }
+        }
+
+        for (var id in args.children) {
+            var child = args.children[id];
+            var v = validateChild(id, child);
+            if (!v.result) {
+                throw v.message;
             }
         }
 
@@ -170,9 +183,14 @@ function mcomponent(args) {
         };
 
         this.addChild = function(id, child) {
-            this.children[id] = child;
-            // Must recompile the view, with the new child included.
-            compileView();
+            var v = validateChild(id, child);
+            if (v.result) {
+                this.children[id] = child;
+                // Must recompile the view, with the new child included.
+                compileView();
+            } else {
+                throw v.message;
+            }
         };
 
         /**
