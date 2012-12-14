@@ -4,7 +4,6 @@ function mcomponent(args) {
     var that = this;
     var list;
     var result = {};
-    var placeHolder = undefined;
 
     var rootModel;
 
@@ -18,9 +17,6 @@ function mcomponent(args) {
     args.children = args.children || {};
     args.iter = args.iter || {};
     args.maxTagCount = args.maxTagCount || 1000;
-    args.placeHolder = args.placeHolder || undefined;
-    args.placeHolderId = args.placeHolderId || undefined;
-    args.clearPlaceHolderBeforeRender = args.clearPlaceHolderBeforeRender !== undefined ? args.clearPlaceHolderBeforeRender : true;
     args.logTags = args.logTags !== undefined ? args.logTags : false;
     args.afterRender = args.afterRender || undefined;
     args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false; // Used for unit testing.
@@ -30,17 +26,15 @@ function mcomponent(args) {
             return { result : false, message : "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
         } else if (/[^a-zA-Z0-9]/.test(id)) {
             return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
+        } else if (typeof child._isComponent !== "function") {
+            return { result : false, message : "Child is not an mcomponent object."};
+        } else if (!child._isComponent()) {
+            return { result : false, message : "Child is not an mcomponent object."};
         }
         return { result : true };
     };
 
     var init = function() {
-        if (args.placeHolder) {
-            placeHolder = args.placeHolder;
-        } else if (args.placeHolderId) {
-            placeHolder = document.getElementById(args.placeHolderId);
-            if (!placeHolder) throw "Unable to find placeholder in DOM with id = '" + args.placeHolderId + "'";
-        }
 
         if (args.model) {
             rootModel = args.model;
@@ -401,10 +395,6 @@ function mcomponent(args) {
                     return that.executionStack[0].model;
                 },
                 getIterator : function(iteratorName) {
-                    if (iteratorName == "iterBeforeRender") {
-                        console.log("OK VAFAN!");
-                        console.log("iteratorName", iteratorName);
-                    }
                     executionContext.ensureIterator(iteratorName);
                     var i = executionContext.getIteratorWithName(iteratorName);
                     return i ? i.getPublicInterface() : undefined;
@@ -1952,6 +1942,10 @@ function mcomponent(args) {
 
         hasRenderErrors : function() {
             return executionContext.hasRenderErrors();
+        },
+
+        _isComponent : function() {
+            return true;
         },
 
         _afterRender : function() {
