@@ -120,7 +120,7 @@ function mcomponent(args) {
      */
     var ExecutionContext_ = function() {
 
-        this.id = "context_" + id;
+        this.id = id;
         this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
         this.children = mainArgs.children;
         this.globals = {};
@@ -177,6 +177,12 @@ function mcomponent(args) {
         /**
          * Children
          */
+
+        this.getChildCount = function() {
+            var counter = 0;
+            for (var id in this.children) counter++;
+            return counter;
+        };
 
         this.getChildWithId = function(id) {
             return this.children[id];
@@ -400,6 +406,20 @@ function mcomponent(args) {
                     executionContext.ensureIterator(iteratorName);
                     var i = executionContext.getIteratorWithName(iteratorName);
                     return i ? i.getPublicInterface() : undefined;
+                },
+                _assert : {
+                    componentIdEqualsExecutionContextId : function() {
+                        return id == executionContext.id ?
+                            true :
+                            id + " != " + executionContext.id;
+                    },
+                    getExecutionContext : function() {
+                        return executionContext;
+                    },
+                    childCount : function(count) {
+                        var got = executionContext.getChildCount();
+                        if (got !== count) throw "Wrong number of children. Expected " + count + ", got " + got + ".";
+                    }
                 }
             }
         };
@@ -2073,6 +2093,10 @@ function mcomponent(args) {
         _assertCompileLogSource : function() {
             var t = compile({tree : getView().tree, logSource : true});
             return t.render();
+        },
+
+        _assertComponentIdEqualsExecutionContextId : function() {
+            return id == executionContext.id;
         },
 
         _getTemplate : function() {

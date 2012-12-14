@@ -2826,6 +2826,99 @@ test("Child components - notrequired", function() {
 
 });
 
+test("Tag assertion", function() {
+
+    var a, b, c;
+
+    ok(a = $().mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}), "Creating child.");
+    ok(a._assertComponentIdEqualsExecutionContextId(), "Correct execution context from mcomponent scope.");
+    equal(a._assertRender(), "true", "Correct execution context in execution scope as well.");
+
+});
+
+test("API assertion", function() {
+
+    ok(a = $().mcomponent({viewHtml : "a{{ js api._assert.childCount(0) }}"}), "Creating child.");
+    equal(a._assertRender(), "a", "No error!");
+
+    ok(a = $().mcomponent({viewHtml : "a{{ js api._assert.childCount(1) }}"}), "Creating child.");
+    ok(a._assertRender() !== "a", "Should contain error.");
+
+    ok(a = $().mcomponent({viewHtml : "a{{ js api._assert.childCount(1) }}", throwOnError : true}), "Creating child.");
+    raises(function() {
+        a._assertRender()
+    }, "Should throw exception.");
+
+});
+
+test("Check child count from execution context", function() {
+
+    var a, b, c;
+
+    ok(a = $().mcomponent({viewHtml : "a {{ showjs api._assert.getExecutionContext().getChildCount() }}"}), "Creating child.");
+    equal(a._assertRender(), "a 0", "0 children");
+
+    ok(b = $().mcomponent({viewHtml : "b"}), "Creating child.");
+
+    a.addChild("b", b);
+
+    equal(a._assertRender(), "a 1", "1 child");
+
+    console.log("SOURCE!");
+    console.log(a._getSource());
+
+});
+
+test("Execution context scope", function() {
+
+    /**
+     * When having children and setting view with other component, ensure that components still have their own execution context.
+     */
+
+    var a, b, c;
+
+    // Test setViewFromComponent first.
+
+    ok(a = $().mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}), "Creating child.");
+    ok(a._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+    equal(a._assertRender(), "a true", "");
+
+    ok(b = $().mcomponent({viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}), "Creating child.");
+    equal(b._assertRender(), "b true", "");
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    b.setViewFromComponent(a);
+    equal(b._assertRender(), "a true", "");
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    ok(a._getId() !== b._getId(), "Components must not have same id.");
+    ok(a._getExecutionContext().id !== b._getExecutionContext().id, "Execution contexts must not have same id.");
+
+    // OK
+
+    ok(a = $().mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"}), "Creating child.");
+    ok(a._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    ok(c = $().mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}), "Creating child.");
+    equal(c._assertRender(), "c true", "");
+    ok(c._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    ok(b = $().mcomponent({viewHtml : "b"}), "Creating child.");
+    equal(b._assertRender(), "b", "Should be b");
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    b.setViewFromComponent(a);
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+    ok(b, "Adding child");
+    b.addChild("c", c);
+    ok(b.getChild("c"), "Child should now exist in b-parent.");
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+    equal(b._assertRender(), "a true c true", "Should be ac with new view and child.");
+    ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+
+});
+
 function Timer(name) {
 
     this.name = name;
