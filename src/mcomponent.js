@@ -5,6 +5,7 @@ function mcomponent(args) {
     var list;
     var result = {};
 
+    var id = Math.floor(Math.random() * 1000); // Used for testing only
     var rootModel;
 
     var mainArgs = args;
@@ -119,6 +120,7 @@ function mcomponent(args) {
      */
     var ExecutionContext_ = function() {
 
+        this.id = "context_" + id;
         this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
         this.children = mainArgs.children;
         this.globals = {};
@@ -1965,6 +1967,14 @@ function mcomponent(args) {
 
         getResult : function() {
             return result;
+        },
+
+        _getId : function() {
+            return id;
+        },
+
+        _getExecutionContext : function() {
+            return executionContext;
         },
 
         _getNiterParametersFromTagParameter : function(name) {
