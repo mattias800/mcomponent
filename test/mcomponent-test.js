@@ -2875,7 +2875,7 @@ test("Execution context scope", function() {
      * When having children and setting view with other component, ensure that components still have their own execution context.
      */
 
-    var a, b, c;
+    var a, b, c, d;
 
     // Test setViewFromComponent first.
 
@@ -2907,13 +2907,27 @@ test("Execution context scope", function() {
     equal(b._assertRender(), "b", "Should be b");
     ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
-    b.setViewFromComponent(a);
+    // Test children count with API assertion
+
+    b.setViewWithHtml("ok{{ js api._assert.childCount(0) }}");
     ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+    ok(b._assertRender() == "ok", "Should have no children in execution context.");
     ok(b, "Adding child");
     b.addChild("c", c);
     ok(b.getChild("c"), "Child should now exist in b-parent.");
     ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+    ok(b._assertRender() !== "ok", "Should have 1 children in execution context.");
 
+    // Test with API assertion, but with viewFromComponent
+
+    ok(d = $().mcomponent({viewHtml : "ok{{ js api._assert.childCount(1) }}"}), "Creating child.");
+    b.setViewFromComponent(d);
+    ok(b._assertRender() == "ok", "Should have 1 child in execution context.");
+    // TODO: Test equal id for context and component.
+
+    // Test with real view with {{ component .. }}
+
+    b.setViewFromComponent(a);
     equal(b._assertRender(), "a true c true", "Should be ac with new view and child.");
     ok(b._assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 

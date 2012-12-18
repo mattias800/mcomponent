@@ -1,11 +1,13 @@
 function mcomponent(args) {
+    args = args || {};
+
     var startTagToken = "{{";
     var endTagToken = "}}";
     var that = this;
     var list;
     var result = {};
 
-    var id = Math.floor(Math.random() * 1000); // Used for testing only
+    var id = args.id || Math.floor(Math.random() * 1000); // Used for testing only
     var rootModel;
 
     var mainArgs = args;
@@ -416,9 +418,9 @@ function mcomponent(args) {
                     getExecutionContext : function() {
                         return executionContext;
                     },
-                    childCount : function(count) {
+                    childCount : function(expectedCount) {
                         var got = executionContext.getChildCount();
-                        if (got !== count) throw "Wrong number of children. Expected " + count + ", got " + got + ".";
+                        if (got !== expectedCount) throw "Wrong number of children. Expected " + expectedCount + ", got " + got + ".";
                     }
                 }
             }
@@ -1111,6 +1113,8 @@ function mcomponent(args) {
 
     var _setViewFromComponent = function(component) {
         _setView(component._getView());
+        // Must recompile the source to have correct scope.
+        view.template = compile({tree : getView().tree});
     };
 
     var getView = function() {
