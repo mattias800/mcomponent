@@ -2156,6 +2156,48 @@ test("niter tag, filter function and getPageCount() in iterator", function() {
 });
 
 
+test("niter tag, prevent page overflow when using where function", function() {
+
+    var c, i;
+
+    var model = {
+        list : [
+            {age : 32, name : "mattias"},
+            {age : 8, name : "butters"},
+            {age : 32, name : "marcus"},
+            {age : 31, name : "johan"},
+            {age : 9, name : "stan"}
+        ]
+    };
+
+    ok(c = $().mcomponent({
+        model : model,
+        iter : {
+            filteredUserListIter : {
+                usePages : true,
+                itemsPerPage : 2,
+                where : function(user) {
+                    return user.age > 30;
+                }
+            }
+        },
+        viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+    equal(c._assertRender(), "mattiasmarcus", "Start state.");
+    ok(i = c.getIterator("filteredUserListIter"), "Iterator should exist.");
+
+    // Go to page 2/2
+    i.showNextPage();
+    equal(c._assertRender(), "johan", "Second page.");
+
+    // Now change model, so that we only have 1 item in the list, and thus, only one page!
+    model.list[2].age = 13;
+    model.list[3].age = 14;
+
+    equal(c._assertRender(), "mattias", "Second page.");
+
+});
+
 test("js and showjs tags", function() {
 
     var c;

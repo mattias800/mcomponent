@@ -143,6 +143,13 @@ function mcomponent(args) {
             this.currentTag = {};
         };
 
+        this.beforeRender = function() {
+            for (var id in this.iterators) {
+                var iterObj = this.iterators[id];
+                iterObj.beforeRender();
+            }
+        };
+
         this.afterRender = function() {
             // Update iterators. This was previously done while rendering, but we want to render, place result in DOM and finally run this.
             for (var i = 0; i < this.iteratorsToUpdateAfterRender.length; i++) {
@@ -512,6 +519,13 @@ function mcomponent(args) {
             }
             else {
                 return itemsShowing;
+            }
+        };
+
+        this.beforeRender = function() {
+            if (whereFunction) {
+                // If there is a where-function, the list might have changed before rendering. Ensure we don't overflow the page.
+                if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
             }
         };
 
@@ -1113,7 +1127,7 @@ function mcomponent(args) {
 
     var _setViewFromComponent = function(component) {
         _setView(component._getView());
-        // Must recompile the source to have correct scope.
+        // Must recompile the source, since the compiled code now references the other components scope.
         view.template = compile({tree : getView().tree});
     };
 
@@ -1947,6 +1961,9 @@ function mcomponent(args) {
         },
 
         render : function() {
+
+            this._beforeRender();
+
             if (getView().template) {
                 try {
                     result.html = getView().template.render();
@@ -1972,6 +1989,10 @@ function mcomponent(args) {
 
         _isComponent : function() {
             return true;
+        },
+
+        _beforeRender : function() {
+            executionContext.beforeRender();
         },
 
         _afterRender : function() {
