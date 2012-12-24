@@ -1748,6 +1748,32 @@ test("niter tag, using pages", function() {
         return item.age == 32;
     }), 0, "getIndexForItemWhere() should work.");
 
+    /* showPageWithItemIndex() */
+
+    i.showPageWithItemIndex(-1);
+    equal(c._assertRender(), "mattiasmarcus");
+
+    i.showPageWithItemIndex(0);
+    equal(c._assertRender(), "mattiasmarcus");
+
+    i.showPageWithItemIndex(1);
+    equal(c._assertRender(), "mattiasmarcus");
+
+    i.showPageWithItemIndex(2);
+    equal(c._assertRender(), "johanbutters");
+
+    i.showPageWithItemIndex(3);
+    equal(c._assertRender(), "johanbutters");
+
+    i.showPageWithItemIndex(4);
+    equal(c._assertRender(), "stan");
+
+    i.showPageWithItemIndex(5);
+    equal(c._assertRender(), "stan");
+
+    i.showPageWithItemIndex(6);
+    equal(c._assertRender(), "stan");
+
     /* showPageWithItemWhere() */
 
     i.showPageWithItemWhere(function(item) {

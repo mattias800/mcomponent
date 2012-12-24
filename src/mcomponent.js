@@ -676,10 +676,16 @@ function mcomponent(args) {
                     throw "Unable to find item that matches where function in iterators list.";
                 },
                 getPageWithItem : function(item) {
-                    return Math.floor(this.getIndexForItem(item) / this.itemsPerPage);
+                    return this.getPageIndexForItemIndex(this.getIndexForItem(item));
                 },
                 getPageWithItemWhere : function(where) {
-                    return Math.floor(this.getIndexForItemWhere(where) / this.itemsPerPage);
+                    return this.getPageIndexForItemIndex(this.getIndexForItemWhere(where));
+                },
+                getPageIndexForItemIndex : function(itemIndex) {
+                    return Math.floor(itemIndex / this.itemsPerPage)
+                },
+                showPageWithItemIndex : function(index) {
+                    this.showPage(this.getPageIndexForItemIndex(index));
                 },
                 showPageWithItem : function(item) {
                     this.showPage(this.getPageWithItem(item));
