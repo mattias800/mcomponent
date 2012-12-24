@@ -1641,6 +1641,67 @@ test("niter tag, using pages", function() {
     i.showPrevPage();
     equal(c._assertRender(), "");
 
+    /*************
+     * Test showPage()
+     */
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan", "butters", "stan"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 3);
+    i.showPage(1);
+    equal(c._assertRender(), "johanbutters", "Should first element only.");
+
+    /* Check that usePages = false causes showPage() to throw exception. */
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan", "butters", "stan"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : false
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
+    ok(i = c.getIterator("userListIter"));
+    raises(function() {
+        i.showPage(1);
+    }, "showPage should throw exception when usePages == false.");
+
+    /*************
+     * Test showPageWithItem() and showPageWithItemThat()
+     */
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan", "butters", "stan"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 3);
+    i.showPageWithItem("johan");
+    equal(c._assertRender(), "johanbutters", "Should first element only.");
+
 });
 
 test("niter tag, pages callbacks", function() {
