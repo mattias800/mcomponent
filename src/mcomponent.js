@@ -665,15 +665,21 @@ function mcomponent(args) {
                     if (currentPage < 0) currentPage = 0;
                     if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
                 },
-                getPageWithItem : function(item) {
+                getIndexForItem : function(item) {
                     for (var i = 0; i < model.length; i++) if (model[i] == item) return i;
                     throw "Unable to find specified item in iterators list.";
                 },
-                getPageWithItemWhere : function(where) {
+                getIndexForItemWhere : function(where) {
                     if (where == undefined) throw "Trying to find item in iterator list, but specified where-function is undefined.";
                     if (typeof where !== "function") throw "Trying to find item in iterator list, but specified where-function is not a function. Type=" + typeof where;
                     for (var i = 0; i < model.length; i++) if (where(model[i])) return i;
                     throw "Unable to find item that matches where function in iterators list.";
+                },
+                getPageWithItem : function(item) {
+                    return Math.floor(this.getIndexForItem(item) / this.itemsPerPage);
+                },
+                getPageWithItemWhere : function(where) {
+                    return Math.floor(this.getIndexForItemWhere(where) / this.itemsPerPage);
                 },
                 showPageWithItem : function(item) {
                     this.showPage(this.getPageWithItem(item));

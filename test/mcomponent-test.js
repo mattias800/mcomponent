@@ -1699,8 +1699,82 @@ test("niter tag, using pages", function() {
     equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
     ok(i = c.getIterator("userListIter"));
     equal(i.getPageCount(), 3);
+    equal(i.getIndexForItem("johan"), 2, "getIndexForItem() should work.");
     i.showPageWithItem("johan");
     equal(c._assertRender(), "johanbutters", "Should first element only.");
+    i.showPageWithItem("butters");
+    equal(c._assertRender(), "johanbutters", "Should first element only.");
+    i.showPageWithItem("stan");
+    equal(c._assertRender(), "stan", "Should first element only.");
+    i.showPageWithItem("marcus");
+    equal(c._assertRender(), "mattiasmarcus", "Should first element only.");
+
+    /************************
+     *  Test showPageWithItemWhere()
+     *************************/
+
+    ok(c = $().mcomponent({
+        model : {
+            list : [
+                {age : 32, name : "mattias", selected : true},
+                {age : 32, name : "marcus"},
+                {age : 31, name : "johan"},
+                {age : 6, name : "butters"},
+                {age : 8, name : "stan"}
+            ]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+    equal(c._assertRender(), "mattiasmarcus");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 3);
+
+    /* getIndexForItemWhere() */
+
+    equal(i.getIndexForItemWhere(function(item) {
+        return item.age == 6;
+    }), 3, "getIndexForItemWhere() should work.");
+
+    equal(i.getIndexForItemWhere(function(item) {
+        return item.selected == true;
+    }), 0, "getIndexForItemWhere() should work.");
+
+    equal(i.getIndexForItemWhere(function(item) {
+        return item.age == 32;
+    }), 0, "getIndexForItemWhere() should work.");
+
+    /* showPageWithItemWhere() */
+
+    i.showPageWithItemWhere(function(item) {
+        return item.age == 6;
+    });
+    equal(c._assertRender(), "johanbutters");
+
+    i.showPageWithItemWhere(function(item) {
+        return item.age == 8;
+    });
+    equal(c._assertRender(), "stan");
+
+    i.showPageWithItemWhere(function(item) {
+        return item.age == 32;
+    });
+    equal(c._assertRender(), "mattiasmarcus");
+
+    i.showPageWithItemWhere(function(item) {
+        return item.age == 31;
+    });
+    equal(c._assertRender(), "johanbutters");
+
+    i.showPageWithItemWhere(function(item) {
+        return item.selected == true;
+    });
+    equal(c._assertRender(), "mattiasmarcus");
+
 
 });
 
