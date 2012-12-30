@@ -1520,18 +1520,48 @@ function mcomponent(args) {
         args.tree = args.tree || [];
 
         for (var i = 0; i < args.tree.length; i++) {
+
             var item = args.tree[i];
+
             if (item.html) {
                 result.pushBuffer(encodeStringToJsString(item.html));
             } else {
+
                 var tagType = getTagType(item.tagName);
                 result.pushTagComment(item);
+
                 if (tagType) {
+                    var tagCompiledSource = undefined;
+                    var tagOk = false;
+
+                    /***************************
+                     * Compile the tag to source
+                     ***************************/
                     try {
-                        result.pushCompiledSource(tagType.compileTagInstance(item, executionContext));
+                        tagCompiledSource = tagType.compileTagInstance(item, executionContext);
                     } catch (e) {
                         throw "Compiling tag failed: " + e.toString();
                     }
+
+                    /*************************************************************
+                     * Compile the source to Function-object to verify that it is working.
+                     *************************************************************/
+                    if (tagCompiledSource) {
+                        try {
+                            tagOk = true;
+                        } catch (e) {
+
+                        }
+                    }
+
+                    /*************************************************************
+                     * Add it to result if it is OK.
+                     *************************************************************/
+                    if (tagOk) {
+                        result.pushCompiledSource(tagCompiledSource);
+                    }
+
+
                 } else {
                     try {
                         result.pushCompiledSource(compilePropertyTag(item));
@@ -1562,7 +1592,7 @@ function mcomponent(args) {
     };
 
     /**
-     * Compiles the view.
+     * Compiles the view and returns the template object.
      *
      * Sets compilationContext.compileError if error is encountered when compiling.
      * Also throws exception when compile fails, if throwOnError == true.
@@ -1610,9 +1640,10 @@ function mcomponent(args) {
             }
         }
 
-        /***************************************************
-         * Return an object that exposes some method needed.
-         **************************************************/
+        /************************************************************
+         * Return the template object that exposes some method needed.
+         * This is the c.getView().template object.
+         ************************************************************/
         return {
             getSource : function() {
                 return source;
