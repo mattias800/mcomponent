@@ -1276,7 +1276,7 @@ function mcomponent(args) {
                     }));
                 } else {
                     // Is not a system tag
-                    root.push(item);
+                    root.push({tag : item});
                     //throw "No such tag type: " + item.tagName;
                 }
             }
@@ -1361,6 +1361,7 @@ function mcomponent(args) {
     };
 
     var getTagType = function(token) {
+        if (token == undefined) return undefined;
         return tagTypes["tag_" + token];
     };
 
@@ -1523,8 +1524,6 @@ function mcomponent(args) {
 
     var compilePartOfTreeToSource = function(tree) {
 
-        if (mainArgs.debugEnabled) console.log("compilePartOfTreeToSource", tree);
-
         var result = new CompiledSource();
 
         tree = tree || [];
@@ -1536,8 +1535,6 @@ function mcomponent(args) {
             if (item.html) {
                 result.pushBuffer(encodeStringToJsString(item.html));
             } else {
-
-                if (mainArgs.debugEnabled) console.log("ITEM", item);
 
                 var tagType = getTagType(item.tagName);
                 result.pushTagComment(item);
@@ -1554,7 +1551,6 @@ function mcomponent(args) {
                     /***************************
                      * Compile the tag to source
                      ***************************/
-                    if (mainArgs.debugEnabled) console.log("Compiling tag to source: " + item.tag.tag);
                     try {
                         tagCompiledSource = tagType.compileTagInstance(item, executionContext);
                     } catch (e) {
@@ -1569,12 +1565,9 @@ function mcomponent(args) {
                      * It is NOT a system tag, it is a property name.
                      ****************************************************************/
 
-                    if (mainArgs.debugEnabled) console.log("no such tag type, compiling property tag instead", item);
-
                     try {
                         tagCompiledSource = compilePropertyTag(item);
                     } catch (e) {
-                        if (mainArgs.debugEnabled) console.log("compiling property tag failed!", item);
                         var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
                         throw msg;
                     }
@@ -1584,7 +1577,6 @@ function mcomponent(args) {
                  * Compile the source to Function-object to verify that it is working.
                  *************************************************************/
                 if (tagCompiledSource) {
-                    if (mainArgs.debugEnabled) console.log("Verifying tag source: ", tagCompiledSource.toString());
                     try {
                         new Function("executionContext", "api", "rootModel", tagCompiledSource.toString());
                         tagOk = true;
@@ -1871,9 +1863,9 @@ function mcomponent(args) {
 
     };
 
-    var compilePropertyTag = function(tag) {
+    var compilePropertyTag = function(tagItem) {
         var result = new CompiledSource();
-        var name = tag.tag;
+        var name = tagItem.tag.tag;
 
         // Handle lookup for "model" only.
         if (name == "model") {
