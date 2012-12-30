@@ -2978,6 +2978,18 @@ test("Invalid tags", function() {
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
     equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
+    /**************************************
+     * Using error messages in nested tags
+     **************************************/
+
+    ok(c = $().mcomponent({
+        debugEnabled : true,
+        viewHtml : '{{ if true }}{{ * showjs alert("hej") }}{{ endif }}'
+    }), "Construction OK!");
+
+    ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
+    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
+
 
 });
 

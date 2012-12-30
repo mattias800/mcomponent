@@ -39,11 +39,11 @@ function mcomponent(args) {
     };
 
     var renderErrorToString = function(error) {
-        return "<div>Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message + "</div>"
+        return "Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message;
     };
 
     var compileErrorToString = function(error) {
-        return "<div>Error compiling tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message + "</div>"
+        return "|Error compiling tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message;
     };
 
     var createGenericCompileErrorMessage = function(e) {
@@ -1644,7 +1644,8 @@ function mcomponent(args) {
         try {
             sourceObj = compileTemplateTreeToSource(args.tree);
         } catch (e) {
-            compilationContext.compileError = e;
+            var es = e.split("|");
+            compilationContext.compileError = es[es.length - 1];
 
             if (mainArgs.throwOnError) {
                 throw compilationContext.compileError;
