@@ -2954,21 +2954,12 @@ test("Invalid tags", function() {
         }), "Construction OK!"
     });
 
-    console.log("---------------------------------- OK LETS GOOOOOOOO!");
-    console.log("---------------------------------- OK LETS GOOOOOOOO!");
-    console.log("---------------------------------- OK LETS GOOOOOOOO!");
-    console.log("---------------------------------- OK LETS GOOOOOOOO!");
-
     ok(c = $().mcomponent({
         viewHtml : '{{ * showjs alert("hej") }}'
     }), "Construction OK!");
 
-    equal(c._assertRender(), "", "Should contain an error message.");
+    ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
 
-    console.log("---------------------------------- DONE!");
-    console.log("---------------------------------- DONE!");
-    console.log("---------------------------------- DONE!");
-    console.log("---------------------------------- DONE!");
 
 });
 

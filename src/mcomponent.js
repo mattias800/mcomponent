@@ -1621,8 +1621,6 @@ function mcomponent(args) {
                 return bodySource;
             },
             render : function() {
-                console.log("RENDERING FROM compile-OBJECT!!");
-                console.log("compilationContext", compilationContext);
                 var r = {};
                 var msg;
                 if (f) {
