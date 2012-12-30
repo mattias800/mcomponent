@@ -1523,6 +1523,8 @@ function mcomponent(args) {
 
     var compilePartOfTreeToSource = function(tree) {
 
+        if (mainArgs.debugEnabled) console.log("compilePartOfTreeToSource", tree);
+
         var result = new CompiledSource();
 
         tree = tree || [];
@@ -1535,11 +1537,18 @@ function mcomponent(args) {
                 result.pushBuffer(encodeStringToJsString(item.html));
             } else {
 
+                if (mainArgs.debugEnabled) console.log("ITEM", item);
+
                 var tagType = getTagType(item.tagName);
                 result.pushTagComment(item);
 
+                var tagCompiledSource = undefined;
+
                 if (tagType) {
-                    var tagCompiledSource = undefined;
+
+                    /****************************************************************
+                     * It is a tag of system type. For example showjs, if, push, etc.
+                     ****************************************************************/
                     var tagOk = false;
 
                     /***************************
@@ -1553,36 +1562,46 @@ function mcomponent(args) {
                         throw msg;
                     }
 
-                    /*************************************************************
-                     * Compile the source to Function-object to verify that it is working.
-                     *************************************************************/
-                    if (tagCompiledSource) {
-                        if (mainArgs.debugEnabled) console.log("Verifying tag source: ", tagCompiledSource.toString());
-                        try {
-                            new Function("executionContext", "api", "rootModel", tagCompiledSource.toString());
-                            tagOk = true;
-                        } catch (e) {
-                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
-                            throw msg;
-                        }
-                    }
-
-                    /*************************************************************
-                     * Add it to result if it is OK.
-                     *************************************************************/
-                    if (tagOk) {
-                        result.pushCompiledSource(tagCompiledSource);
-                    }
-
 
                 } else {
+
+                    /****************************************************************
+                     * It is NOT a system tag, it is a property name.
+                     ****************************************************************/
+
+                    if (mainArgs.debugEnabled) console.log("no such tag type, compiling property tag instead", item);
+
                     try {
-                        result.pushCompiledSource(compilePropertyTag(item));
+                        tagCompiledSource = compilePropertyTag(item);
+                    } catch (e) {
+                        if (mainArgs.debugEnabled) console.log("compiling property tag failed!", item);
+                        var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                        throw msg;
+                    }
+                }
+
+                /*************************************************************
+                 * Compile the source to Function-object to verify that it is working.
+                 *************************************************************/
+                if (tagCompiledSource) {
+                    if (mainArgs.debugEnabled) console.log("Verifying tag source: ", tagCompiledSource.toString());
+                    try {
+                        new Function("executionContext", "api", "rootModel", tagCompiledSource.toString());
+                        tagOk = true;
                     } catch (e) {
                         var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
                         throw msg;
                     }
                 }
+
+                /*************************************************************
+                 * Add it to result if it is OK.
+                 *************************************************************/
+                if (tagOk) {
+                    result.pushCompiledSource(tagCompiledSource);
+                }
+
+
             }
         }
 
@@ -1886,7 +1905,7 @@ function mcomponent(args) {
         };
     };
 
-    var createModelContextUpdateCompiledSource = function(item) {
+    var createModelContextUpdateCompiledSource = function() {
         var r = new CompiledSource();
         r.push("var peek = executionContext.peek()");
         r.push("model = peek ? peek.model : undefined");

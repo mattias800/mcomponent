@@ -2933,6 +2933,10 @@ test("Invalid tags", function() {
 
     var c;
 
+    /***********************
+     * Using exceptions
+     ***********************/
+
     raises(function() {
         c = $().mcomponent({
             viewHtml : '{{ showjs "mattias }}',
@@ -2949,18 +2953,30 @@ test("Invalid tags", function() {
 
     raises(function() {
         c = $().mcomponent({
-            viewHtml : '{{ * showjs alert("hej") }}',
+            viewHtml : '{{ Å showjs alert("hej") }}',
             throwOnError : true
         }), "Construction OK!"
     });
+
+    /***********************
+     * Using error messages
+     ***********************/
+
+    ok(c = $().mcomponent({
+        debugEnabled : true,
+        viewHtml : '{{ showjs "mattias }}'
+    }), "Construction OK!");
+
+    ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
+    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
     ok(c = $().mcomponent({
         debugEnabled : true,
         viewHtml : '{{ * showjs alert("hej") }}'
     }), "Construction OK!");
 
-    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
+    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
 
 });
