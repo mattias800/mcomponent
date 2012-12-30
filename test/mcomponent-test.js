@@ -2955,9 +2955,11 @@ test("Invalid tags", function() {
     });
 
     ok(c = $().mcomponent({
+        debugEnabled : true,
         viewHtml : '{{ * showjs alert("hej") }}'
     }), "Construction OK!");
 
+    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
 
 
