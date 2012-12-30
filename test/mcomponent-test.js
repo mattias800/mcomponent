@@ -2968,7 +2968,7 @@ test("Invalid tags", function() {
     }), "Construction OK!");
 
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
-    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
+    //equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
     ok(c = $().mcomponent({
         debugEnabled : true,
@@ -2976,7 +2976,7 @@ test("Invalid tags", function() {
     }), "Construction OK!");
 
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
-    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
+    //equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
     /**************************************
      * Using error messages in nested tags
@@ -2988,7 +2988,7 @@ test("Invalid tags", function() {
     }), "Construction OK!");
 
     ok(c._assertRender() !== "", "Should not be empty, should contain an error message.");
-    equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
+    //equal(c._assertRender(), "", "Should not be empty, should contain an error message.");
 
 
 });
