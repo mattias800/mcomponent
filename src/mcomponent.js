@@ -112,6 +112,10 @@ function mcomponent(args) {
 
         this.getSuccessfullyCompiledTags = function() {
             return this.successfullyCompiledTags;
+        };
+
+        this.clearCompileError = function() {
+            this.compileError = undefined;
         }
     };
 
@@ -1126,18 +1130,12 @@ function mcomponent(args) {
     };
 
     var compileView = function() {
-        try {
-            compileViewInner();
-            compilationContext.compileError = undefined;
-        } catch (e) {
-            compilationContext.compileError = e;
-            if (mainArgs.throwOnError) {
-                throw e;
-            }
-        }
-    };
+        /**
+         * Executed by setView(). Should throw exception if throwOnError == true.
+         */
 
-    var compileViewInner = function() {
+        compilationContext.clearCompileError();
+
         var r = buildList(view.html);
         if (r.error) {
             throw r.message;
@@ -1563,16 +1561,31 @@ function mcomponent(args) {
 
     };
 
+    /**
+     * Compiles the view.
+     *
+     * Sets compilationContext.compileError if error is encountered when compiling.
+     * Also throws exception when compile fails, if throwOnError == true.
+     *
+     * @param args
+     * @return {{getSource: Function, getBodySource: Function, render: Function, process: Function}}
+     */
     var compile = function(args) {
         var debugEnabled = false;
         var sourceObj;
 
+        /**************************
+         * Compile to source first.
+         **************************/
         try {
             sourceObj = compileToSource(args);
         } catch (e) {
             compilationContext.compileError = e;
         }
 
+        /*****************************************
+         * If success, compile to Function object.
+         ****************************************/
         if (sourceObj) {
             var source = sourceObj.full;
             var bodySource = sourceObj.body;
@@ -1589,8 +1602,17 @@ function mcomponent(args) {
                     console.log(e.toString());
                 }
                 compilationContext.compileError = e;
+
+                if (mainArgs.throwOnError) {
+                    msg = createCompileErrorString(compilationContext.compileError);
+                    throw msg;
+                }
             }
         }
+
+        /***************************************************
+         * Return an object that exposes some method needed.
+         **************************************************/
         return {
             getSource : function() {
                 return source;
@@ -1599,7 +1621,10 @@ function mcomponent(args) {
                 return bodySource;
             },
             render : function() {
+                console.log("RENDERING FROM compile-OBJECT!!");
+                console.log("compilationContext", compilationContext);
                 var r = {};
+                var msg;
                 if (f) {
                     executionContext.makeReadyForRender();
                     try {
@@ -1617,14 +1642,21 @@ function mcomponent(args) {
                             executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
                         }
                     }
-                }
-                if (compilationContext.compileError) {
-                    var msg = createCompileErrorString(compilationContext.compileError);
+                } else if (compilationContext.compileError) {
+                    msg = createCompileErrorString(compilationContext.compileError);
                     executionContext.renderResult = [msg];
 
                     if (mainArgs.throwOnError) {
                         throw msg;
                     }
+                } else {
+                    msg = createCompileErrorString("Critical error, no compiled result, and no error.");
+                    executionContext.renderResult = [msg];
+
+                    if (mainArgs.throwOnError) {
+                        throw msg;
+                    }
+
                 }
                 return executionContext.renderResult.join("");
             },
@@ -1999,17 +2031,15 @@ function mcomponent(args) {
             this._beforeRender();
 
             if (getView().template) {
-                try {
-                    result.html = getView().template.render();
-                } catch (e) {
-                    result.html = e.toString();
-                    if (args.throwOnError) throw e;
-                }
-            } else if (compilationContext.compileError) {
-                var msg = createCompileErrorString(compilationContext.compileError);
-                result.html = msg;
-                if (args.throwOnError) throw msg;
+                /**
+                 * template.render() can throw exception if throwOnError=true and compilation failed.
+                 * If throwOnError=false and compilation failed, renderResult will be populated with error message.
+                 */
+                result.html = getView().template.render();
             } else {
+                /**
+                 * There is no view. Result should be empty.
+                 */
                 result.html = "";
             }
 

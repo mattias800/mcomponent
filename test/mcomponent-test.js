@@ -2918,7 +2918,7 @@ test("niter tag", function() {
 });
 
 
-test("set view, render, change view, render again", function() {
+test("Set view, render, change view, render again", function() {
 
     var c;
 
@@ -2926,6 +2926,49 @@ test("set view, render, change view, render again", function() {
     equal(c._assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
     c.setViewWithHtml("ojoj");
     equal(c._assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
+
+});
+
+test("Invalid tags", function() {
+
+    var c;
+
+    raises(function() {
+        c = $().mcomponent({
+            viewHtml : '{{ showjs "mattias }}',
+            throwOnError : true
+        }), "Construction OK!"
+    });
+
+    raises(function() {
+        c = $().mcomponent({
+            viewHtml : '{{ * showjs alert("hej") }}',
+            throwOnError : true
+        }), "Construction OK!"
+    });
+
+    raises(function() {
+        c = $().mcomponent({
+            viewHtml : '{{ * showjs alert("hej") }}',
+            throwOnError : true
+        }), "Construction OK!"
+    });
+
+    console.log("---------------------------------- OK LETS GOOOOOOOO!");
+    console.log("---------------------------------- OK LETS GOOOOOOOO!");
+    console.log("---------------------------------- OK LETS GOOOOOOOO!");
+    console.log("---------------------------------- OK LETS GOOOOOOOO!");
+
+    ok(c = $().mcomponent({
+        viewHtml : '{{ * showjs alert("hej") }}'
+    }), "Construction OK!");
+
+    equal(c._assertRender(), "", "Should contain an error message.");
+
+    console.log("---------------------------------- DONE!");
+    console.log("---------------------------------- DONE!");
+    console.log("---------------------------------- DONE!");
+    console.log("---------------------------------- DONE!");
 
 });
 
@@ -3066,9 +3109,6 @@ test("Check child count from execution context", function() {
     a.addChild("b", b);
 
     equal(a._assertRender(), "a 1", "1 child");
-
-    console.log("SOURCE!");
-    console.log(a._getSource());
 
 });
 
