@@ -37,6 +37,11 @@ function mcomponent(args) {
         return { result : true };
     };
 
+    var renderErrorToString = function(error) {
+        return "<div>Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message + "</div>"
+    };
+
+
     var init = function() {
 
         if (args.model) {
@@ -172,19 +177,15 @@ function mcomponent(args) {
                 tag : tagName
             };
             this.renderErrors.push(error);
-            this.renderResult.push(this.renderErrorToString(error));
+            this.renderResult.push(renderErrorToString(error));
 
             if (args.throwOnError) {
-                throw this.renderErrorToString(error);
+                throw renderErrorToString(error);
             }
         };
 
         this.hasRenderErrors = function() {
             return this.renderErrors.length ? true : false;
-        };
-
-        this.renderErrorToString = function(error) {
-            return "<div>Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message + "</div>"
         };
 
         /**
@@ -1548,9 +1549,12 @@ function mcomponent(args) {
                      *************************************************************/
                     if (tagCompiledSource) {
                         try {
+                            new Function("executionContext", "api", "rootModel", tagCompiledSource.toString());
                             tagOk = true;
                         } catch (e) {
-
+                            var msg = renderErrorToString({tag : item.tag.tag, message : e.toString()});
+                            console.log(msg, item);
+                            throw msg;
                         }
                     }
 
@@ -1666,7 +1670,7 @@ function mcomponent(args) {
                             console.log("model", _getModel());
                         }
                         if (mainArgs.throwOnError) {
-                            throw "Error at tag " + startTagToken + " " + executionContext.currentTag.name + " " + endTagToken + ": " + e.toString();
+                            throw renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()});
                         } else {
                             executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
                         }
