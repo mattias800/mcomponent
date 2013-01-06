@@ -3197,6 +3197,21 @@ test("Execution context scope", function() {
 
 });
 
+test("Weird HTML", function() {
+
+    var a;
+
+    ok(a = $().mcomponent({viewHtml : "ÅÄÖ=#€%"}), "Creating child.");
+    equal(a.assert.assertRender(), "ÅÄÖ=#€%");
+
+    ok(a = $().mcomponent({viewHtml : '!2394839835€)(%!##€&!#/€!#")!""#!"#)£$§|∞§©£@][≈£≈'}), "Creating child.");
+    equal(a.assert.assertRender(), '!2394839835€)(%!##€&!#/€!#")!""#!"#)£$§|∞§©£@][≈£≈');
+
+    ok(a = $().mcomponent({viewHtml : '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£$§|∞§©£@][≈£≈ } }   '}), "Creating child.");
+    equal(a.assert.assertRender(), '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£$§|∞§©£@][≈£≈ } }   ');
+
+});
+
 function Timer(name) {
 
     this.name = name;
