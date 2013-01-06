@@ -30,9 +30,9 @@ function mcomponent(args) {
             return { result : false, message : "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
         } else if (/[^a-zA-Z0-9]/.test(id)) {
             return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
-        } else if (typeof child._isComponent !== "function") {
+        } else if (typeof child._.isComponent !== "function") {
             return { result : false, message : "Child is not an mcomponent object."};
-        } else if (!child._isComponent()) {
+        } else if (!child._.isComponent()) {
             return { result : false, message : "Child is not an mcomponent object."};
         }
         return { result : true };
@@ -215,7 +215,7 @@ function mcomponent(args) {
             if (v.result) {
                 this.children[id] = child;
             } else {
-                throw v.message;
+                throw "Error trying to add child: " + v.message;
             }
         };
 
@@ -1167,7 +1167,7 @@ function mcomponent(args) {
     };
 
     var _setViewFromComponent = function(component) {
-        _setView(component._getView());
+        _setView(component._.getView());
         // Must recompile the source, since the compiled code now references the other components scope.
         view.template = compile({tree : getView().tree});
     };
@@ -2138,37 +2138,8 @@ function mcomponent(args) {
             return executionContext.hasRenderErrors();
         },
 
-        _isComponent : function() {
-            return true;
-        },
-
         getResult : function() {
             return result;
-        },
-
-        _getId : function() {
-            return id;
-        },
-
-        _getExecutionContext : function() {
-            return executionContext;
-        },
-
-        _getNiterParametersFromTagParameter : function(name) {
-            return getNiterParametersFromTagParameter(name);
-        },
-
-        _getContainerType : function() {
-            return args.containerType;
-        },
-
-        _getClipboard : function(name) {
-            return executionContext.getClipboardWithName(name);
-        },
-
-        _pushModel : function(model) {
-            executionContext.pushModel(model);
-            return true;
         },
 
         assert : {
@@ -2248,66 +2219,96 @@ function mcomponent(args) {
 
             assertComponentIdEqualsExecutionContextId : function() {
                 return id == executionContext.id;
-            }
+            },
 
-
-        },
-
-        _getExecutionStackSize : function() {
-            return executionContext.executionStack.length;
-        },
-
-        _getTemplate : function() {
-            return compile({tree : getView().tree});
-        },
-
-        _assertSetViewAndBuildList : function(html) {
-            var v = getView();
-            v.html = html;
-            if (html) {
-                var r = buildList(view.html);
-                if (r.error) {
-                    throw r.message;
+            assertSetViewAndBuildList : function(html) {
+                var v = getView();
+                v.html = html;
+                if (html) {
+                    var r = buildList(view.html);
+                    if (r.error) {
+                        throw r.message;
+                    } else {
+                        view.list = r.list;
+                        view.tree = {}
+                    }
                 } else {
-                    view.list = r.list;
-                    view.tree = {}
+                    v.list = [];
+                    v.tree = {};
                 }
-            } else {
-                v.list = [];
-                v.tree = {};
+                return true;
             }
-            return true;
+
+
         },
 
-        _findBlockEnd : function(i, args) {
-            var list = getView().list;
-            return findBlockEnd(list, i, args).index;
-        },
+        _ : {
 
-        _findBlockEndTag : function(i, args) {
-            var list = getView().list;
-            return findBlockEnd(list, i, args);
-        },
+            getExecutionStackSize : function() {
+                return executionContext.executionStack.length;
+            },
 
-        _getTree : function() {
-            return getView().tree;
-        },
+            getTemplate : function() {
+                return compile({tree : getView().tree});
+            },
 
-        _getList : function() {
-            return getView().list;
-        },
+            findBlockEnd : function(i, args) {
+                var list = getView().list;
+                return findBlockEnd(list, i, args).index;
+            },
 
-        _getView : function() {
-            return view;
-        },
+            findBlockEndTag : function(i, args) {
+                var list = getView().list;
+                return findBlockEnd(list, i, args);
+            },
 
-        _getSource : function() {
-            return compile({tree : getView().tree}).getSource().toString();
-        },
+            getTree : function() {
+                return getView().tree;
+            },
 
-        _getBodySource : function() {
-            return compile({tree : getView().tree}).getBodySource().toString();
+            getList : function() {
+                return getView().list;
+            },
+
+            getView : function() {
+                return view;
+            },
+
+            getSource : function() {
+                return compile({tree : getView().tree}).getSource().toString();
+            },
+
+            getBodySource : function() {
+                return compile({tree : getView().tree}).getBodySource().toString();
+            },
+
+            isComponent : function() {
+                return true;
+            },
+
+            getId : function() {
+                return id;
+            },
+
+            getExecutionContext : function() {
+                return executionContext;
+            },
+
+            getNiterParametersFromTagParameter : function(name) {
+                return getNiterParametersFromTagParameter(name);
+            },
+
+            getClipboard : function(name) {
+                return executionContext.getClipboardWithName(name);
+            },
+
+            pushModel : function(model) {
+                executionContext.pushModel(model);
+                return true;
+            }
+
         }
+
 
     };
 }

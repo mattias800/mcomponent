@@ -305,19 +305,19 @@ test("Util function - getNiterParameters", function() {
 
     var p;
 
-    ok(p = c._getNiterParametersFromTagParameter(""));
+    ok(p = c._.getNiterParametersFromTagParameter(""));
     equal(p.iterName, undefined);
     equal(p.variableName, undefined);
 
-    ok(p = c._getNiterParametersFromTagParameter("name"), "Testing 'name'.");
+    ok(p = c._.getNiterParametersFromTagParameter("name"), "Testing 'name'.");
     equal(p.iterName, "name");
     equal(p.variableName, undefined);
 
-    ok(p = c._getNiterParametersFromTagParameter("name userlist"), "Testing 'name userlist'.");
+    ok(p = c._.getNiterParametersFromTagParameter("name userlist"), "Testing 'name userlist'.");
     equal(p.iterName, "name");
     equal(p.variableName, "userlist");
 
-    ok(p = c._getNiterParametersFromTagParameter("name userlist huh", "Testing 'name userlist huh'."));
+    ok(p = c._.getNiterParametersFromTagParameter("name userlist huh", "Testing 'name userlist huh'."));
     equal(p.iterName, "name");
     equal(p.variableName, "userlist huh");
 
@@ -450,13 +450,13 @@ test("Execution context", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "{{ name }}"}));
-    equal(c._getExecutionStackSize(), 0, "No model, execution stack should start empty.");
-    ok(c._pushModel({test : "test"}));
-    equal(c._getExecutionStackSize(), 1, "Pushed model, execution stack should now have one element.");
+    equal(c._.getExecutionStackSize(), 0, "No model, execution stack should start empty.");
+    ok(c._.pushModel({test : "test"}));
+    equal(c._.getExecutionStackSize(), 1, "Pushed model, execution stack should now have one element.");
 
     c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ name }}"});
 
-    equal(c._getExecutionStackSize(), 1, "Model should be pushed to execution stack.");
+    equal(c._.getExecutionStackSize(), 1, "Model should be pushed to execution stack.");
 
 });
 
@@ -468,7 +468,7 @@ test("Find block end", function() {
 
     ok(c.assert.assertListSize(1), "List size is 1.");
     raises(function() {
-        c._findBlockEnd(0)
+        c._.findBlockEnd(0)
     }, "Not tag with block, throw exception");
 
 
@@ -481,38 +481,38 @@ test("Find block end", function() {
 
     ok(c.assert.assertListSize(1), "List size is 1.");
     raises(function() {
-        c._findBlockEnd(0)
+        c._.findBlockEnd(0)
     }, "Exception, list is too short.");
 
     ok(c = $().mcomponent({viewHtml : "before{{ if aaaname }}inside{{ endif }}after"}), "Construction should be OK!");
     ok(c.assert.assertListSize(5), "List size is 5.");
-    equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
+    equal(c._.findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
     c = $().mcomponent({viewHtml : "{{ if supername }}test{{ endif }}"});
     ok(c.assert.assertListSize(3), "List size is 3.");
-    equal(c._findBlockEnd(0), 2, "Should find ending tag on index 2.");
+    equal(c._.findBlockEnd(0), 2, "Should find ending tag on index 2.");
 
     ok(c = $().mcomponent(), "Construction should be ok...");
-    ok(c._assertSetViewAndBuildList("{{ if thename }}{{ if age }}test{{ endif }}"));
+    ok(c.assert.assertSetViewAndBuildList("{{ if thename }}{{ if age }}test{{ endif }}"));
     ok(c.assert.assertListSize(4), "List size is 4.");
     raises(function() {
-        c._findBlockEnd(0);
+        c._.findBlockEnd(0);
     }, "Should not find a closing endif.");
-    equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
+    equal(c._.findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
     c = $().mcomponent({viewHtml : "{{ if name }}{{ if age }}test{{ endif }}{{ endif }}"});
     ok(c.assert.assertListSize(5), "List size is 5.");
-    equal(c._findBlockEnd(0), 4, "Should find ending tag on index 4.");
-    equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
+    equal(c._.findBlockEnd(0), 4, "Should find ending tag on index 4.");
+    equal(c._.findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
     c = $().mcomponent({viewHtml : "{{ if name }}{{ push age }}test{{ endpush }}{{ endif }}"});
     ok(c.assert.assertListSize(5), "List size is 5.");
-    equal(c._findBlockEnd(0), 4, "Should find ending tag on index 4.");
-    equal(c._findBlockEnd(1), 3, "Should find ending tag on index 3.");
+    equal(c._.findBlockEnd(0), 4, "Should find ending tag on index 4.");
+    equal(c._.findBlockEnd(1), 3, "Should find ending tag on index 3.");
 
     c = $().mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
     ok(c.assert.assertListSize(3), "List size is 3.");
-    equal(c._findBlockEnd(0), 2, "Should find ending tag on index 2.");
+    equal(c._.findBlockEnd(0), 2, "Should find ending tag on index 2.");
 
 
 });
@@ -524,25 +524,25 @@ test("Find block end, for if cases", function() {
 
     c = $().mcomponent({viewHtml : "{{ if (test) }}{{ else }}{{ endif }}"});
     ok(c.assert.assertListSize(3), "List size is 3.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'else' tag on index 1.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'endif' tag on index 2.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'else' tag on index 1.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'endif' tag on index 2.");
 
     c = $().mcomponent({viewHtml : "{{ if (test) }}testtrue{{ else }}testfalse{{ endif }}"});
     ok(c.assert.assertListSize(5), "List size is 5.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'else' tag on index 1.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'endif' tag on index 2.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'else' tag on index 1.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'endif' tag on index 2.");
 
     c = $().mcomponent({viewHtml : "{{ if (test) }}{{ elseif (test2) }}{{ else }}{{ endif }}"});
     ok(c.assert.assertListSize(4), "List size is 4.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'elseif' tag on index 1.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'else' tag on index 2.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 3, "Should find 'endif' tag on index 3.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"]}), 1, "Should find 'elseif' tag on index 1.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}), 2, "Should find 'else' tag on index 2.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 3, "Should find 'endif' tag on index 3.");
 
     c = $().mcomponent({viewHtml : "{{ if (test) }}testIsTrue{{ elseif (test2) }}test2IsTrue{{ else }}neitherIsTrue{{ endif }}"});
     ok(c.assert.assertListSize(7), "List size is 7.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'elseif' tag on index 2.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'else' tag on index 1.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 4}), 6, "Should find 'endif' tag on index 6.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"]}), 2, "Should find 'elseif' tag on index 2.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}), 4, "Should find 'else' tag on index 1.");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 4}), 6, "Should find 'endif' tag on index 6.");
 
 });
 
@@ -553,15 +553,15 @@ test("General", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "{{ push age }}test{{ endpush }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._getTree()[0].tagName, "push", "First root tag should be push tag.");
-    equal(c._getTree()[0].content[0].html, "test", "Second level should be HTML 'test'.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree()[0].tagName, "push", "First root tag should be push tag.");
+    equal(c._.getTree()[0].content[0].html, "test", "Second level should be HTML 'test'.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (name) }}{{ push age }}test{{ endpush }}{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
-    equal(c._getTree()[0].content[0].tagName, "push", "Second level should be a push.");
-    equal(c._getTree()[0].content[0].content[0].html, "test", "Second level should be HTML 'test'.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree()[0].tagName, "if", "First root tag should be if tag.");
+    equal(c._.getTree()[0].content[0].tagName, "push", "Second level should be a push.");
+    equal(c._.getTree()[0].content[0].content[0].html, "test", "Second level should be HTML 'test'.");
 
 });
 
@@ -571,23 +571,23 @@ test("if, elseif, else tags", function() {
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ else }}2{{ endif }}"}), "Construction OK!");
     ok(c.assert.assertListSize(5), "List size is 5.");
-    equal(c._getTree()[0].conditions.length, 1, "Only one condition in if case.");
-    equal(c._getTree()[0].contentRoots.length, 1, "Only one conditioned root.");
-    equal(c._getTree()[0].contentRoots[0].length, 1, "Only one element in the true-conditioned root.");
-    equal(c._getTree()[0].contentRoots[0][0].html, "1", "True case contains '1'.");
-    equal(c._getTree()[0].elseContent.length, 1, "Else contains one element");
-    equal(c._getTree()[0].elseContent[0].html, "2", "Else contains '2'.");
+    equal(c._.getTree()[0].conditions.length, 1, "Only one condition in if case.");
+    equal(c._.getTree()[0].contentRoots.length, 1, "Only one conditioned root.");
+    equal(c._.getTree()[0].contentRoots[0].length, 1, "Only one element in the true-conditioned root.");
+    equal(c._.getTree()[0].contentRoots[0][0].html, "1", "True case contains '1'.");
+    equal(c._.getTree()[0].elseContent.length, 1, "Else contains one element");
+    equal(c._.getTree()[0].elseContent[0].html, "2", "Else contains '2'.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c.assert.assertListSize(6), "List size is 6.");
-    equal(c._findBlockEnd(0, {endTags : ["else", "elseif"]}), 5, "Should find outer 'endif' tag on index 5.");
-    equal(c._findBlockEnd(2, {endTags : ["else", "elseif"]}), 4, "Should find inner 'endif' tag on index 4.");
-    equal(c._getTree()[0].conditions.length, 1, "Only one condition on outer if case.");
-    equal(c._getTree()[0].contentRoots.length, 1, "Only one content list also, on outer if case.");
-    equal(c._getTree()[0].elseContent.length, 0, "No else content on outer if case.");
-    equal(c._getTree()[0].contentRoots[0].length, 2, "Content for outer if case should have two elements. '1' and inner if.");
-    equal(c._getTree()[0].contentRoots[0][0].html, "1", "First content element is HTML '1'.");
-    equal(c._getTree()[0].contentRoots[0][1].tag.tagName, "if", "Second content element is 'if' tag");
+    equal(c._.findBlockEnd(0, {endTags : ["else", "elseif"]}), 5, "Should find outer 'endif' tag on index 5.");
+    equal(c._.findBlockEnd(2, {endTags : ["else", "elseif"]}), 4, "Should find inner 'endif' tag on index 4.");
+    equal(c._.getTree()[0].conditions.length, 1, "Only one condition on outer if case.");
+    equal(c._.getTree()[0].contentRoots.length, 1, "Only one content list also, on outer if case.");
+    equal(c._.getTree()[0].elseContent.length, 0, "No else content on outer if case.");
+    equal(c._.getTree()[0].contentRoots[0].length, 2, "Content for outer if case should have two elements. '1' and inner if.");
+    equal(c._.getTree()[0].contentRoots[0][0].html, "1", "First content element is HTML '1'.");
+    equal(c._.getTree()[0].contentRoots[0][1].tag.tagName, "if", "Second content element is 'if' tag");
 
 });
 
@@ -643,96 +643,96 @@ test("if tag", function() {
     equal(c.assert.assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}baibai{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
-    equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
-    equal(c._getTree()[0].content[0].html, "baibai", "Second level should be HTML 'baibai'.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree()[0].tagName, "if", "First root tag should be if tag.");
+    equal(c._.getTree()[0].content[0].html, "baibai", "Second level should be HTML 'baibai'.");
     equal(c.assert.assertRender(), "baibai", "Should contain 'baibai', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (true) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c.assert.assertListSize(6), "Root contains 6 elements.");
-    equal(c._getTree().length, 1, "Root contains 1 elements.");
-    equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
-    equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
-    equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 1.");
+    equal(c._.getTree().length, 1, "Root contains 1 elements.");
+    equal(c._.getTree()[0].tagName, "if", "First root tag should be if tag.");
+    equal(c._.getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
+    equal(c._.getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 1.");
     equal(c.assert.assertRender(), "12", "Should contain '12', since both if cases are true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c.assert.assertListSize(6), "Root contains 6 elements.");
-    equal(c._getTree().length, 1, "Root contains 1 elements.");
-    equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
-    equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
-    equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 2.");
+    equal(c._.getTree().length, 1, "Root contains 1 elements.");
+    equal(c._.getTree()[0].tagName, "if", "First root tag should be if tag.");
+    equal(c._.getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
+    equal(c._.getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 2.");
     equal(c.assert.assertRender(), "1", "Should contain '1', since only first if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}1{{ if (true) }}2{{ endif }}{{ endif }}"}), "Construction OK!");
     ok(c.assert.assertListSize(6), "Root contains 6 elements.");
-    equal(c._getTree().length, 1, "Root contains 1 elements.");
-    equal(c._getTree()[0].tagName, "if", "First root tag should be if tag.");
-    equal(c._getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
-    equal(c._getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 3.");
+    equal(c._.getTree().length, 1, "Root contains 1 elements.");
+    equal(c._.getTree()[0].tagName, "if", "First root tag should be if tag.");
+    equal(c._.getTree()[0].content[0].html, "1", "Second level should be HTML '1'.");
+    equal(c._.getTree()[0].content[1].tagName, "if", "Second level should also have an if tag 3.");
     equal(c.assert.assertRender(), "", "Should contain '', since only second if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "1{{ if (true) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 4.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 4.");
     equal(c.assert.assertRender(), "12345", "Should contain '12345'.");
 
     ok(c = $().mcomponent({viewHtml : "1{{ if (true) }}2{{ if (false) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag.");
     equal(c.assert.assertRender(), "1245", "Should contain '1245'.");
 
     ok(c = $().mcomponent({viewHtml : "1{{ if (false) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 5.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 5.");
     equal(c.assert.assertRender(), "15", "Should contain '15'.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 6.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 6.");
     equal(c.assert.assertRender(), "12345", "Should contain '12345', then if with this.model works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
     equal(c.assert.assertRender(), "1245", "Should contain '1245', then if with this.model works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 8.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 8.");
     equal(c.assert.assertRender(), "12345", "Should contain '12345', then if with model (without this.model) works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"}), "Construction OK!");
     ok(c.assert.assertListSize(9), "Root contains 9 elements.");
-    equal(c._getTree().length, 3, "Root contains 3 elements.");
-    equal(c._getTree()[0].html, "1", "First root tag should be if tag.");
-    equal(c._getTree()[1].tagName, "if", "Second root tag should be if tag.");
-    equal(c._getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-    equal(c._getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 9.");
+    equal(c._.getTree().length, 3, "Root contains 3 elements.");
+    equal(c._.getTree()[0].html, "1", "First root tag should be if tag.");
+    equal(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
+    equal(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
+    equal(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 9.");
     equal(c.assert.assertRender(), "1245", "Should contain '1245', then if with model (without this.model) works.");
 
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (this.model.name == 'mattias') }}2{{ endif }}3"}), "Construction OK!");
@@ -747,42 +747,42 @@ test("else, elseif tags", function() {
     var c;
 
     ok(c = $().mcomponent({viewHtml : "{{ if (true) }}ok{{ else }}fail{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}ok{{ else }}fail2{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail{{ else }}ok{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (true) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (false) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "innerfail", "Should contain 'innerfail', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (false) }}fail3{{ elseif (false) }}fail4{{ elseif (false) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (false) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
     // Malformed
     //{{ if (this.model.users }}
 
     ok(c = $().mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     equal(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
 
 
@@ -948,7 +948,7 @@ test("large view test", function() {
     };
 
     ok(c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}}), "Construction OK!");
-    equal(c._getTree().length, 1, "Root contains only one element.");
+    equal(c._.getTree().length, 1, "Root contains only one element.");
     ok(result = c.assert.assertRender(), "Rendering of large view should be OK!");
     equal(result, "yayName:MattiasMale:YesAge:31Name:MustMale:YesAge:28Name:JennyMale:NoAge:27", "And the result should be correct.");
 
@@ -3155,8 +3155,8 @@ test("Execution context scope", function() {
     equal(b.assert.assertRender(), "a true", "");
     ok(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
-    ok(a._getId() !== b._getId(), "Components must not have same id.");
-    ok(a._getExecutionContext().id !== b._getExecutionContext().id, "Execution contexts must not have same id.");
+    ok(a._.getId() !== b._.getId(), "Components must not have same id.");
+    ok(a._.getExecutionContext().id !== b._.getExecutionContext().id, "Execution contexts must not have same id.");
 
     // OK
 
@@ -3310,7 +3310,7 @@ var doMcomponentProfiling = function() {
     };
 
     c = $().mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-    var t = c._getTemplate();
+    var t = c._.getTemplate();
 
     var tcompile = new Timer("compile");
     var times = 1000;
@@ -3323,7 +3323,7 @@ var doMcomponentProfiling = function() {
 
 
     console.log(m);
-    console.log(c._getView().html);
+    console.log(c._.getView().html);
     console.log(t.getSource());
 
 
