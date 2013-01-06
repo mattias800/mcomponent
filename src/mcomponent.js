@@ -38,6 +38,10 @@ function mcomponent(args) {
         return { result : true };
     };
 
+    /************************
+     * Error message helpers
+     ************************/
+
     var renderErrorToString = function(error) {
         return "Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message;
     };
@@ -49,6 +53,16 @@ function mcomponent(args) {
     var createGenericCompileErrorMessage = function(e) {
         return "Error compiling view, view is not formatted correctly, please check your tags: " + e.toString();
     };
+
+    var createCompileExceptionMessage = function(text, tag) {
+        var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
+        var msg = "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
+        return msg;
+    };
+
+    /***************************
+     * Init code
+     ***************************/
 
     var init = function() {
 
@@ -112,6 +126,10 @@ function mcomponent(args) {
 
     };
 
+    /***************************
+     * Compilation context
+     ***************************/
+
     var CompilationContext_ = function() {
 
         var that = this;
@@ -134,9 +152,10 @@ function mcomponent(args) {
 
     var compilationContext = new CompilationContext_();
 
-    /**
-     * @constructor
-     */
+    /***************************
+     * Execution context
+     ***************************/
+
     var ExecutionContext_ = function() {
 
         this.id = id;
@@ -358,6 +377,7 @@ function mcomponent(args) {
          * If undefined is found, it will keep looking for a value, but return undefined if no value is found.
          * If nothing is found at all, it throws an exception.
          * @param name
+         * @param parentPrefixResult
          */
         this.lookupModelInStack = function(name, parentPrefixResult) {
             parentPrefixResult = parentPrefixResult || {};
@@ -411,6 +431,10 @@ function mcomponent(args) {
             return this.executionStack.length;
         };
 
+        /**
+         * This is the "api" object that is available in tags.
+         * @return {{lookup: Function, getRootModel: Function, getIterator: Function, _assert: {componentIdEqualsExecutionContextId: Function, getExecutionContext: Function, childCount: Function}}}
+         */
         this.getTagApi = function() {
             var that = this;
             return {
@@ -499,9 +523,10 @@ function mcomponent(args) {
 
     var executionContext = new ExecutionContext_();
 
-    /**
-     * @constructor
-     */
+    /****************************
+     * Iterator context
+     ****************************/
+
     var IteratorContext_ = function(iterConfig, modelUsed) {
 
         if (modelUsed == undefined) throw "IteratorContext must get a model as second parameter.";
@@ -723,6 +748,10 @@ function mcomponent(args) {
         };
     };
 
+    /****************************
+     * Tag types
+     ****************************/
+
     var tagTypes = {
         tag_show : {
             token : "show",
@@ -845,13 +874,13 @@ function mcomponent(args) {
 
                 for (var i = 0; i < tagInstance.conditions.length; i++) {
                     result.push((isFirst ? "" : "} else ") + "if (" + tagInstance.conditions[i] + ") {");
-                    result.pushCompiledSource(compilePartOfTreeToSource(tagInstance.contentRoots[i]).indent());
+                    result.pushCompiledSource(compileTreeToSource(tagInstance.contentRoots[i]).indent());
                     isFirst = false;
                 }
 
                 if (tagInstance.elseContent && tagInstance.elseContent.length) {
                     result.push("} else {");
-                    result.pushCompiledSource(compilePartOfTreeToSource(tagInstance.elseContent).indent());
+                    result.pushCompiledSource(compileTreeToSource(tagInstance.elseContent).indent());
                 }
                 result.push("}");
                 return result;
@@ -885,7 +914,7 @@ function mcomponent(args) {
                 result.pushCompiledSource(compiledLookup.compiledSource);
                 result.push("model = " + compiledLookup.varName);
                 result.push("executionContext.pushModel(model)");
-                result.pushCompiledSource(compilePartOfTreeToSource(tagInstance.content));
+                result.pushCompiledSource(compileTreeToSource(tagInstance.content));
                 result.push("executionContext.pop()");
                 result.pushCompiledSource(createModelContextUpdateCompiledSource());
                 return result;
@@ -905,7 +934,7 @@ function mcomponent(args) {
             compileTagInstance : function(tagInstance, executionContext, args) {
                 // Do nothing in compiled tag, we add it at parse time.
                 var result = new CompiledSource();
-                result.pushCompiledSource(compilePartOfTreeToSource(tagInstance.content));
+                result.pushCompiledSource(compileTreeToSource(tagInstance.content));
                 return result;
             },
             createTagInstance : function(args) {
@@ -927,7 +956,7 @@ function mcomponent(args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (!name) name = "default";
-                result.pushCompiledSource(compilePartOfTreeToSource(executionContext.getClipboardWithName(name)));
+                result.pushCompiledSource(compileTreeToSource(executionContext.getClipboardWithName(name)));
                 return result;
             },
             createTagInstance : function(args) {
@@ -1082,7 +1111,7 @@ function mcomponent(args) {
                 result.push("var " + stackItemVar + " = {model: model, context: context}");
                 result.push("executionContext.push(" + stackItemVar + ")");
 
-                result.pushCompiledSource(compilePartOfTreeToSource(tagInstance.content));
+                result.pushCompiledSource(compileTreeToSource(tagInstance.content));
 
                 result.push("executionContext.pop()");
                 result.indent();
@@ -1119,12 +1148,22 @@ function mcomponent(args) {
         }
     };
 
+    /**
+     * Internal setModel method. Updates any state of the component that needs updating when setting the model.
+     * @param model
+     * @private
+     */
     var _setModel = function(model) {
         executionContext.clearIterators(); // If we change model, all iterators are reset.
         executionContext.clear();
         executionContext.pushModel(model);
     };
 
+    /**
+     * Internal getModel
+     * @return {*}
+     * @private
+     */
     var _getModel = function() {
         return executionContext.getModel();
     };
@@ -1238,9 +1277,13 @@ function mcomponent(args) {
             } else {
                 var tagType = getTagType(item.tagName);
                 var endIndex, subList, endIndexTag;
+
+                /***************************************************
+                 * Special case for if, to support elseif and else
+                 * Find block, build tree out of it
+                 ***************************************************/
+
                 if (tagType && tagType.token == tagTypes.tag_if.token) {
-                    // Special case for if, to support elseif and else
-                    // Find block, build tree out of it
 
                     try {
                         endIndexTag = findBlockEnd(list, i, {});
@@ -1256,7 +1299,9 @@ function mcomponent(args) {
                     i = endIndexTag.index;
 
                 } else if (tagType && tagType.hasBlock) {
+
                     // Find block, build tree out of it
+
                     try {
                         endIndex = findBlockEnd(list, i, {}).index;
                     } catch (e) {
@@ -1270,10 +1315,13 @@ function mcomponent(args) {
                     i = endIndex;
 
                 } else if (tagType) {
+
                     // not hasBlock.
+
                     root.push(tagType.createTagInstance({
                         tag : item
                     }));
+
                 } else {
                     // Is not a system tag
                     root.push({tag : item});
@@ -1471,8 +1519,6 @@ function mcomponent(args) {
         }
     };
 
-    var _uncompiledVariableName = {};
-
     /**
      * Formats a string to be usable as variable name. For example, list[0].name becomes list0_name
      * @param name
@@ -1492,6 +1538,8 @@ function mcomponent(args) {
             .replace(/\./g, "_");
     };
 
+    var _uncompiledVariableName = {};
+
     /**
      * Returns a variable name that is not already in use by the compiled code. Ensures no variable name collisions.
      * @param name
@@ -1504,6 +1552,19 @@ function mcomponent(args) {
         return name + "__" + _uncompiledVariableName[name]++;
     };
 
+    /**
+     * Formats any string into a Javascript string token.
+     *
+     * For example:
+     * Mattias
+     * Andersson
+     *
+     * Becomes:
+     * "Mattias\nAndersson"
+     *
+     * @param s
+     * @return {string}
+     */
     var encodeStringToJsString = function(s) {
         s = s
             .replace(/\\/g, "\\\\")
@@ -1516,13 +1577,7 @@ function mcomponent(args) {
         return "\"" + s + "\"";
     };
 
-    var createCompileExceptionMessage = function(text, tag) {
-        var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
-        var msg = "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
-        return msg;
-    };
-
-    var compilePartOfTreeToSource = function(tree) {
+    var compileTreeToSource = function(tree) {
 
         var result = new CompiledSource();
 
@@ -1609,14 +1664,14 @@ function mcomponent(args) {
      * @param args
      * @return {{full: CompiledSource, body: *}}
      */
-    var compileTemplateTreeToSource = function(tree) {
+    var compileTreeToSourceWithBaseCodeIncluded = function(tree) {
 
         var result = new CompiledSource();
         // executionContext is available at all times.
         result.push("var globals = executionContext.getGlobals()");
         result.push("var model = rootModel");
         result.push("var context = {}");
-        var body = compilePartOfTreeToSource(tree);
+        var body = compileTreeToSource(tree);
         result.pushCompiledSource(body);
         return {
             full : result,
@@ -1642,7 +1697,7 @@ function mcomponent(args) {
          * Compile to source first.
          **************************/
         try {
-            sourceObj = compileTemplateTreeToSource(args.tree);
+            sourceObj = compileTreeToSourceWithBaseCodeIncluded(args.tree);
         } catch (e) {
             var es = e.split("|");
             compilationContext.compileError = es[es.length - 1];
