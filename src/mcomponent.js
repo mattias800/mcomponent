@@ -2032,6 +2032,47 @@ function mcomponent(args) {
         return false;
     };
 
+    var render = function() {
+
+        _beforeRender();
+
+        if (getView().template) {
+            /**
+             * template.render() can throw exception if throwOnError=true and compilation failed.
+             * If throwOnError=false and compilation failed, renderResult will be populated with error message.
+             */
+            result.html = getView().template.render();
+        } else {
+            /**
+             * There is no view. Result should be empty.
+             */
+            result.html = "";
+        }
+
+        return _afterRender();
+
+    };
+
+    var _beforeRender = function() {
+        executionContext.beforeRender();
+    };
+
+    var _afterRender = function() {
+
+        executionContext.afterRender();
+
+        if (mainArgs.afterRender) {
+            if (typeof mainArgs.afterRender == "function") {
+                mainArgs.afterRender();
+            } else {
+                throw "afterRender argument must be a function or not defined.";
+            }
+        }
+
+        return result;
+    };
+
+
     init();
 
     /**************
@@ -2090,24 +2131,7 @@ function mcomponent(args) {
         },
 
         render : function() {
-
-            this._beforeRender();
-
-            if (getView().template) {
-                /**
-                 * template.render() can throw exception if throwOnError=true and compilation failed.
-                 * If throwOnError=false and compilation failed, renderResult will be populated with error message.
-                 */
-                result.html = getView().template.render();
-            } else {
-                /**
-                 * There is no view. Result should be empty.
-                 */
-                result.html = "";
-            }
-
-            return this._afterRender();
-
+            return render();
         },
 
         hasRenderErrors : function() {
@@ -2116,25 +2140,6 @@ function mcomponent(args) {
 
         _isComponent : function() {
             return true;
-        },
-
-        _beforeRender : function() {
-            executionContext.beforeRender();
-        },
-
-        _afterRender : function() {
-
-            executionContext.afterRender();
-
-            if (mainArgs.afterRender) {
-                if (typeof mainArgs.afterRender == "function") {
-                    mainArgs.afterRender();
-                } else {
-                    throw "afterRender argument must be a function or not defined.";
-                }
-            }
-
-            return result;
         },
 
         getResult : function() {
@@ -2166,85 +2171,90 @@ function mcomponent(args) {
             return true;
         },
 
-        _assertLookup : function(name, model) {
-            return lookup(name, model);
-        },
+        assert : {
 
-        _assertGetTagParameters : function(tagContent) {
-            return getTagParameters(tagContent);
+            assertLookup : function(name, model) {
+                return lookup(name, model);
+            },
+
+            assertGetTagParameters : function(tagContent) {
+                return getTagParameters(tagContent);
+            },
+
+            assertListSize : function(i) {
+                if (getView().list.length == i) {
+                    return true;
+                }
+                else {
+                    throw "List size check failed. Expected:" + i + ", but got:" + getView().list.length;
+                }
+            },
+
+            assertListItemHasHtml : function(i, html) {
+                var item = getView().list[i];
+                if (item && item.html && item.html === html) {
+                    return true;
+                }
+                else if (item && item.html) {
+                    throw "List item check failed. Expected HTML:" + html + ", but got:" + item.html;
+                }
+                else if (item) {
+                    throw "List item check failed. Expected HTML:" + html + ", but element is not of HTML type.";
+                }
+                else {
+                    throw "List item check failed. List has no element with index:" + i;
+                }
+            },
+
+            assertListItemHasTagName : function(i, tagName) {
+                var item = getView().list[i];
+                if (item && item.tagName && item.tagName === tagName) {
+                    return true;
+                }
+                else if (item && item.tagName) {
+                    throw "List item check failed. Expected tag name:" + tagName + ", but got:" + item.tagName;
+                }
+                else if (item) {
+                    throw "List item check failed. Expected tag name:" + tagName + ", but element is not a tag.";
+                }
+                else {
+                    throw "List item check failed. List has no element with index:" + i;
+                }
+            },
+
+            assertBlockEnd : function(i, expected) {
+                var list = getView().list;
+                var r = findBlockEnd(list, i, {}).index;
+                if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
+                return true;
+            },
+
+            assertFindParentPrefixCount : function(name) {
+                return findParentPrefix(name).count;
+            },
+
+            assertFindParentPrefixName : function(name) {
+                return findParentPrefix(name).name;
+            },
+
+            assertRender : function() {
+                return render().html;
+            },
+
+            assertCompileLogSource : function() {
+                var t = compile({tree : getView().tree, logSource : true});
+                return t.render();
+            },
+
+            assertComponentIdEqualsExecutionContextId : function() {
+                return id == executionContext.id;
+            }
+
+
         },
 
         _getExecutionStackSize : function() {
             return executionContext.executionStack.length;
-        },
-
-        _assertListSize : function(i) {
-            if (getView().list.length == i) {
-                return true;
-            }
-            else {
-                throw "List size check failed. Expected:" + i + ", but got:" + getView().list.length;
-            }
-        },
-
-        _assertListItemHasHtml : function(i, html) {
-            var item = getView().list[i];
-            if (item && item.html && item.html === html) {
-                return true;
-            }
-            else if (item && item.html) {
-                throw "List item check failed. Expected HTML:" + html + ", but got:" + item.html;
-            }
-            else if (item) {
-                throw "List item check failed. Expected HTML:" + html + ", but element is not of HTML type.";
-            }
-            else {
-                throw "List item check failed. List has no element with index:" + i;
-            }
-        },
-
-        _assertListItemHasTagName : function(i, tagName) {
-            var item = getView().list[i];
-            if (item && item.tagName && item.tagName === tagName) {
-                return true;
-            }
-            else if (item && item.tagName) {
-                throw "List item check failed. Expected tag name:" + tagName + ", but got:" + item.tagName;
-            }
-            else if (item) {
-                throw "List item check failed. Expected tag name:" + tagName + ", but element is not a tag.";
-            }
-            else {
-                throw "List item check failed. List has no element with index:" + i;
-            }
-        },
-
-        _assertBlockEnd : function(i, expected) {
-            var list = getView().list;
-            var r = findBlockEnd(list, i, {}).index;
-            if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
-            return true;
-        },
-
-        _assertFindParentPrefixCount : function(name) {
-            return findParentPrefix(name).count;
-        },
-
-        _assertFindParentPrefixName : function(name) {
-            return findParentPrefix(name).name;
-        },
-
-        _assertRender : function() {
-            return this.render().html;
-        },
-
-        _assertCompileLogSource : function() {
-            var t = compile({tree : getView().tree, logSource : true});
-            return t.render();
-        },
-
-        _assertComponentIdEqualsExecutionContextId : function() {
-            return id == executionContext.id;
         },
 
         _getTemplate : function() {
