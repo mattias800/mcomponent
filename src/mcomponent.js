@@ -653,6 +653,10 @@ function mcomponent(args) {
             return isOnFirstPage() && isOnLastPage();
         };
 
+        /**
+         * Calculates number of pages for iterator. Empty model will have 0 pages.
+         * @return {Number}
+         */
         var getPageCount = function() {
             var s;
             if (whereFunction) {
@@ -674,6 +678,12 @@ function mcomponent(args) {
                 }
             }
             return filteredModel;
+        };
+
+        var ensureCurrentPageIsWithinLimits = function() {
+            var pageCount = getPageCount();
+            if (currentPage >= pageCount) currentPage = pageCount - 1;
+            if (currentPage < 0) currentPage = 0;
         };
 
         this.getPublicInterface = function() {
@@ -705,20 +715,18 @@ function mcomponent(args) {
                 showNextPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage++;
-                    var pageCount = getPageCount();
-                    if (currentPage >= pageCount) currentPage = pageCount - 1;
+                    ensureCurrentPageIsWithinLimits();
                 },
                 showPrevPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage--;
-                    if (currentPage < 0) currentPage = 0;
+                    ensureCurrentPageIsWithinLimits();
                 },
                 showPage : function(index) {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage = index;
                     if (currentPage < 0) currentPage = 0;
-                    var pageCount = getPageCount();
-                    if (currentPage >= pageCount) currentPage = pageCount - 1;
+                    ensureCurrentPageIsWithinLimits();
                 },
                 getIndexForItem : function(item) {
                     var filteredModel = getFilteredModel();

@@ -1510,6 +1510,37 @@ test("niter tag, using pages", function() {
 
     ok(c = $().mcomponent({
         model : {
+            list : []
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "", "Should be empty.");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 0);
+    equal(i.getCurrentPage(), 0);
+    i.showNextPage();
+    equal(c.assert.assertRender(), "", "Should still be empty.");
+    equal(i.getCurrentPage(), 0);
+    i.showNextPage();
+    equal(c.assert.assertRender(), "", "Should still be empty.");
+    equal(i.getCurrentPage(), 0);
+    i.showPrevPage();
+    equal(c.assert.assertRender(), "", "Should still be empty.");
+    equal(i.getCurrentPage(), 0);
+    i.showPrevPage();
+    equal(c.assert.assertRender(), "", "Should still be empty.");
+    equal(i.getCurrentPage(), 0);
+    i.showPrevPage();
+    equal(c.assert.assertRender(), "", "Should still be empty.");
+    equal(i.getCurrentPage(), 0);
+
+    ok(c = $().mcomponent({
+        model : {
             list : ["mattias", "marcus", "johan", "butters", "stan"]
         },
         iter : {
