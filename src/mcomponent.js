@@ -2154,8 +2154,6 @@ function mcomponent(args) {
 
     var _afterRender = function() {
 
-        executionContext.afterRender();
-
         if (mainArgs.afterRender) {
             if (typeof mainArgs.afterRender == "function") {
                 mainArgs.afterRender();
@@ -2168,6 +2166,8 @@ function mcomponent(args) {
          * Update execution context after mainArgs.afterRender(),
          * since it might update the DOM which execution context callbacks might affect.
          *********************************************************/
+
+        executionContext.afterRender();
 
         return result;
     };
