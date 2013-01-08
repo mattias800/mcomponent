@@ -563,7 +563,8 @@ function mcomponent(args) {
         this.beforeRender = function() {
             if (whereFunction) {
                 // If there is a where-function, the list might have changed before rendering. Ensure we don't overflow the page.
-                if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
+                var pageCount = getPageCount();
+                if (currentPage >= pageCount) currentPage = pageCount - 1;
             }
         };
 
@@ -690,7 +691,8 @@ function mcomponent(args) {
                 showNextPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage++;
-                    if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
+                    var pageCount = getPageCount();
+                    if (currentPage >= pageCount) currentPage = pageCount - 1;
                 },
                 showPrevPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
@@ -701,7 +703,8 @@ function mcomponent(args) {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage = index;
                     if (currentPage < 0) currentPage = 0;
-                    if (currentPage >= getPageCount()) currentPage = getPageCount() - 1;
+                    var pageCount = getPageCount();
+                    if (currentPage >= pageCount) currentPage = pageCount - 1;
                 },
                 getIndexForItem : function(item) {
                     for (var i = 0; i < model.length; i++) if (model[i] == item) return i;
@@ -2123,6 +2126,11 @@ function mcomponent(args) {
                 throw "afterRender argument must be a function or not defined.";
             }
         }
+
+        /********************************************************
+         * Update execution context after mainArgs.afterRender(),
+         * since it might update the DOM which execution context callbacks might affect.
+         *********************************************************/
 
         return result;
     };
