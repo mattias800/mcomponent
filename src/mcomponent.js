@@ -532,6 +532,9 @@ function mcomponent(args) {
         if (modelUsed == undefined) throw "IteratorContext must get a model as second parameter.";
 
         var model = modelUsed;
+        var fullModel = modelUsed;
+
+
         var config = iterConfig;
         var itemsShowing = iterConfig.itemsPerPage;
         var currentPage = 0;
@@ -662,6 +665,17 @@ function mcomponent(args) {
             return Math.ceil(s / config.itemsPerPage);
         };
 
+        var getFilteredModel = function() {
+            var filteredModel = [];
+            if (!whereFunction) return model;
+            for (var i = 0; i < model.length; i++) {
+                if (whereFunction(model[i])) {
+                    filteredModel.push(model[i]);
+                }
+            }
+            return filteredModel;
+        };
+
         this.getPublicInterface = function() {
             return {
 
@@ -707,13 +721,15 @@ function mcomponent(args) {
                     if (currentPage >= pageCount) currentPage = pageCount - 1;
                 },
                 getIndexForItem : function(item) {
-                    for (var i = 0; i < model.length; i++) if (model[i] == item) return i;
+                    var filteredModel = getFilteredModel();
+                    for (var i = 0; i < filteredModel.length; i++) if (filteredModel[i] == item) return i;
                     throw "Unable to find specified item in iterators list.";
                 },
                 getIndexForItemWhere : function(where) {
+                    var filteredModel = getFilteredModel();
                     if (where == undefined) throw "Trying to find item in iterator list, but specified where-function is undefined.";
                     if (typeof where !== "function") throw "Trying to find item in iterator list, but specified where-function is not a function. Type=" + typeof where;
-                    for (var i = 0; i < model.length; i++) if (where(model[i])) return i;
+                    for (var i = 0; i < filteredModel.length; i++) if (where(filteredModel[i])) return i;
                     throw "Unable to find item that matches where function in iterators list.";
                 },
                 getPageWithItem : function(item) {

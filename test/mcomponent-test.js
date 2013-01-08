@@ -2359,6 +2359,54 @@ test("niter tag, prevent page overflow when using where function", function() {
 
 });
 
+test("niter tag, showPageWithItem methods, combined with where function", function() {
+    var c, i;
+
+    var model = {
+        list : [
+            {age : 32, name : "mattias"},
+            {age : 8, name : "butters"},
+            {age : 32, name : "marcus"},
+            {age : 31, name : "johan"},
+            {age : 9, name : "stan"}
+        ]
+    };
+
+    ok(c = $().mcomponent({
+        model : model,
+        iter : {
+            list : {
+                usePages : true,
+                itemsPerPage : 1,
+                where : function(user) {
+                    return user.age > 30;
+                }
+            }
+        },
+        viewHtml : "{{ niter list list }}{{ name }}{{ endniter }}"}), "Construction OK!");
+
+    equal(c.assert.assertRender(), "mattias", "Should be empty.");
+    ok(i = c.getIterator("list"), "Iterator should exist");
+    equal(i.getPageCount(), 3, "3 pages when there are 3 items after where has been applied.");
+
+    raises(function() {
+        i.getPageWithItem(model.list[-1]);
+    }, "Item -1 never exists, so should throw exception.");
+    equal(i.getPageWithItem(model.list[0]), 0, "Item 0 should be on page 0.");
+    raises(function() {
+        i.getPageWithItem(model.list[1]);
+    }, "Item 2 should be on NO page.");
+    equal(i.getPageWithItem(model.list[2]), 1, "Item 2 should be on page 1.");
+    equal(i.getPageWithItem(model.list[3]), 2, "Item 3 should be on page 2.");
+    raises(function() {
+        i.getPageWithItem(model.list[4]);
+    }, "Item 4 should be on NO page.");
+    raises(function() {
+        i.getPageWithItem(model.list[5]);
+    }, "Item 5 does not exist.");
+
+});
+
 test("js and showjs tags", function() {
 
     var c;
