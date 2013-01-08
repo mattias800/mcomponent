@@ -693,10 +693,11 @@ function mcomponent(args) {
             return filteredModel;
         };
 
-        var ensureCurrentPageIsWithinLimits = function() {
+        var ensurePageIsWithinLimits = function(page) {
             var pageCount = getPageCount();
-            if (currentPage >= pageCount) currentPage = pageCount - 1;
-            if (currentPage < 0) currentPage = 0;
+            if (page >= pageCount) page = pageCount - 1;
+            if (page < 0) page = 0;
+            return page;
         };
 
         this.getPublicInterface = function() {
@@ -728,18 +729,18 @@ function mcomponent(args) {
                 showNextPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage++;
-                    ensureCurrentPageIsWithinLimits();
+                    currentPage = ensurePageIsWithinLimits(currentPage);
                 },
                 showPrevPage : function() {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage--;
-                    ensureCurrentPageIsWithinLimits();
+                    currentPage = ensurePageIsWithinLimits(currentPage);
                 },
                 showPage : function(index) {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage = index;
                     if (currentPage < 0) currentPage = 0;
-                    ensureCurrentPageIsWithinLimits();
+                    currentPage = ensurePageIsWithinLimits(currentPage);
                 },
                 getIndexForItem : function(item) {
                     var filteredModel = getFilteredModel();
