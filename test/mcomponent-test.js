@@ -2123,6 +2123,39 @@ test("niter tag, pages callbacks", function() {
     ok(!i.isOnFirstOrLastPage(), "Should not be isOnFirstOrLastPage");
     equal(a, 77, "Should now be 77.");
 
+    a = 22;
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "johan", "butters", "stan"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true,
+                whenThereAreItems : function(api) {
+                    a = 77;
+                },
+                whenThereAreNoItems : function(api) {
+                    a = 88;
+                }
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    equal(a, 22, "Should be 22 first.");
+    equal(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 3);
+    equal(i.getCurrentPage(), 0, "Should be on page 0.");
+    equal(a, 77, "Should be 77.");
+    c.setModel({list : []});
+    equal(a, 77, "Should be 77.");
+    equal(c.assert.assertRender(), "", "Empty since the list is empty.");
+    equal(a, 88, "Should be 88.");
+    equal(i.getPageCount(), 0);
+    equal(i.getCurrentPage(), 0, "Should be on page 0.");
+    equal(a, 88, "Should be 88.");
+
+
 });
 
 test("niter tag, filter function", function() {

@@ -93,6 +93,10 @@ function mcomponent(args) {
             };
             config.whenNotLastPageIsShowing = config.whenNotLastPageIsShowing || function() {
             };
+            config.whenThereAreItems = config.whenThereAreItems || function() {
+            };
+            config.whenThereAreNoItems = config.whenThereAreNoItems || function() {
+            };
             config.where = config.where || undefined;
             executionContext.setIteratorConfigForId(iterId, config);
         }
@@ -532,9 +536,6 @@ function mcomponent(args) {
         if (modelUsed == undefined) throw "IteratorContext must get a model as second parameter.";
 
         var model = modelUsed;
-        var fullModel = modelUsed;
-
-
         var config = iterConfig;
         var itemsShowing = iterConfig.itemsPerPage;
         var currentPage = 0;
@@ -632,6 +633,18 @@ function mcomponent(args) {
                     if (!isOnLastPage()) config.whenNotLastPageIsShowing(this.getPublicInterface());
                 } else {
                     throw "Iterator '" + config.name + "' whenNotLastPageIsShowing is not a function.";
+                }
+
+                if (typeof config.whenThereAreItems === "function") {
+                    if (model && model.length) config.whenThereAreItems(this.getPublicInterface());
+                } else {
+                    throw "Iterator '" + config.name + "' whenThereAreItems is not a function.";
+                }
+
+                if (typeof config.whenThereAreNoItems === "function") {
+                    if (!model || !model.length) config.whenThereAreNoItems(this.getPublicInterface());
+                } else {
+                    throw "Iterator '" + config.name + "' whenThereAreItems is not a function.";
                 }
 
             }
