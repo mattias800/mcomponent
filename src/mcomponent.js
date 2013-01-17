@@ -100,7 +100,7 @@ function mcomponent(args) {
             config.whenThereAreNoItems = extConfig.whenThereAreNoItems || function() {
             };
             config.where = extConfig.where || undefined;
-            executionContext.setIteratorConfigForId(iterId, config);
+            executionContext.createIterator(iterId, config);
         }
 
         for (var id in args.clipboard) {
@@ -170,7 +170,6 @@ function mcomponent(args) {
         this.globals = {};
         this.clipboard = {};
         this.iterators = {};
-        this.iteratorConfigs = {};
         this.renderResult = [];
         this.renderErrors = [];
         this.currentTag = {};
@@ -281,15 +280,8 @@ function mcomponent(args) {
          */
 
         this.getIteratorConfigForId = function(id) {
-            return this.iteratorConfigs[id];
-        };
-
-        this.setIteratorConfigForId = function(id, val) {
-            this.iteratorConfigs[id] = val;
-        };
-
-        this.getIteratorConfigs = function() {
-            return this.iteratorConfigs;
+            if (this.iterators[id] == undefined) throw "Trying to get config for iterator (id=" + id + "), but there is no iterator with that id.";
+            return this.iterators[id].getConfig();
         };
 
         /**
@@ -308,24 +300,24 @@ function mcomponent(args) {
             return this.iterators;
         };
 
-        this.ensureIterator = function(iteratorName, model) {
-            if (!this.iterators[iteratorName]) {
-                this.buildIterator(iteratorName, model);
+        this.createIterator = function(iteratorName, iteratorConfig) {
+            this.iterators[iteratorName] = new IteratorContext_(iteratorName, iteratorConfig);
+        };
+
+        this.ensureIteratorExistsAndSetModel = function(iteratorName, model) {
+            var i = this.getIteratorWithName(iteratorName);
+            if (i) {
+                i.setModel(model);
+                return i;
+            } else {
+                this.pushCurrentRenderError("Trying to use iterator, but no iterator configuration with name '" + iteratorName + "' exists.");
+                return undefined;
             }
-            return this.iterators[iteratorName];
         };
 
         this.clearIterators = function() {
-            this.iterators = {};
-        };
-
-        this.buildIterator = function(iteratorName, model) {
-            if (this.iteratorConfigs[iteratorName]) {
-                this.iteratorConfigs[iteratorName].name = iteratorName;
-                this.iterators[iteratorName] = new IteratorContext_(this.iteratorConfigs[iteratorName], model);
-            } else {
-                // We require the configuration to exist. If user wrongly spells the iterator name in config or in view, it can be hard to debug. So we ensure that config exists with the same name to prevent this.
-                this.pushCurrentRenderError("Trying to build iterator, but no iterator configuration with name '" + iteratorName + "' exists.");
+            for (var iterId in this.iterators) {
+                this.iterators[iterId].clear();
             }
         };
 
@@ -455,7 +447,6 @@ function mcomponent(args) {
                     return that.executionStack[0].model;
                 },
                 getIterator : function(iteratorName) {
-                    executionContext.ensureIterator(iteratorName);
                     var i = executionContext.getIteratorWithName(iteratorName);
                     return i ? i.getPublicInterface() : undefined;
                 },
@@ -533,16 +524,45 @@ function mcomponent(args) {
      * Iterator context
      ****************************/
 
-    var IteratorContext_ = function(iterConfig, modelUsed) {
+    var IteratorContext_ = function(aIteratorName, iterConfig) {
 
-        if (modelUsed == undefined) throw "IteratorContext must get a model as second parameter.";
-
-        var model = modelUsed;
+        var iteratorName = aIteratorName;
+        var model = undefined;
         var config = iterConfig;
-        var itemsShowing = iterConfig.itemsPerPage;
+        var itemsShowing = config.itemsPerPage;
         var currentPage = 0;
         var showingAllItems = false;
         var whereFunction = config.where;
+
+        var setModel = function(m) {
+            model = m;
+        };
+
+        this.setModel = function(m) {
+            setModel(m);
+        };
+
+        var getModel = function() {
+            return model;
+        };
+
+        var hasModel = function() {
+            return model ? true : false;
+        };
+
+        var getModelLength = function() {
+            return model ? model.length : 0;
+        };
+
+        /**
+         * Clears the iterator. This is run when the model of the component is changed.
+         */
+        this.clear = function() {
+            // TODO How much must be cleared??
+            itemsShowing = config.itemsPerPage;
+            currentPage = 0;
+            showingAllItems = false;
+        };
 
         this.getConfig = function() {
             return config;
@@ -551,8 +571,7 @@ function mcomponent(args) {
         this.getStart = function() {
             if (config.usePages) {
                 return currentPage * config.itemsPerPage;
-            }
-            else {
+            } else {
                 return 0;
             }
         };
@@ -569,14 +588,13 @@ function mcomponent(args) {
         this.beforeRender = function() {
             if (whereFunction) {
                 // If there is a where-function, the list might have changed before rendering. Ensure we don't overflow the page.
-                var pageCount = getPageCount();
-                if (currentPage >= pageCount) currentPage = pageCount - 1;
+                currentPage = ensurePageIsWithinLimits(currentPage);
             }
         };
 
         this.renderUpdate = function(start, end) {
             if (!config.usePages) {
-                if (this.getStart() == 0 && this.getEnd() >= model.length) {
+                if (this.getStart() == 0 && this.getEnd() >= getModelLength()) {
                     if (typeof config.whenAllItemsAreShowing === "function") {
                         showingAllItems = true;
                         config.whenAllItemsAreShowing(this.getPublicInterface());
@@ -638,13 +656,13 @@ function mcomponent(args) {
                 }
 
                 if (typeof config.whenThereAreItems === "function") {
-                    if (model && model.length) config.whenThereAreItems(this.getPublicInterface());
+                    if (hasModel() && getModelLength()) config.whenThereAreItems(this.getPublicInterface());
                 } else {
                     throw "Iterator '" + config.name + "' whenThereAreItems is not a function.";
                 }
 
                 if (typeof config.whenThereAreNoItems === "function") {
-                    if (!model || !model.length) config.whenThereAreNoItems(this.getPublicInterface());
+                    if (!hasModel() || !getModelLength()) config.whenThereAreNoItems(this.getPublicInterface());
                 } else {
                     throw "Iterator '" + config.name + "' whenThereAreItems is not a function.";
                 }
@@ -673,11 +691,16 @@ function mcomponent(args) {
          * @return {Number}
          */
         var getPageCount = function() {
+            if (!hasModel()) return 0;
             var s;
             if (whereFunction) {
                 // We have a where-function, we need to use it when counting pages.
                 s = 0;
-                for (var i = 0; i < model.length; i++) if (whereFunction(model[i])) s++;
+                for (var i = 0; i < model.length; i++) {
+                    if (whereFunction(model[i])) {
+                        s++;
+                    }
+                }
             } else {
                 s = model.length;
             }
@@ -703,13 +726,14 @@ function mcomponent(args) {
         };
 
         this.getPublicInterface = function() {
+
             return {
 
                 showingAllItems : showingAllItems,
                 currentPage : currentPage,
-                itemsShowing : itemsShowing >= model.length ? model.length : itemsShowing,
+                itemsShowing : Math.min(getModelLength(), itemsShowing),
                 itemsPerPage : config.itemsPerPage,
-                itemsTotal : model.length,
+                itemsTotal : getModelLength(),
 
                 showMoreItems : function() {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showMoreItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
@@ -719,7 +743,7 @@ function mcomponent(args) {
                 },
                 showAllItems : function() {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showAllItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
-                    itemsShowing = model.length;
+                    itemsShowing = getModelLength();
                     showingAllItems = true;
                 },
                 getCurrentPage : function() {
@@ -745,11 +769,15 @@ function mcomponent(args) {
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
                 getIndexForItem : function(item) {
+                    if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
+                    if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
                     for (var i = 0; i < filteredModel.length; i++) if (filteredModel[i] == item) return i;
                     throw "Unable to find specified item in iterators list.";
                 },
                 getIndexForItemWhere : function(where) {
+                    if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
+                    if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
                     if (where == undefined) throw "Trying to find item in iterator list, but specified where-function is undefined.";
                     if (typeof where !== "function") throw "Trying to find item in iterator list, but specified where-function is not a function. Type=" + typeof where;
@@ -1094,7 +1122,11 @@ function mcomponent(args) {
                     niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
                     name = niterParameters.variableName;
                     iterId = niterParameters.iterName;
-                    iterConfig = executionContext.getIteratorConfigForId(iterId);
+                    try {
+                        iterConfig = executionContext.getIteratorConfigForId(iterId);
+                    } catch (e) {
+                        throw createCompileExceptionMessage("There is no iterator config with this id: " + iterId, tagInstance);
+                    }
                 }
 
                 var listVar;
@@ -1117,7 +1149,7 @@ function mcomponent(args) {
 
                 if (isNiter) {
 
-                    resultOuter.push("var " + iterContextVar + " = executionContext.ensureIterator('" + iterId + "', " + listVar + ")");
+                    resultOuter.push("var " + iterContextVar + " = executionContext.ensureIteratorExistsAndSetModel('" + iterId + "', " + listVar + ")");
 
                     if (iterConfig && iterConfig.where) {
                         // Apply filter function to list.
@@ -1132,6 +1164,7 @@ function mcomponent(args) {
 
                     resultOuter.push("var " + startVar + " = " + iterContextVar + ".getStart()");
                     resultOuter.push("var " + endVar + " = Math.min(" + iterContextVar + ".getEnd(), " + listVar + ".length)");
+
                 } else {
                     // Is normal iter, do full list
                     resultOuter.push("var " + startVar + " = 0");

@@ -850,7 +850,7 @@ test("API", function() {
             userListIter : { itemsPerPage : 3 }
         },
         viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"}), "Construction OK lets go!!");
-    equal(c.assert.assertRender(), "333", "Should contain 333.");
+    equal(c.assert.assertRender(), "333", "Should contain 333. Ok!");
 
     var i;
 
@@ -1431,13 +1431,16 @@ test("niter tag, using show more", function() {
     var a = 3;
     var b = 1;
 
-    ok(c = $().mcomponent({
-        model : {
-            list : ["mattias", "marcus", "johan"]
-        },
-        viewHtml : "{{ niter userListIter list }}{{ endniter }}",
-        throwOnError : true
-    }), "Construction OK!");
+    raises(function() {
+        c = $().mcomponent({
+            model : {
+                list : ["mattias", "marcus", "johan"]
+            },
+            viewHtml : "{{ niter userListIter list }}{{ endniter }}",
+            throwOnError : true
+        });
+    }, "Construction should fail since there is no iterator config!");
+
     raises(function() {
         c.assert.assertRender();
     }, "Should throw error since we haven't declared an iterator configuration.");
@@ -1934,7 +1937,7 @@ test("niter tag, pages callbacks", function() {
         viewHtml : "{{ niter iterBeforeRender list }}{{ show }}{{ endniter }}"}),
         "Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!");
 
-    ok(i = c.getIterator("userListIter"), "Should be able to use iterator before rendering the component.");
+    ok(i = c.getIterator("iterBeforeRender"), "Should be able to use iterator before rendering the component.");
     equal(a, 1, "Should be 1 first.");
     equal(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
     equal(i.getPageCount(), 2);
@@ -2924,12 +2927,14 @@ test("niter tag", function() {
 
     var c;
 
-    ok(c = $().mcomponent({
-        model : {
-            list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{{ niter userListIter list }}{{ endniter }}",
-        throwOnError : true
-    }), "Construction OK!");
+    raises(function() {
+        c = $().mcomponent({
+            model : {
+                list : ["mattias", "marcus", "johan"]
+            }, viewHtml : "{{ niter userListIter list }}{{ endniter }}",
+            throwOnError : true
+        })
+    }, "Construction OK!");
 
     raises(function() {
         c.assert.assertRender();
