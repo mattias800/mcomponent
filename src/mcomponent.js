@@ -72,32 +72,34 @@ function mcomponent(args) {
         }
 
         for (var iterId in args.iter) {
-            var config = args.iter[iterId];
-            config.usePages = config.usePages !== undefined ? config.usePages : false;
-            config.itemsPerPage = config.itemsPerPage || 10;
-            config.whenAllItemsAreShowing = config.whenAllItemsAreShowing || function() {
+            var extConfig = args.iter[iterId];
+            // Make new config object, so that we don't share with external scope.
+            var config = {};
+            config.usePages = extConfig.usePages ? true : false;
+            config.itemsPerPage = extConfig.itemsPerPage || 10;
+            config.whenAllItemsAreShowing = extConfig.whenAllItemsAreShowing || function() {
             };
-            config.whenNotAllItemsAreShowing = config.whenNotAllItemsAreShowing || function() {
+            config.whenNotAllItemsAreShowing = extConfig.whenNotAllItemsAreShowing || function() {
             };
-            config.whenFirstOrLastPageIsShowing = config.whenFirstOrLastPageIsShowing || function() {
+            config.whenFirstOrLastPageIsShowing = extConfig.whenFirstOrLastPageIsShowing || function() {
             };
-            config.whenNotFirstOrLastPageIsShowing = config.whenNotFirstOrLastPageIsShowing || function() {
+            config.whenNotFirstOrLastPageIsShowing = extConfig.whenNotFirstOrLastPageIsShowing || function() {
             };
-            config.whenFirstAndLastPageIsShowing = config.whenFirstAndLastPageIsShowing || function() {
+            config.whenFirstAndLastPageIsShowing = extConfig.whenFirstAndLastPageIsShowing || function() {
             };
-            config.whenFirstPageIsShowing = config.whenFirstPageIsShowing || function() {
+            config.whenFirstPageIsShowing = extConfig.whenFirstPageIsShowing || function() {
             };
-            config.whenLastPageIsShowing = config.whenLastPageIsShowing || function() {
+            config.whenLastPageIsShowing = extConfig.whenLastPageIsShowing || function() {
             };
-            config.whenNotFirstPageIsShowing = config.whenNotFirstPageIsShowing || function() {
+            config.whenNotFirstPageIsShowing = extConfig.whenNotFirstPageIsShowing || function() {
             };
-            config.whenNotLastPageIsShowing = config.whenNotLastPageIsShowing || function() {
+            config.whenNotLastPageIsShowing = extConfig.whenNotLastPageIsShowing || function() {
             };
-            config.whenThereAreItems = config.whenThereAreItems || function() {
+            config.whenThereAreItems = extConfig.whenThereAreItems || function() {
             };
-            config.whenThereAreNoItems = config.whenThereAreNoItems || function() {
+            config.whenThereAreNoItems = extConfig.whenThereAreNoItems || function() {
             };
-            config.where = config.where || undefined;
+            config.where = extConfig.where || undefined;
             executionContext.setIteratorConfigForId(iterId, config);
         }
 
