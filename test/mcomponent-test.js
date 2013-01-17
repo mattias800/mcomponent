@@ -1838,6 +1838,64 @@ test("niter tag, using pages", function() {
 
 });
 
+test("niter tag, using iterator before rendering", function() {
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "must", "johan"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 0);
+    equal(i.getCurrentPage(), 0);
+    i.showNextPage();
+    equal(i.getCurrentPage(), 1);
+    equal(c.assert.assertRender(), "mustjohan", "Should contain page 2.");
+
+});
+
+test("niter tag, using showPageWithItemWhere using an external model", function() {
+    var model = {
+        list : ["mattias", "marcus", "must", "johan"]
+    };
+
+    ok(c = $().mcomponent({
+        model : model,
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        debugEnabled : true,
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    ok(i = c.getIterator("userListIter"), "Iterator should be available.");
+    equal(i.getPageCount(), 0, "No page count yet, since there is no model.");
+    equal(i.getCurrentPage(), 0, "Current page starts at 0.");
+    raises(function() {
+        i.showPageWithItemWhere(function(item) {
+            return item == "must";
+        });
+    }, "Should throw exception, it cannot lookup the item on the list, since the list is still undefined.");
+
+    i.setModel(model.list);
+    i.showPageWithItemWhere(function(item) {
+        return item == "must";
+    });
+
+    equal(i.getCurrentPage(), 1);
+    equal(c.assert.assertRender(), "mustjohan", "Should contain second page.");
+
+    i.showNextPage();
+    equal(i.getCurrentPage(), 1);
+    equal(c.assert.assertRender(), "mustjohan", "Should contain page 2.");
+});
+
 test("niter tag, pages callbacks", function() {
     var c;
     var a = 1;

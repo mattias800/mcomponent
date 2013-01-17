@@ -718,11 +718,12 @@ function mcomponent(args) {
             return filteredModel;
         };
 
-        var ensurePageIsWithinLimits = function(page) {
+        var ensurePageIsWithinLimits = function(pageIndex) {
+            if (!hasModel()) return pageIndex;
             var pageCount = getPageCount();
-            if (page >= pageCount) page = pageCount - 1;
-            if (page < 0) page = 0;
-            return page;
+            if (pageIndex >= pageCount) pageIndex = pageCount - 1;
+            if (pageIndex < 0) pageIndex = 0;
+            return pageIndex;
         };
 
         this.getPublicInterface = function() {
@@ -781,7 +782,11 @@ function mcomponent(args) {
                     var filteredModel = getFilteredModel();
                     if (where == undefined) throw "Trying to find item in iterator list, but specified where-function is undefined.";
                     if (typeof where !== "function") throw "Trying to find item in iterator list, but specified where-function is not a function. Type=" + typeof where;
-                    for (var i = 0; i < filteredModel.length; i++) if (where(filteredModel[i])) return i;
+                    for (var i = 0; i < filteredModel.length; i++) {
+                        if (where(filteredModel[i])) {
+                            return i;
+                        }
+                    }
                     throw "Unable to find item that matches where function in iterators list.";
                 },
                 getPageWithItem : function(item) {
@@ -813,6 +818,9 @@ function mcomponent(args) {
                 },
                 isOnFirstAndLastPage : function() {
                     return isOnFirstAndLastPage();
+                },
+                setModel : function(m) {
+                    setModel(m);
                 }
             }
 
