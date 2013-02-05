@@ -2038,6 +2038,7 @@ function mcomponent(args) {
         insideDo.indent();
         innerFunction.pushCompiledSource(insideDo);
         innerFunction.push("} while (" + iVar + " >= 0)");
+        innerFunction.push("throw \"Property '" + name + "' not found on model stack.\"");
         innerFunction.indent();
         r.pushCompiledSource(innerFunction);
         r.push("}");

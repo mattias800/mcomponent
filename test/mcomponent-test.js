@@ -444,7 +444,6 @@ test("Set view with special characters", function() {
 
 });
 
-
 test("Execution context", function() {
 
     var c;
@@ -516,7 +515,6 @@ test("Find block end", function() {
 
 
 });
-
 
 test("Find block end, for if cases", function() {
 
@@ -1226,6 +1224,22 @@ test("showing other things than model properties", function() {
     ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ show Math.floor(1.5); }}"}), "Construction OK!");
     equal(c.assert.assertRender(), "1", "Should contain '1' after Math.floor.");
 
+    ok(c = $().mcomponent({model : {name : "mattias"}, viewHtml : "{{ Math.floor(1.5) }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "1", "Should contain '1' after Math.floor.");
+
+});
+
+test("showing model properties that doesn't exist", function() {
+
+    var c;
+
+    ok(c = $().mcomponent({
+            model : {name : "mattias"},
+            viewHtml : "{{ age }}"}
+    ), "Construction OK!");
+    ok(c.assert.assertRender() !== "", "Should contain an error message after API lookup.");
+
+
 });
 
 test("show tag", function() {
@@ -1282,7 +1296,24 @@ test("push tag", function() {
             testyeah : "yeah"
         }
     }, viewHtml : "{{ push db.user }}{{ show testyeah }}{{ endpush }}"}), "Construction OK!");
-    equal(c.assert.assertRender(), "", "Pushing two level property. Should contain nothing since model stack lookup should fail.");
+    ok(c.assert.assertRender() !== "", "Pushing two level property. Should contain something since model stack lookup should fail and cause error.");
+
+    ok(c = $().mcomponent({
+            model : {
+                db : {
+                    user : {
+                        name : "marcus"
+                    },
+                    testyeah : "yeah"
+                }
+            },
+            viewHtml : "{{ push db.user }}{{ show testyeah }}{{ endpush }}",
+            throwOnError : true
+        }
+    ), "Construction OK!");
+    raises(function() {
+        c.assert.assertRender();
+    }, "Pushing two level property. Should contain something since model stack lookup should fail and cause error.")
 
     ok(c = $().mcomponent({model : {
         db : {
@@ -2579,7 +2610,6 @@ test("niter tag, filter function and getPageCount() in iterator", function() {
 
 });
 
-
 test("niter tag, prevent page overflow when using where function", function() {
 
     var c, i;
@@ -3017,7 +3047,6 @@ test("js and showjs tag", function() {
 
 });
 
-
 test("Compiled clipboard", function() {
 
     var c;
@@ -3139,7 +3168,6 @@ test("iter tag", function() {
 
 });
 
-
 test("niter tag", function() {
 
     var c;
@@ -3250,7 +3278,6 @@ test("niter tag", function() {
     equal(a, 5, "a should now be 5 since callback changed the value.");
 
 });
-
 
 test("Set view, render, change view, render again", function() {
 
