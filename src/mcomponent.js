@@ -686,6 +686,30 @@ function mcomponent(args) {
             return isOnFirstPage() && isOnLastPage();
         };
 
+        var getFirstIndexForCurrentPage = function() {
+            return currentPage * config.itemsPerPage;
+        };
+
+        /**
+         * Returns last index for current page, but it takes the model into concideration.
+         * If page shows items 5-9, but the model only has 7 items, then it returns 7.
+         * @return {Number}
+         */
+        var getLastIndexForCurrentPage = function() {
+            var pageEndIndex = currentPage * config.itemsPerPage + config.itemsPerPage - 1;
+            return hasModel() ? Math.min(pageEndIndex, getFilteredModel().length) : pageEndIndex;
+        };
+
+        var getFirstItemOnCurrentPage = function() {
+            if (!hasModel()) throw "Iterators getFirstItemOnCurrentPage() function can not be used before the iterator has been assigned a model. Do this by rendering the view, or by running setModel() on iterator manually.";
+            return getFilteredModel()[getFirstIndexForCurrentPage()];
+        };
+
+        var getLastItemOnCurrentPage = function() {
+            if (!hasModel()) throw "Iterators getLastItemOnCurrentPage() function can not be used before the iterator has been assigned a model. Do this by rendering the view, or by running setModel() on iterator manually.";
+            return getFilteredModel()[getLastIndexForCurrentPage()];
+        };
+
         /**
          * Calculates number of pages for iterator. Empty model will have 0 pages.
          * @return {Number}
@@ -818,6 +842,18 @@ function mcomponent(args) {
                 },
                 isOnFirstAndLastPage : function() {
                     return isOnFirstAndLastPage();
+                },
+                getFirstIndexForCurrentPage : function() {
+                    return getFirstIndexForCurrentPage();
+                },
+                getLastIndexForCurrentPage : function() {
+                    return getLastIndexForCurrentPage();
+                },
+                getFirstItemOnCurrentPage : function() {
+                    return getFirstItemOnCurrentPage();
+                },
+                getLastItemOnCurrentPage : function() {
+                    return getLastItemOnCurrentPage();
                 },
                 setModel : function(m) {
                     setModel(m);

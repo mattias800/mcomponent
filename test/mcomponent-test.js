@@ -1838,6 +1838,144 @@ test("niter tag, using pages", function() {
 
 });
 
+test("niter tag, misc iterator functions", function() {
+
+    /********************************************************
+     * Check isOnFirstPage, etc, when more than one page.
+     ********************************************************/
+
+    var c;
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    ok(c.assert.assertRender());
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 3);
+    equal(i.isOnFirstPage(), true, "Should be on first page.");
+    equal(i.isOnLastPage(), false, "Should NOT be on last page.");
+    equal(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on first.");
+    equal(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+
+    /* Then second page */
+
+    i.showNextPage();
+    equal(i.getPageCount(), 3);
+    equal(i.isOnFirstPage(), false, "Should NOT be on first page.");
+    equal(i.isOnLastPage(), false, "Should NOT be on last page.");
+    equal(i.isOnFirstOrLastPage(), false, "Is NOT on first OR last page, since we are on first.");
+    equal(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+
+    /* Then third and last page */
+
+    i.showNextPage();
+    equal(i.getPageCount(), 3);
+    equal(i.isOnFirstPage(), false, "Should NOT be on first page.");
+    equal(i.isOnLastPage(), true, "Should be on last page.");
+    equal(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on last.");
+    equal(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+
+    /********************************************************
+     * Check isOnFirstPage, etc, when only one page.
+     ********************************************************/
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+    ok(c.assert.assertRender());
+    ok(i = c.getIterator("userListIter"));
+    equal(i.getPageCount(), 1);
+    equal(i.isOnFirstPage(), true, "Should be on first page.");
+    equal(i.isOnLastPage(), true, "Should be on last page.");
+    equal(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on first.");
+    equal(i.isOnFirstAndLastPage(), true, "Is on first AND last page.");
+
+    /********************************************************
+     * Check getFirstIndexForCurrentPage, etc
+     ********************************************************/
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+
+    ok(c.assert.assertRender());
+    ok(i = c.getIterator("userListIter"));
+
+    equal(i.getPageCount(), 3);
+    equal(i.getCurrentPage(), 0);
+
+    equal(i.getFirstIndexForCurrentPage(), 0);
+    equal(i.getLastIndexForCurrentPage(), 1);
+    i.showNextPage();
+    equal(i.getFirstIndexForCurrentPage(), 2);
+    equal(i.getLastIndexForCurrentPage(), 3);
+    i.showNextPage();
+    equal(i.getFirstIndexForCurrentPage(), 4);
+    equal(i.getLastIndexForCurrentPage(), 5);
+    i.showNextPage();
+    equal(i.getFirstIndexForCurrentPage(), 4);
+    equal(i.getLastIndexForCurrentPage(), 5);
+
+    /********************************************************
+     * Check getFirstItemForCurrentPage, etc
+     ********************************************************/
+
+    ok(c = $().mcomponent({
+        model : {
+            list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+        },
+        iter : {
+            userListIter : {
+                itemsPerPage : 2,
+                usePages : true
+            }
+        },
+        viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
+
+    ok(c.assert.assertRender());
+    ok(i = c.getIterator("userListIter"));
+
+    equal(i.getPageCount(), 3);
+    equal(i.getCurrentPage(), 0);
+
+    equal(i.getFirstItemOnCurrentPage(), "mattias");
+    equal(i.getLastItemOnCurrentPage(), "marcus");
+    i.showNextPage();
+    equal(i.getFirstItemOnCurrentPage(), "must");
+    equal(i.getLastItemOnCurrentPage(), "johan");
+    i.showNextPage();
+    equal(i.getFirstItemOnCurrentPage(), "kurt");
+    equal(i.getLastItemOnCurrentPage(), "korv");
+    i.showNextPage();
+    equal(i.getFirstItemOnCurrentPage(), "kurt");
+    equal(i.getLastItemOnCurrentPage(), "korv");
+
+});
+
 test("niter tag, using iterator before rendering", function() {
     ok(c = $().mcomponent({
         model : {
