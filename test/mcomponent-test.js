@@ -2680,11 +2680,32 @@ test("js and showjs tags", function() {
     ok(c = $().mcomponent({viewHtml : "{{ showjs Math.sqrt(9); }}"}), "Construction OK!");
     equal(c.assert.assertRender(), "3", "Should not throw error.");
 
+    ok(c = $().mcomponent({viewHtml : "{{ showjs Math.max(9, 21); }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "21", "Should not throw error.");
+
+    ok(c = $().mcomponent({viewHtml : "{{ showjs Math.min(9, 21); }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "9", "Should not throw error.");
+
     ok(c = $().mcomponent({model : {name : "mattias yo"}, viewHtml : "{{ showjs model.name; }}"}), "Construction OK!");
     equal(c.assert.assertRender(), "mattias yo", "Should be able to use model.");
 
     ok(c = $().mcomponent({viewHtml : "{{ js Math.sqrt(5); }}"}), "Construction OK!");
     equal(c.assert.assertRender(), "", "Should not throw error.");
+
+    ok(c = $().mcomponent({viewHtml : "{{ js Math.max(9, 21); }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "", "Should not throw error.");
+
+    ok(c = $().mcomponent({viewHtml : "{{ js Math.min(9, 21); }}"}), "Construction OK!");
+    equal(c.assert.assertRender(), "", "Should not throw error.");
+
+    ok(c = $().mcomponent({throwOnError : true, viewHtml : "{{ js undefined.prutt() }}"}), "Construction OK!");
+    raises(function() {
+        c.assert.assertRender();
+    }, "Should throw null pointer exception.");
+
+    ok(c = $().mcomponent({viewHtml : "{{ showjs undefined.prutt() }}"}), "Construction OK!");
+    ok(c.assert.assertRender() !== "", "Should not be empty, must contain error.");
+
 
 });
 
