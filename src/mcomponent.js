@@ -1369,10 +1369,10 @@ function mcomponent(args) {
              * Compile to template object
              **************************************/
 
-            // compile() handles compilationContext.setError and throwOnError itself. For now.
+            // buildTemplate() handles compilationContext.setError and throwOnError itself. For now.
 
             try {
-                localView.template = compile({tree : localView.tree});
+                localView.template = buildTemplate(localView.tree);
             } catch (e) {
                 localCompilationContext.setCompileError(e);
                 throwError(e);
@@ -1401,7 +1401,7 @@ function mcomponent(args) {
     var _setViewFromComponent = function(component) {
         _setView(component._.getView());
         // Must recompile the source, since the compiled code now references the other components scope.
-        view.template = compile({tree : getView().tree});
+        view.template = buildTemplate(getView().tree);
     };
 
     var getView = function() {
@@ -1873,13 +1873,12 @@ function mcomponent(args) {
     /**
      * Compiles the view and returns the template object.
      *
-     * Sets compilationContext.compileError if error is encountered when compiling.
-     * Also throws exception when compile fails, if throwOnError == true.
+     * Throws exception when buildTemplate fails, always. throwOnError is handled by parent method.
      *
-     * @param args
+     * @param tree
      * @return {{getSource: Function, getBodySource: Function, render: Function, process: Function}}
      */
-    var compile = function(args) {
+    var buildTemplate = function(tree) {
         var debugEnabled = false;
         var sourceObj = undefined;
 
@@ -1887,24 +1886,19 @@ function mcomponent(args) {
          * Compile to source first.
          **************************/
         try {
-            sourceObj = compileTreeToSourceWithBaseCodeIncluded(args.tree);
+            sourceObj = compileTreeToSourceWithBaseCodeIncluded(tree);
         } catch (e) {
             var es = e.split("|");
-            compilationContext.setCompileError([es.length - 1]);
-
-            if (mainArgs.throwOnError) {
-                throw compilationContext.getCompileError();
-            }
+            throw [es.length - 1];
         }
 
         /*****************************************
-         * If success, compile to Function object.
+         * If success, buildTemplate to Function object.
          ****************************************/
         if (sourceObj) {
             var source = sourceObj.full;
             var bodySource = sourceObj.body;
 
-            if (args.logSource) console.log(source);
             var f;
 
             try {
@@ -1916,11 +1910,7 @@ function mcomponent(args) {
                     console.log(e.toString());
                 }
                 if (mainArgs.debugEnabled) console.log("Error compiling full template source.", e.toString(), "\n" + source.toString());
-                compilationContext.setCompileError(createGenericCompileErrorMessage(e));
-
-                if (mainArgs.throwOnError) {
-                    throw compilationContext.getCompileError();
-                }
+                throw createGenericCompileErrorMessage(e);
             }
         }
 
@@ -2464,7 +2454,7 @@ function mcomponent(args) {
             },
 
             assertCompileLogSource : function() {
-                var t = compile({tree : getView().tree, logSource : true});
+                var t = buildTemplate(getView().tree);
                 return t.render();
             },
 
@@ -2499,7 +2489,7 @@ function mcomponent(args) {
             },
 
             getTemplate : function() {
-                return compile({tree : getView().tree});
+                return buildTemplate(getView().tree);
             },
 
             findBlockEnd : function(i, args) {
@@ -2525,11 +2515,11 @@ function mcomponent(args) {
             },
 
             getSource : function() {
-                return compile({tree : getView().tree}).getSource().toString();
+                return buildTemplate(getView().tree).getSource().toString();
             },
 
             getBodySource : function() {
-                return compile({tree : getView().tree}).getBodySource().toString();
+                return buildTemplate(getView().tree).getBodySource().toString();
             },
 
             isComponent : function() {
