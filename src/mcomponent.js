@@ -826,10 +826,20 @@ function mcomponent(args) {
                     this.showPage(this.getPageIndexForItemIndex(index));
                 },
                 showPageWithItem : function(item) {
-                    this.showPage(this.getPageWithItem(item));
+                    try {
+                        var pageWithItem = this.getPageWithItem(item);
+                        this.showPage(pageWithItem);
+                    } catch (e) {
+                        throw "Trying to show page with specified item, but no such item was found.";
+                    }
                 },
                 showPageWithItemWhere : function(where) {
-                    this.showPage(this.getPageWithItemWhere(where));
+                    try {
+                        var pageWithItemWhere = this.getPageWithItemWhere(where);
+                        this.showPage(pageWithItemWhere);
+                    } catch (e) {
+                        throw "Trying to show page with item that passes where-function, but no such item was found.";
+                    }
                 },
                 isOnFirstPage : function() {
                     return isOnFirstPage();
