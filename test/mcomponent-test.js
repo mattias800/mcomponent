@@ -2700,6 +2700,26 @@ test("niter tag, showPageWithItem methods, combined with where function", functi
 
 });
 
+test("niter tag, causing compile errors", function() {
+
+    var c;
+
+    raises(function() {
+        c = $().mcomponent({
+            viewHtml : "{{ niter list list }}{{ enditer }}",
+            throwOnError : true
+        });
+    }, "Construction fails and with throwOnError, there should be an exception.");
+
+    ok(c = $().mcomponent({viewHtml : "{{ niter list list }}{{ enditer }}"}), "Compiling fails, but should not throw an exception.");
+    equal(c.assert.assertRender(), "mattias", "'showjs' tag should work.");
+
+});
+
+setTimeout(function() {
+    $().mcomponent({viewHtml : "{{ niter list list }}{{ enditer }}"});
+}, 1000);
+
 test("js and showjs tags", function() {
 
     var c;
@@ -2809,6 +2829,15 @@ test("Setting model with setter, then getting it", function() {
 
 module("Final");
 
+setTimeout(function() {
+
+    ok(c = $().mcomponent({
+        clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
+        model : {age : 80},
+        viewHtml : "{{ paste clip1 }}"
+    }), "Construction OK!");
+
+}, 3000);
 test("Clipboard", function() {
     var c;
 

@@ -60,6 +60,14 @@ function mcomponent(args) {
         return msg;
     };
 
+    /**
+     * Throws exception, only if throwOnError is true.
+     * @param e
+     */
+    var throwError = function(e) {
+        if (mainArgs.throwOnError) throw e;
+    };
+
     /***************************
      * Init code
      ***************************/
@@ -105,11 +113,13 @@ function mcomponent(args) {
 
         for (var id in args.clipboard) {
             var html = args.clipboard[id];
-            var r = buildList(html);
-            if (r.error) {
-                throw "Failed to add clipboard with id = '" + id + "':" + r.message;
-            } else {
-                executionContext.setClipboardWithName(id, buildTree(r.list));
+            var list = undefined;
+            var tree = undefined;
+
+            try {
+                executionContext.setClipboardWithName(id, buildTree(buildList(html).list));
+            } catch (e) {
+                throw "Failed to add clipboard with id = '" + id + "': " + e.toString();
             }
         }
 
@@ -153,7 +163,19 @@ function mcomponent(args) {
 
         this.clearCompileError = function() {
             this.compileError = undefined;
-        }
+        };
+
+        this.setCompileError = function(msg) {
+            this.compileError = msg;
+        };
+
+        this.getCompileError = function(msg) {
+            return this.compileError;
+        };
+
+        this.hasCompileError = function(msg) {
+            return this.compileError ? true : false;
+        };
     };
 
     var compilationContext = new CompilationContext_();
@@ -1298,36 +1320,77 @@ function mcomponent(args) {
         return executionContext.getModel();
     };
 
-    var compileList = function() {
-        var r = buildList(view.html);
-        if (r.error) {
-            throw r.message;
-        } else {
-            view.list = r.list;
-        }
-    };
-
-    var compileView = function() {
+    /**
+     * Takes view HTML in a string and compiles it. Returns a view and a compilation context.
+     * @param html
+     */
+    var compileHtmlToView = function(html) {
         /**
          * Executed by setView(). Should throw exception if throwOnError == true.
          */
 
-        compilationContext.clearCompileError();
+        var localCompilationContext = new CompilationContext_();
+        var localView = {};
 
-        var r = buildList(view.html);
-        if (r.error) {
-            throw r.message;
-        } else {
-            view.list = r.list;
-            view.tree = buildTree(view.list);
-            view.template = compile({tree : getView().tree});
+        localCompilationContext.clearCompileError();
+
+        /**************************************
+         * Compile to list
+         **************************************/
+
+        localView.list = undefined;
+        localView.tree = undefined;
+        localView.template = undefined;
+
+        try {
+            localView.list = buildList(html);
+        } catch (e) {
+            localCompilationContext.setCompileError(e);
+            throwError(e);
         }
+
+        if (localView.list) {
+
+            /**************************************
+             * Compile to tree
+             **************************************/
+
+            try {
+                localView.tree = buildTree(localView.list);
+            } catch (e) {
+                localCompilationContext.setCompileError(e);
+                throwError(e);
+            }
+        }
+
+        if (localView.tree) {
+
+            /**************************************
+             * Compile to template object
+             **************************************/
+
+            // compile() handles compilationContext.setError and throwOnError itself. For now.
+
+            try {
+                localView.template = compile({tree : localView.tree});
+            } catch (e) {
+                localCompilationContext.setCompileError(e);
+                throwError(e);
+            }
+        }
+
+        return {
+            view : localView,
+            compilationContext : localCompilationContext
+        };
     };
 
     var _setViewWithHtml = function(html) {
         view.html = html;
         if (html) {
-            compileView();
+            var r = compileHtmlToView(html);
+            view = r.view;
+            compilationContext = r.compilationContext;
         } else {
             view.list = [];
             view.tree = {};
@@ -1371,9 +1434,9 @@ function mcomponent(args) {
             var endIndex = viewHtml.indexOf(endTagToken);
 
             if (endIndex < 0) {
-                return {error : true, message : "Missing end tag."};
+                throw "Missing end tag.";
             } else if (endIndex < startIndex) {
-                return {error : true, message : "Too many end tags."};
+                throw "Too many end tags.";
             }
 
             var trim = function(s) {
@@ -1392,10 +1455,7 @@ function mcomponent(args) {
             viewHtml = viewHtml.substring(endIndex + endTagToken.length);
 
         }
-        return {
-            error : false,
-            list : list
-        };
+        return list;
     };
 
     var buildTree = function(list) {
@@ -1830,10 +1890,10 @@ function mcomponent(args) {
             sourceObj = compileTreeToSourceWithBaseCodeIncluded(args.tree);
         } catch (e) {
             var es = e.split("|");
-            compilationContext.compileError = es[es.length - 1];
+            compilationContext.setCompileError([es.length - 1]);
 
             if (mainArgs.throwOnError) {
-                throw compilationContext.compileError;
+                throw compilationContext.getCompileError();
             }
         }
 
@@ -1856,10 +1916,10 @@ function mcomponent(args) {
                     console.log(e.toString());
                 }
                 if (mainArgs.debugEnabled) console.log("Error compiling full template source.", e.toString(), "\n" + source.toString());
-                compilationContext.compileError = createGenericCompileErrorMessage(e);
+                compilationContext.setCompileError(createGenericCompileErrorMessage(e));
 
                 if (mainArgs.throwOnError) {
-                    throw compilationContext.compileError;
+                    throw compilationContext.getCompileError();
                 }
             }
         }
@@ -1900,13 +1960,13 @@ function mcomponent(args) {
                      * compilationContext.compileError should be a formatted error message at this point. No further formatting should be required.
                      */
 
-                    if (!compilationContext.compileError) {
-                        compilationContext.compileError = createGenericCompileErrorMessage("Critical error, no compiled result, and no error.")
+                    if (!compilationContext.hasCompileError()) {
+                        compilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
                     }
 
-                    executionContext.renderResult = [compilationContext.compileError];
+                    executionContext.renderResult = [compilationContext.getCompileError()];
                     if (mainArgs.throwOnError) {
-                        throw compilationContext.compileError;
+                        throw compilationContext.getCompileError();
                     }
                 }
 
@@ -2416,13 +2476,12 @@ function mcomponent(args) {
                 var v = getView();
                 v.html = html;
                 if (html) {
-                    var r = buildList(view.html);
-                    if (r.error) {
-                        throw r.message;
-                    } else {
-                        view.list = r.list;
-                        view.tree = {}
+                    try {
+                        view.list = buildList(view.html);
+                    } catch (e) {
+                        throw e;
                     }
+                    view.tree = {}
                 } else {
                     v.list = [];
                     v.tree = {};
