@@ -56,8 +56,7 @@ function mcomponent(args) {
 
     var createCompileExceptionMessage = function(text, tag) {
         var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
-        var msg = "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
-        return msg;
+        return "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
     };
 
     /**
@@ -117,7 +116,7 @@ function mcomponent(args) {
             var tree = undefined;
 
             try {
-                executionContext.setClipboardWithName(id, buildTree(buildList(html).list));
+                executionContext.setClipboardWithName(id, buildTree(buildList(html)));
             } catch (e) {
                 throw "Failed to add clipboard with id = '" + id + "': " + e.toString();
             }
