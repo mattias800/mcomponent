@@ -168,16 +168,16 @@ function mcomponent(args) {
             this.compileError = msg;
         };
 
-        this.getCompileError = function(msg) {
+        this.getCompileError = function() {
             return this.compileError;
         };
 
-        this.hasCompileError = function(msg) {
+        this.hasCompileError = function() {
             return this.compileError ? true : false;
         };
     };
 
-    var compilationContext = new CompilationContext_();
+    var globalCompilationContext = undefined;
 
     /***************************
      * Execution context
@@ -1342,7 +1342,7 @@ function mcomponent(args) {
         localView.template = undefined;
 
         try {
-            localView.list = buildList(html);
+            localView.list = buildList(html, localCompilationContext);
         } catch (e) {
             localCompilationContext.setCompileError(e);
             throwError(e);
@@ -1355,7 +1355,7 @@ function mcomponent(args) {
              **************************************/
 
             try {
-                localView.tree = buildTree(localView.list);
+                localView.tree = buildTree(localView.list, localCompilationContext);
             } catch (e) {
                 localCompilationContext.setCompileError(e);
                 throwError(e);
@@ -1368,10 +1368,8 @@ function mcomponent(args) {
              * Compile to template object
              **************************************/
 
-            // buildTemplate() handles compilationContext.setError and throwOnError itself. For now.
-
             try {
-                localView.template = buildTemplate(localView.tree);
+                localView.template = buildTemplate(localView.tree, localCompilationContext);
             } catch (e) {
                 localCompilationContext.setCompileError(e);
                 throwError(e);
@@ -1389,7 +1387,7 @@ function mcomponent(args) {
         if (html) {
             var r = compileHtmlToView(html);
             view = r.view;
-            compilationContext = r.compilationContext;
+            globalCompilationContext = r.compilationContext;
         } else {
             view.list = [];
             view.tree = {};
@@ -1415,7 +1413,7 @@ function mcomponent(args) {
      * Builds a list of elements from a view.
      * Even elements are HTML, odd elements are tags.
      */
-    var buildList = function(viewHtml) {
+    var buildList = function(viewHtml, localCompilationContext) {
         var list = [];
         for (var i = 0; i < args.maxTagCount; i++) {
             var startIndex = viewHtml.indexOf(startTagToken);
@@ -1457,7 +1455,13 @@ function mcomponent(args) {
         return list;
     };
 
-    var buildTree = function(list) {
+    /**
+     * Builds a tree out of a list.
+     * @param list
+     * @param localCompilationContext
+     * @return {Array}
+     */
+    var buildTree = function(list, localCompilationContext) {
         var root = [];
         for (var i = 0; i < list.length; i++) {
             var item = list[i];
@@ -1518,7 +1522,6 @@ function mcomponent(args) {
                 }
             }
 
-            compilationContext.addSuccessfullyCompiledTag(item);
         }
         return root;
     };
@@ -1927,6 +1930,9 @@ function mcomponent(args) {
             render : function() {
                 var r = {};
                 var msg;
+                if (mainArgs.debugEnabled) console.log("OK RENDERING");
+                if (mainArgs.debugEnabled) console.log("f", f);
+                if (mainArgs.debugEnabled) console.log("globalCompilationContext", globalCompilationContext);
                 if (f) {
                     executionContext.makeReadyForRender();
                     try {
@@ -1949,13 +1955,13 @@ function mcomponent(args) {
                      * compilationContext.compileError should be a formatted error message at this point. No further formatting should be required.
                      */
 
-                    if (!compilationContext.hasCompileError()) {
-                        compilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
+                    if (!globalCompilationContext.hasCompileError()) {
+                        globalCompilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
                     }
 
-                    executionContext.renderResult = [compilationContext.getCompileError()];
+                    executionContext.renderResult = [globalCompilationContext.getCompileError()];
                     if (mainArgs.throwOnError) {
-                        throw compilationContext.getCompileError();
+                        throw globalCompilationContext.getCompileError();
                     }
                 }
 
