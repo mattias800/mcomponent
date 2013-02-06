@@ -2879,6 +2879,17 @@ test("Clipboard", function() {
 
     equal(c.assert.assertRender(), "<div><div>hej</div></div>", "Predefined clipboard");
 
+    /***********************
+     * Empty clipboard
+     ***********************/
+
+    ok(c = $().mcomponent({
+        clipboard : {clip1 : ""},
+        viewHtml : "{{ paste clip1 }}"
+    }), "Construction OK!");
+
+    equal(c.assert.assertRender(), "", "Predefined clipboard is empty, should yield in empty result.");
+
 });
 
 test("Clipboards with errors", function() {
