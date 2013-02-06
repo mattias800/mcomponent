@@ -78,8 +78,8 @@ function mcomponent(args) {
             _setModel(rootModel);
         }
 
-        for (var iterId in args.iter) {
-            var extConfig = args.iter[iterId];
+        for (var iteratorName in args.iter) {
+            var extConfig = args.iter[iteratorName];
             // Make new config object, so that we don't share with external scope.
             var config = {};
             config.usePages = extConfig.usePages ? true : false;
@@ -107,7 +107,7 @@ function mcomponent(args) {
             config.whenThereAreNoItems = extConfig.whenThereAreNoItems || function() {
             };
             config.where = extConfig.where || undefined;
-            executionContext.createIterator(iterId, config);
+            executionContext.createIterator(iteratorName, config);
         }
 
         for (var id in args.clipboard) {
@@ -337,8 +337,8 @@ function mcomponent(args) {
         };
 
         this.clearIterators = function() {
-            for (var iterId in this.iterators) {
-                this.iterators[iterId].clear();
+            for (var iteratorName in this.iterators) {
+                this.iterators[iteratorName].clear();
             }
         };
 
@@ -1188,7 +1188,7 @@ function mcomponent(args) {
                 var isNiter = tagInstance.tagName == "niter";
                 var iterContext;
                 var niterParameters;
-                var iterId = undefined;
+                var iteratorName = undefined;
                 var iterConfig = undefined;
 
                 var name = tagInstance.tag.parameters;
@@ -1196,11 +1196,11 @@ function mcomponent(args) {
                 if (isNiter) {
                     niterParameters = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
                     name = niterParameters.variableName;
-                    iterId = niterParameters.iterName;
+                    iteratorName = niterParameters.iterName;
                     try {
-                        iterConfig = executionContext.getIteratorConfigForId(iterId);
+                        iterConfig = executionContext.getIteratorConfigForId(iteratorName);
                     } catch (e) {
-                        throw createCompileExceptionMessage("There is no iterator config with this id: " + iterId, tagInstance);
+                        throw createCompileExceptionMessage("There is no iterator config with this id: " + iteratorName, tagInstance);
                     }
                 }
 
@@ -1224,11 +1224,11 @@ function mcomponent(args) {
 
                 if (isNiter) {
 
-                    resultOuter.push("var " + iterContextVar + " = executionContext.ensureIteratorExistsAndSetModel('" + iterId + "', " + listVar + ")");
+                    resultOuter.push("var " + iterContextVar + " = executionContext.ensureIteratorExistsAndSetModel('" + iteratorName + "', " + listVar + ")");
 
                     if (iterConfig && iterConfig.where) {
                         // Apply filter function to list.
-                        if (typeof iterConfig.where !== "function") throw "Iterator config '" + iterId + "' has a filter, but it is not a function.";
+                        if (typeof iterConfig.where !== "function") throw "Iterator config '" + iteratorName + "' has a filter, but it is not a function.";
                         resultOuter.push("var " + filteredListVar + " = []");
                         resultOuter.push("var " + filterFunctionVar + " = " + iterContextVar + ".getConfig().where");
                         resultOuter.push("for (var " + iVar + " = 0; " + iVar + " < " + listVar + ".length; " + iVar + "++) {");
