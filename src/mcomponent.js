@@ -1,4 +1,5 @@
 function mcomponent(args) {
+
     args = args || {};
 
     var startTagToken = "{{";

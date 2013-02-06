@@ -17,8 +17,6 @@ if (typeof mcomponent === "function") {
 
         var c;
 
-        ok(true, "dummy");
-
         ok(c = mcomponent(), "Construction is OK.");
 
         equal(c.assert.assertLookup("username", {username : "butters"}), "butters", "Should lookup 'username' properly.");

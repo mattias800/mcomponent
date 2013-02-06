@@ -10,7 +10,8 @@
     },
     "main" : "lib/main.js",
     "scripts" : {
-        "test" : "node test/testrunner.js"
+        "test" : "rm lib/main.js; cp src/mcomponent.js lib/main.js; echo \"module.exports = mcomponent;\" >> lib/main.js; node test/testrunner.js",
+        "prepublish" : "rm lib/main.js; cp src/mcomponent.js lib/main.js; echo \"module.exports = mcomponent;\" >> lib/main.js"
     },
     "dependencies" : {
 
