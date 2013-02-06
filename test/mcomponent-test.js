@@ -1232,12 +1232,16 @@ test("showing other things than model properties", function() {
 test("showing model properties that doesn't exist", function() {
 
     var c;
+    var model = {name : "mattias"};
 
     ok(c = $().mcomponent({
-            model : {name : "mattias"},
+            model : model,
             viewHtml : "{{ age }}"}
     ), "Construction OK!");
+
     ok(c.assert.assertRender() !== "", "Should contain an error message after API lookup.");
+    model.age = 32;
+    equal(c.assert.assertRender(), "32", "Should now contain lookup result.");
 
 
 });
@@ -3323,22 +3327,22 @@ test("Invalid tags", function() {
         c = $().mcomponent({
             viewHtml : '{{ showjs "mattias }}',
             throwOnError : true
-        }), "Construction OK!"
-    });
+        })
+    }, "Construction OK!");
 
     raises(function() {
         c = $().mcomponent({
             viewHtml : '{{ * showjs alert("hej") }}',
             throwOnError : true
-        }), "Construction OK!"
-    });
+        })
+    }, "Construction OK!");
 
     raises(function() {
         c = $().mcomponent({
             viewHtml : '{{ Å showjs alert("hej") }}',
             throwOnError : true
-        }), "Construction OK!"
-    });
+        })
+    }, "Construction OK!");
 
     /***********************
      * Using error messages

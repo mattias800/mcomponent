@@ -55,7 +55,7 @@ function mcomponent(args) {
     };
 
     var compileErrorToString = function(error) {
-        return "|Error compiling tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message;
+        return "Error compiling tag " + startTagToken + " " + error.tag + " " + endTagToken + (error.message ? ": " + error.message : "");
     };
 
     var createGenericCompileErrorMessage = function(e) {
@@ -1386,7 +1386,10 @@ function mcomponent(args) {
             try {
                 localView.source = buildSource(localView.tree);
             } catch (e) {
-                localCompilationContext.setCompileError(e);
+
+                /* Returns a stack of errors. First element is outmost error, which is the one the user will care about */
+
+                localCompilationContext.setCompileError(e[0]);
                 throwError(e);
             }
         }
@@ -1815,18 +1818,24 @@ function mcomponent(args) {
                     /****************************************************************
                      * It is a tag of system type. For example showjs, if, push, etc.
                      ****************************************************************/
+
                     var tagOk = false;
 
                     /***************************
                      * Compile the tag to source
                      ***************************/
+
                     try {
                         tagCompiledSource = tagType.compileTagInstance(item, executionContext);
                     } catch (e) {
-                        var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
-                        throw msg;
+                        if (e && e.length !== undefined) {
+                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            throw e;
+                        } else {
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            throw [msg];
+                        }
                     }
-
 
                 } else {
 
@@ -1837,27 +1846,39 @@ function mcomponent(args) {
                     try {
                         tagCompiledSource = compilePropertyTag(item);
                     } catch (e) {
-                        var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
-                        throw msg;
+                        if (e && e.length !== undefined) {
+                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            throw e;
+                        } else {
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            throw [msg];
+                        }
                     }
                 }
 
-                /*************************************************************
+                /*****************************************************************************
                  * Compile the source to Function-object to verify that it is working.
-                 *************************************************************/
+                 *****************************************************************************/
+
                 if (tagCompiledSource) {
                     try {
                         new Function("executionContext", "api", "rootModel", tagCompiledSource.toString());
                         tagOk = true;
                     } catch (e) {
-                        var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
-                        throw msg;
+                        if (e && e.length !== undefined) {
+                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            throw e;
+                        } else {
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            throw [msg];
+                        }
                     }
                 }
 
                 /*************************************************************
                  * Add it to result if it is OK.
                  *************************************************************/
+
                 if (tagOk) {
                     result.pushCompiledSource(tagCompiledSource);
                 }
@@ -1900,8 +1921,7 @@ function mcomponent(args) {
         try {
             sourceObj = compileTreeToSourceWithBaseCodeIncluded(tree);
         } catch (e) {
-            var es = e.split("|");
-            throw [es.length - 1];
+            throw e;
         }
         return sourceObj;
 
