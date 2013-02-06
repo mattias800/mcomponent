@@ -1339,10 +1339,11 @@ function mcomponent(args) {
 
         localView.list = undefined;
         localView.tree = undefined;
+        localView.source = undefined;
         localView.template = undefined;
 
         try {
-            localView.list = buildList(html, localCompilationContext);
+            localView.list = buildList(html);
         } catch (e) {
             localCompilationContext.setCompileError(e);
             throwError(e);
@@ -1355,7 +1356,7 @@ function mcomponent(args) {
              **************************************/
 
             try {
-                localView.tree = buildTree(localView.list, localCompilationContext);
+                localView.tree = buildTree(localView.list);
             } catch (e) {
                 localCompilationContext.setCompileError(e);
                 throwError(e);
@@ -1365,16 +1366,22 @@ function mcomponent(args) {
         if (localView.tree) {
 
             /**************************************
-             * Compile to template object
+             * Compile to source object
              **************************************/
 
             try {
-                localView.template = buildTemplate(localView.tree, localCompilationContext);
+                localView.source = buildSource(localView.tree);
             } catch (e) {
                 localCompilationContext.setCompileError(e);
                 throwError(e);
             }
         }
+
+        /****************************************************************************
+         * Finally, compile to template object, regardless of previous result.
+         ****************************************************************************/
+
+        localView.template = buildTemplate(localView.source, localCompilationContext);
 
         return {
             view : localView,
@@ -1383,12 +1390,13 @@ function mcomponent(args) {
     };
 
     var _setViewWithHtml = function(html) {
-        view.html = html;
-        if (html) {
+        if (html !== undefined) {
             var r = compileHtmlToView(html);
             view = r.view;
+            view.html = html;
             globalCompilationContext = r.compilationContext;
         } else {
+            view.html = undefined;
             view.list = [];
             view.tree = {};
             view.template = undefined;
@@ -1398,7 +1406,7 @@ function mcomponent(args) {
     var _setViewFromComponent = function(component) {
         _setView(component._.getView());
         // Must recompile the source, since the compiled code now references the other components scope.
-        view.template = buildTemplate(getView().tree);
+        view.template = buildTemplate(getView().source);
     };
 
     var getView = function() {
@@ -1413,7 +1421,7 @@ function mcomponent(args) {
      * Builds a list of elements from a view.
      * Even elements are HTML, odd elements are tags.
      */
-    var buildList = function(viewHtml, localCompilationContext) {
+    var buildList = function(viewHtml) {
         var list = [];
         for (var i = 0; i < args.maxTagCount; i++) {
             var startIndex = viewHtml.indexOf(startTagToken);
@@ -1461,7 +1469,7 @@ function mcomponent(args) {
      * @param localCompilationContext
      * @return {Array}
      */
-    var buildTree = function(list, localCompilationContext) {
+    var buildTree = function(list) {
         var root = [];
         for (var i = 0; i < list.length; i++) {
             var item = list[i];
@@ -1872,27 +1880,34 @@ function mcomponent(args) {
 
     };
 
-    /**
-     * Compiles the view and returns the template object.
-     *
-     * Throws exception when buildTemplate fails, always. throwOnError is handled by parent method.
-     *
-     * @param tree
-     * @return {{getSource: Function, getBodySource: Function, render: Function, process: Function}}
-     */
-    var buildTemplate = function(tree) {
-        var debugEnabled = false;
-        var sourceObj = undefined;
+    var buildSource = function(tree) {
+        var sourceObj;
 
-        /**************************
-         * Compile to source first.
-         **************************/
         try {
             sourceObj = compileTreeToSourceWithBaseCodeIncluded(tree);
         } catch (e) {
             var es = e.split("|");
             throw [es.length - 1];
         }
+        return sourceObj;
+
+    };
+
+    /**
+     * Takes source and compilation context and builds a template object. Source can be undefined, if previous compilation passes has failed. But in that case, compilation context must contain an error.
+     *
+     * buildTemplate() may not throw an exception in normal usage, since it must always return a template.
+     *
+     * @param tree
+     * @return {{getSource: Function, getBodySource: Function, render: Function, process: Function}}
+     */
+    var buildTemplate = function(sourceObj, localCompilationContext) {
+        var debugEnabled = false;
+
+        if (sourceObj == undefined && localCompilationContext == undefined) throw "Severe error: buildTemplate() must get sourceObj and/or compilation context. May not ommit both.";
+        if (sourceObj == undefined && !localCompilationContext.hasCompileError()) throw "Severe error: buildTemplate() got no sourceObj but compilation context indicates no compilation errors.";
+
+        var f;
 
         /*****************************************
          * If success, buildTemplate to Function object.
@@ -1900,8 +1915,6 @@ function mcomponent(args) {
         if (sourceObj) {
             var source = sourceObj.full;
             var bodySource = sourceObj.body;
-
-            var f;
 
             try {
                 f = new Function("executionContext", "api", "rootModel", source);
@@ -1911,7 +1924,6 @@ function mcomponent(args) {
                     console.log(e);
                     console.log(e.toString());
                 }
-                if (mainArgs.debugEnabled) console.log("Error compiling full template source.", e.toString(), "\n" + source.toString());
                 throw createGenericCompileErrorMessage(e);
             }
         }
@@ -1930,9 +1942,6 @@ function mcomponent(args) {
             render : function() {
                 var r = {};
                 var msg;
-                if (mainArgs.debugEnabled) console.log("OK RENDERING");
-                if (mainArgs.debugEnabled) console.log("f", f);
-                if (mainArgs.debugEnabled) console.log("globalCompilationContext", globalCompilationContext);
                 if (f) {
                     executionContext.makeReadyForRender();
                     try {
@@ -1955,13 +1964,13 @@ function mcomponent(args) {
                      * compilationContext.compileError should be a formatted error message at this point. No further formatting should be required.
                      */
 
-                    if (!globalCompilationContext.hasCompileError()) {
-                        globalCompilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
+                    if (!localCompilationContext.hasCompileError()) {
+                        localCompilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
                     }
 
-                    executionContext.renderResult = [globalCompilationContext.getCompileError()];
+                    executionContext.renderResult = [localCompilationContext.getCompileError()];
                     if (mainArgs.throwOnError) {
-                        throw globalCompilationContext.getCompileError();
+                        throw localCompilationContext.getCompileError();
                     }
                 }
 
@@ -2381,7 +2390,11 @@ function mcomponent(args) {
         },
 
         hasRenderErrors : function() {
-            return executionContext.hasRenderErrors();
+            return executionContext.hasRenderErrors() || globalCompilationContext.hasCompileError();
+        },
+
+        hasCompileError : function() {
+            return globalCompilationContext.hasCompileError();
         },
 
         getResult : function() {

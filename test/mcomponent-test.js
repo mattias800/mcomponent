@@ -2041,7 +2041,6 @@ test("niter tag, using showPageWithItemWhere using an external model", function(
                 usePages : true
             }
         },
-        debugEnabled : true,
         viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}), "Construction OK!");
     ok(i = c.getIterator("userListIter"), "Iterator should be available.");
     equal(i.getPageCount(), 0, "No page count yet, since there is no model.");
@@ -2711,14 +2710,16 @@ test("niter tag, causing compile errors", function() {
         });
     }, "Construction fails and with throwOnError, there should be an exception.");
 
-    ok(c = $().mcomponent({viewHtml : "{{ niter list list }}{{ enditer }}"}), "Compiling fails, but should not throw an exception.");
-    equal(c.assert.assertRender(), "mattias", "'showjs' tag should work.");
+    ok(c = $().mcomponent({
+        viewHtml : "{{ niter list list }}{{ enditer }}",
+        debugEnabled : true
+    }), "Compiling fails, but should not throw an exception.");
+
+    ok(c.assert.assertRender() !== "", "niter and enditer mismatch. Should output error in DOM, so result can not be empty.");
+    ok(c.hasCompileError(), "Should contain compile errors because of enditer mismatch.");
+    ok(c.hasRenderErrors(), "Should contain render errors as well, since all compile errors cause a render error.");
 
 });
-
-setTimeout(function() {
-    $().mcomponent({viewHtml : "{{ niter list list }}{{ enditer }}"});
-}, 1000);
 
 test("js and showjs tags", function() {
 
@@ -2829,15 +2830,6 @@ test("Setting model with setter, then getting it", function() {
 
 module("Final");
 
-setTimeout(function() {
-
-    ok(c = $().mcomponent({
-        clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
-        model : {age : 80},
-        viewHtml : "{{ paste clip1 }}"
-    }), "Construction OK!");
-
-}, 3000);
 test("Clipboard", function() {
     var c;
 
@@ -3353,7 +3345,6 @@ test("Invalid tags", function() {
      ***********************/
 
     ok(c = $().mcomponent({
-        debugEnabled : true,
         viewHtml : '{{ showjs "mattias }}'
     }), "Construction OK!");
 
@@ -3361,7 +3352,6 @@ test("Invalid tags", function() {
     //equal(c.assert.assertRender(), "", "Should not be empty, should contain an error message.");
 
     ok(c = $().mcomponent({
-        debugEnabled : true,
         viewHtml : '{{ * showjs alert("hej") }}'
     }), "Construction OK!");
 
@@ -3373,7 +3363,6 @@ test("Invalid tags", function() {
      **************************************/
 
     ok(c = $().mcomponent({
-        debugEnabled : true,
         viewHtml : '{{ if true }}{{ * showjs alert("hej") }}{{ endif }}'
     }), "Construction OK!");
 
