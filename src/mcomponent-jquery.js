@@ -11,6 +11,9 @@
             afterRender : undefined
         }, args);
 
+        if (mainArgs.placeHolder && typeof mainArgs.placeHolder !== "object") throw "args.placeHolder must be a DOM node if specified.";
+        if (mainArgs.placeHolderId && typeof mainArgs.placeHolderId !== "string") throw "args.placeHolderId must be a string if specified.";
+
         var externalAfterRender = args.afterRender;
         var placeHolder = $(args.placeHolder)[0] || $("#" + args.placeHolderId)[0];
         var component;
