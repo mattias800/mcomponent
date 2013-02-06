@@ -4,3 +4,6 @@
 mcomponent.iml
 mcomponent.ipr
 mcomponent.iws
+node_modules
+node_modules/*
+npm-debug.log
