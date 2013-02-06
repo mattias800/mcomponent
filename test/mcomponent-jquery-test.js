@@ -1,4 +1,4 @@
-module("DOM dependent tests");
+QUnit.module("DOM dependent tests");
 
 test("Construction", function() {
 
