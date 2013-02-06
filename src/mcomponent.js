@@ -12,7 +12,10 @@ function mcomponent(args) {
 
     var mainArgs = args;
 
-    // Set default values.
+    /************************************************************
+     * Arguments and their default values
+     ************************************************************/
+
     args.viewHtml = args.viewHtml || undefined;
     args.viewFromComponent = args.viewFromComponent || undefined;
     args.model = args.model || undefined;
@@ -22,7 +25,12 @@ function mcomponent(args) {
     args.maxTagCount = args.maxTagCount || 1000;
     args.logTags = args.logTags !== undefined ? args.logTags : false;
     args.afterRender = args.afterRender || undefined;
-    args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false; // Used for unit testing.
+
+    /************************************************************
+     * Arguments used for testing purposes only
+     ************************************************************/
+
+    args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false;
     args.debugEnabled = args.debugEnabled ? true : false;
 
     var validateChild = function(id, child) {
@@ -176,6 +184,12 @@ function mcomponent(args) {
             return this.compileError ? true : false;
         };
     };
+
+    /*********************************************************************************
+     * Global reference to compilation context.
+     * We need this for the public interface for template,
+     * which does not have access to locally scoped context objects.
+     *********************************************************************************/
 
     var globalCompilationContext = undefined;
 
