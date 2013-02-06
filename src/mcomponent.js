@@ -2005,11 +2005,9 @@ function mcomponent(args) {
                             console.log(e.toString());
                             console.log("model", _getModel());
                         }
-                        if (mainArgs.throwOnError) {
-                            throw renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()});
-                        } else {
-                            executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
-                        }
+
+                        throwError(renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()}));
+                        executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
                     }
                 } else {
                     /**
@@ -2021,9 +2019,8 @@ function mcomponent(args) {
                     }
 
                     executionContext.renderResult = [localCompilationContext.getCompileError()];
-                    if (mainArgs.throwOnError) {
-                        throw localCompilationContext.getCompileError();
-                    }
+
+                    throwError(localCompilationContext.getCompileError());
                 }
 
                 return executionContext.renderResult.join("");
