@@ -126,7 +126,8 @@ function mcomponent(args) {
             try {
                 executionContext.setClipboardWithName(id, buildTree(buildList(html)));
             } catch (e) {
-                throw "Failed to add clipboard with id = '" + id + "': " + e.toString();
+                executionContext.setClipboardErrorWithName(id, e);
+                throwError("Failed to add clipboard with id = '" + id + "': " + e.toString());
             }
         }
 
@@ -204,6 +205,7 @@ function mcomponent(args) {
         this.children = mainArgs.children;
         this.globals = {};
         this.clipboard = {};
+        this.clipboardError = {}; // If adding a clipboard failed, the error will be inserted here.
         this.iterators = {};
         this.renderResult = [];
         this.renderErrors = [];
@@ -306,8 +308,16 @@ function mcomponent(args) {
             return this.clipboard[name];
         };
 
+        this.getClipboardErrorWithName = function(name) {
+            return this.clipboardError[name];
+        };
+
         this.setClipboardWithName = function(name, val) {
             this.clipboard[name] = val;
+        };
+
+        this.setClipboardErrorWithName = function(name, val) {
+            this.clipboardError[name] = val;
         };
 
         /**
@@ -1116,7 +1126,15 @@ function mcomponent(args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (!name) name = "default";
-                result.pushCompiledSource(compileTreeToSource(executionContext.getClipboardWithName(name)));
+                var clipboard = executionContext.getClipboardWithName(name);
+                var clipboardError = executionContext.getClipboardErrorWithName(name);
+                if (clipboard) {
+                    result.pushCompiledSource(compileTreeToSource(clipboard));
+                } else if (clipboardError) {
+                    result.pushRenderError("Error in clipboard: " + clipboardError);
+                } else {
+                    result.pushRenderError("There is no clipboard with id='" + name + "'.");
+                }
                 return result;
             },
             createTagInstance : function(args) {
@@ -1309,7 +1327,7 @@ function mcomponent(args) {
         try {
             return new Function("model", "context", "globals", "api", "return " + exp);
         } catch (e) {
-            throw "Trying to compile invalid expression: " + exp;
+            throw "Invalid expression: " + exp;
         }
     };
 

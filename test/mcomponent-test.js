@@ -2881,6 +2881,26 @@ test("Clipboard", function() {
 
 });
 
+test("Clipboards with errors", function() {
+    var c;
+
+    ok(c = $().mcomponent({
+        viewHtml : "{{ paste clip1 }}"
+    }), "Construction OK!");
+
+    ok(c.assert.assertRender() !== "", "Clipboard item does not exist, should contain error.");
+    //equal(c.assert.assertRender(), "", "Clipboard item does not exist, should contain error.");
+
+    ok(c = $().mcomponent({
+        clipboard : {clip1 : "{{ if model.age) }}{{ endif }}"},
+        viewHtml : "{{ paste clip1 }}"
+    }), "Construction OK!");
+
+    ok(c.assert.assertRender() !== "", "Predefined clipboard has an error, should output error.");
+    //equal(c.assert.assertRender(), "", "Predefined clipboard has an error!");
+
+});
+
 test("Render and result", function() {
 
     var c;
