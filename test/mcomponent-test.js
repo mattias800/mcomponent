@@ -2657,7 +2657,8 @@ if (typeof mcomponent === "function") {
 
 
         ok(c = mcomponent({
-            viewHtml : '{{ iter bounds["out"] }}{{ enditer }}'
+            viewHtml : '{{ iter bounds["out"] }}{{ enditer }}',
+            throwOnError : true
         }), "Compiling this view should work.");
 
     });
