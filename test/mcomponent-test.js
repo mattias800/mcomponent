@@ -2647,6 +2647,21 @@ if (typeof mcomponent === "function") {
 
     });
 
+    test("iter/niter tag, with alternative resolve styles", function() {
+
+        var c;
+
+        ok(c = mcomponent({
+            viewHtml : "{{ iter bounds['out'] }}{{ enditer }}"
+        }), "Compiling this view should work.");
+
+
+        ok(c = mcomponent({
+            viewHtml : '{{ iter bounds["out"] }}{{ enditer }}'
+        }), "Compiling this view should work.");
+
+    });
+
     test("niter tag, causing compile errors", function() {
 
         var c;
@@ -2659,8 +2674,7 @@ if (typeof mcomponent === "function") {
         }, "Construction fails and with throwOnError, there should be an exception.");
 
         ok(c = mcomponent({
-            viewHtml : "{{ niter list list }}{{ enditer }}",
-            debugEnabled : true
+            viewHtml : "{{ niter list list }}{{ enditer }}"
         }), "Compiling fails, but should not throw an exception.");
 
         ok(c.assert.assertRender() !== "", "niter and enditer mismatch. Should output error in DOM, so result can not be empty.");
