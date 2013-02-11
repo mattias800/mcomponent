@@ -121,7 +121,7 @@ However, you don't have to use CSS selector for this. You can set the view in se
 
 ```js
 	var c1 = $("#myView").mcomponent();
-	var c2 = $().mcomponent(viewHtml:$("#myView").html());
+	var c2 = $().mcomponent({viewHtml:$("#myView").html()});
 	var c3 = $().mcomponent();
 	c3.setViewWithHtml($("#myView").html());
 ```
