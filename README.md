@@ -117,13 +117,14 @@ Since we are using jQuery, we can use ordinary CSS selector to specify what view
 	var component = $("#myView").mcomponent();
 ```
 
-However, you don't have to use CSS selector for this. You can set the view in several ways. Here are three examples.
+However, you don't have to use CSS selector for this. You can set the view in several ways. Here are a few examples.
 
 ```js
 	var c1 = $("#myView").mcomponent();
-	var c2 = $().mcomponent({viewHtml:$("#myView").html()});
-	var c3 = $().mcomponent();
-	c3.setViewWithHtml($("#myView").html());
+	var c2 = $().mcomponent({ viewHtml : $("#myView").html() });
+	var c3 = $().mcomponent({ viewHtml : "Username:{{ username }}" });
+	var c4 = $().mcomponent();
+	c4.setViewWithHtml($("#myView").html());
 ```
 
 You can also copy the view from another component. See the reference manual.
