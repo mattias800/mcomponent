@@ -6,7 +6,7 @@ Code running in production, documentation just started? Story of my life.
 A compiling template engine for Javascript inspired by Struts 2.
 
 Introduction
-------------
+============
 
 mcomponent allows you write views in a way similar to JSP, but instead of running on the server, mcomponent is running in the Javascript VM.
 
@@ -21,9 +21,10 @@ This allows you to change model, render again, sort a list in a different way an
 
 
 Installation and usage
-----------------------
+======================
 
-__In the browser__
+In the browser
+--------------
 
 Just download __mcomponent.js__ (from __./src/__) and include it in your web page.
 
@@ -31,7 +32,8 @@ __mcomponent.js__ exposes a method _mcomponent()_ to global namespace. __mcompon
 
 To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function _$.mcomponent_. 
 
-__In Node__
+In Node
+-------
 
 Just use require. mcomponent is available in the officiel NPM repo.
 
