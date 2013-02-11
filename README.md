@@ -13,7 +13,7 @@ mcomponent allows you write views in a way similar to JSP, but instead of runnin
 This allows you to change model, render again, sort a list in a different way and render again, without reloading the page.
 
 * Supports all major browsers.
-* Supports Node (using require) 
+* Supports Node, available in npm repo. Use require("mcomponent")
 * It is very simple to use, any errors are shown directly in the rendering result/DOM.
 * It is quite powerful and exposes some really useful functionality.
 * You are in control, nothing is done automagically.
