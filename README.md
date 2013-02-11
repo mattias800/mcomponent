@@ -39,7 +39,7 @@ __mcomponent.js__ exposes a method _mcomponent()_ to global namespace.
 	var c = mcomponent();
 ```
 
-To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function _$.mcomponent_. 
+To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function. 
 
 ```js
 	var component = $().mcomponent();
