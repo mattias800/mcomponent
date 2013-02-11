@@ -189,6 +189,25 @@ Now we create our new view. Notice that we use the {{ .. }} syntax to create tag
 	</script>
 ```
 
+You can omit the "show" tag if you want.
+
+```html+django
+	<script id="myView" type="text/view">
+		id:{{ id }}, username:{{ username }}, email:{{ email }}
+	</script>
+```
+
+If the first word in the tag doesn't match a known tag type, it will try to look it up on the model instead. This is usually how we write views. "show" is used when you want to display a property that uses a keyword.
+
+Lets say you have model.show = true.
+
+```html+django
+	<script id="myView" type="text/view">
+		id:{{ show }} // Will not work, since "show" is a tag and we're missing the parameter!
+		id:{{ show show }} // Yay, works!
+	</script>
+```
+
 Finally, create a user object, add it to the component and render!
 
 ```js
