@@ -359,8 +359,8 @@ __Output:__
 	id:2, username:maximus, email:maximus@maximus124.com
 
 
-7. More coming!
----------------
+More coming!
+===========
 
 We need to go over more things.
 
