@@ -10,7 +10,7 @@ mcomponent is a compiling template engine for Javascript.
 
 mcomponent allows you write views in a way similar to JSP, but instead of running on the server, mcomponent is running in the Javascript VM (for example, the web browser).
 
-This allows you to change model, render again, sort a list in a different way and render again, without reloading the page.
+This allows you to change model, render again. Or sort a list of articles from lowest to highest price instead of by name and render again, without reloading the page.
 
 It is inspired by Struts 2.0 JSP tag library, but has expanded into more than that.
 
