@@ -48,7 +48,7 @@ To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, an
 In Node
 -------
 
-Just use require. mcomponent is available in the officiel NPM repo.
+Just use require. mcomponent is available in the official NPM repo.
 
 ```bash
 	$ npm install mcomponent
