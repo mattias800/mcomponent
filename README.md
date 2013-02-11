@@ -20,14 +20,31 @@ This allows you to change model, render again, sort a list in a different way an
 * It is pretty fast. All views are compiled to Javascript code which is then compiled by the VM.
 
 
-mcomponent.js vs mcomponent-jquery.js
--------------------------------------
+Installation and usage
+----------------------
+
+__In the browser__
+
+Just download __mcomponent.js__ (from __./src/__) and include it in your web page.
 
 __mcomponent.js__ exposes a method _mcomponent()_ to global namespace. __mcomponent.js__ is required to use mcomponent.
-If you use require(), nothing is put into global namespace, of course.
-
 
 To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function _$.mcomponent_. 
+
+__In Node__
+
+Just use require. mcomponent is available in the officiel NPM repo.
+
+```bash
+	$ npm install mcomponent
+```
+
+Then in the Javascript code:
+
+```js
+	var mcomponent = require("mcomponent");
+```
+
 
 
 Tutorial
