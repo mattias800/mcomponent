@@ -116,13 +116,13 @@ Also, we will want to display properties of the model. This is done using the 's
 
 First the placeholder.
 
-```
+```html
 	<div id="myPlaceHolder"></div>
 ```
 
 Now we create our new view. Notice that we use the {{ .. }} syntax to create tags, and that we use the 'show' tag.
 
-```
+```html+django
 	<script id="myView" type="text/view">
 		id:{{ show id }}, username:{{ show username }}, email:{{ show email }}
 	</script>
