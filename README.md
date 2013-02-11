@@ -17,7 +17,7 @@ This allows you to change model, render again, sort a list in a different way an
 * It is very simple to use, any errors are shown directly in the rendering result/DOM.
 * It is quite powerful and exposes some really useful functionality.
 * You are in control, nothing is done automagically.
-* All views are compiled to Javascript code which is then compiled by the VM, so it is fast.
+* It is pretty fast. All views are compiled to Javascript code which is then compiled by the VM.
 
 
 mcomponent.js vs mcomponent-jquery.js
