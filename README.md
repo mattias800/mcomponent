@@ -44,7 +44,7 @@ The view defines how the result will look. It does not contain any data, only ta
 
 First we create a view using a script tag.
 
-```
+```html
 	<script id="myView" type="text/view">
 		Yay, I am a view!
 	</script>
@@ -52,7 +52,7 @@ First we create a view using a script tag.
 
 Since we are using jQuery, we can use ordinary CSS selector to specify what view to use.
 
-```
+```js
 	var component = $("#myView").mcomponent();
 ```
 
@@ -80,13 +80,13 @@ You can place this placeholder where ever you want in the DOM, as long as it exi
 
 You can assign it at construction, or later. Just do it before you render.
 
-```
+```html
 	<div id="myPlaceHolder"></div>
 ```
 
 Then add the view...
 
-```
+```html
 	<script id="myView" type="text/html">
 		Yay, I am a view!
 	</script>
@@ -94,7 +94,7 @@ Then add the view...
 
 And create and render the component.
 
-```
+```js
 	var component = $("#myView").mcomponent({placeHolderId:"myPlaceHolder"});
 	component.render();
 ```
@@ -120,11 +120,11 @@ First the placeholder.
 	<div id="myPlaceHolder"></div>
 ```
 
-Now we create our new view. Notice that we use the {% .. %} syntax to create tags, and that we use the 'show' tag.
+Now we create our new view. Notice that we use the {{ .. }} syntax to create tags, and that we use the 'show' tag.
 
 ```
 	<script id="myView" type="text/view">
-		id:{% show id %}, username:{% show username %}, email:{% show email %}
+		id:{{ show id }}, username:{{ show username }}, email:{{ show email }}
 	</script>
 ```
 
@@ -166,9 +166,9 @@ Then we add the view. Note that we use the 'iter' tag here. It will repeat every
 
 ```
 	<script id="myView" type="text/view">
-		{% iter userList %}
-			id:{% show id %}, username:{% show username %}, email:{% show email %}
-		{% enditer %}
+		{{ iter userList }}
+			id:{{ show id }}, username:{{ show username }}, email:{{ show email }}
+		{{ enditer }}
 	</script>
 ```
 	
@@ -224,11 +224,11 @@ And next we add the view. Note that we use the 'if' tag inside of 'iter' now.
 The condition can use model to access the properties of the current user.
 
 	<script id="myView" type="text/view">
-		{% iter userList %}
-		{% if (model.female) %}
-			id:{% show id %}, username:{% show username %}, email:{% show email %}
-			{% endif %}
-		{% enditer %}
+		{{ iter userList }}
+		{{ if (model.female) }}
+			id:{{ show id }}, username:{{ show username }}, email:{{ show email }}
+			{{ endif }}
+		{{ enditer }}
 		</script>
 
 And then we add a list of users as the model again.
