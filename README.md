@@ -5,22 +5,37 @@ Code running in production, documentation just started? Story of my life.
 
 A compiling template engine for Javascript inspired by Struts 2.
 
+Introduction
+------------
+
+mcomponent allows you write views in a way similar to JSP, but instead of running on the server, mcomponent is running in the Javascript VM.
+
+This allows you to change model, render again, sort a list in a different way and render again, without reloading the page.
+
+* Supports all major browsers.
+* Supports Node (using require) 
+* It is very simple to use, any errors are shown directly in the rendering result/DOM.
+* It is quite powerful and exposes some really useful functionality.
+* You are in control, nothing is done automagically.
+* All views are compiled to Javascript code which is then compiled by the VM, so it is fast.
+
 
 mcomponent.js vs mcomponent-jquery.js
 -------------------------------------
 
-mcomponent.js exposes a method __mcomponent()__ to global namespace.
+__mcomponent.js__ exposes a method _mcomponent()_ to global namespace. __mcomponent.js__ is required to use mcomponent.
+If you use require(), nothing is put into global namespace, of course.
 
 
-Include mcomponent-jquery.js as well, and you will get a jQuery-function __$.mcomponent__. 
+To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function _$.mcomponent_. 
 
-This is what we will demonstrate in the tutorial.
 
 Tutorial
 ========
 
 Here is a large step by step tutorial which displays the basic functionality of mcomponent.
 
+All of the examples are for the browser, not for Node.
 
 All HTML and Javascript code is displayed, and the boxed "Output" is the result rendered by mcomponent.
 
@@ -277,3 +292,21 @@ __Output:__
 	id:2, username:maximus, email:maximus@maximus124.com
 
 
+7. More coming!
+---------------
+
+We need to go over more things.
+
+__Tags__
+
+* show
+* js
+* showjs
+* niter
+
+__Other stuff__
+
+* model.property vs property only.
+* globals
+* context
+* The model stack
