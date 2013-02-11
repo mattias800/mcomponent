@@ -29,7 +29,7 @@ All HTML and Javascript code is displayed, and the boxed "Output" is the result 
 
 Ok, lets go!
 
-```
+```js
 	var component = $().mcomponent();
 ```
 
@@ -44,7 +44,7 @@ The view defines how the result will look. It does not contain any data, only ta
 
 First we create a view using a script tag.
 
-```html
+```html+django
 	<script id="myView" type="text/view">
 		Yay, I am a view!
 	</script>
@@ -80,13 +80,13 @@ You can place this placeholder where ever you want in the DOM, as long as it exi
 
 You can assign it at construction, or later. Just do it before you render.
 
-```html
+```html+django
 	<div id="myPlaceHolder"></div>
 ```
 
 Then add the view...
 
-```html
+```html+django
 	<script id="myView" type="text/html">
 		Yay, I am a view!
 	</script>
@@ -116,7 +116,7 @@ Also, we will want to display properties of the model. This is done using the 's
 
 First the placeholder.
 
-```html
+```html+django
 	<div id="myPlaceHolder"></div>
 ```
 
@@ -130,7 +130,7 @@ Now we create our new view. Notice that we use the {{ .. }} syntax to create tag
 
 Finally, create a user object, add it to the component and render!
 
-```
+```js
 	var user = { 
 		id:5, 
 		username:"superkiller2k", 
@@ -158,13 +158,13 @@ The iterator tag is used to iterate over lists of things. For this example, we w
 
 As usual, we start with the placeholder.
 
-```
+```html+django
 	<div id="myPlaceHolder"></div>
 ```
 
 Then we add the view. Note that we use the 'iter' tag here. It will repeat everything between 'iter' and 'enditer' once for every element in the list.
 
-```
+```html+django
 	<script id="myView" type="text/view">
 		{{ iter userList }}
 			id:{{ show id }}, username:{{ show username }}, email:{{ show email }}
@@ -175,7 +175,7 @@ Then we add the view. Note that we use the 'iter' tag here. It will repeat every
 And lets add a model which contains of a list of users and render it.
 
 
-
+```js
 	var model = {
 		userList: [
 			{ 
@@ -217,12 +217,15 @@ What if we don't want to list all users? Maybe only all the girls. Which is a co
 
 Lets use the if tag! If tags ends with endif tags. Objects available in the condition are this, model and context.
 
+```html+django
 	<div id="myPlaceHolder"></div>
+```
 
 And next we add the view. Note that we use the 'if' tag inside of 'iter' now.
 
 The condition can use model to access the properties of the current user.
 
+```html+django
 	<script id="myView" type="text/view">
 		{{ iter userList }}
 		{{ if (model.female) }}
@@ -230,11 +233,13 @@ The condition can use model to access the properties of the current user.
 			{{ endif }}
 		{{ enditer }}
 		</script>
+```
 
 And then we add a list of users as the model again.
 
 We add a boolean property called 'female'. And then render the component.
 
+```js
 	var model = {
 		userList: [
 			{ 
@@ -264,6 +269,7 @@ We add a boolean property called 'female'. And then render the component.
 	});
 	
 	component.render();
+```
 	
 __Output:__
 
