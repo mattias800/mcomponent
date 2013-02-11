@@ -3,22 +3,23 @@ mcomponent
 
 Code running in production, documentation just started? Story of my life.
 
-A compiling template engine for Javascript inspired by Struts 2.
-
 Introduction
 ============
 
-mcomponent allows you write views in a way similar to JSP, but instead of running on the server, mcomponent is running in the Javascript VM.
+mcomponent is a compiling template engine for Javascript. 
+
+mcomponent allows you write views in a way similar to JSP, but instead of running on the server, mcomponent is running in the Javascript VM (for example, the web browser).
 
 This allows you to change model, render again, sort a list in a different way and render again, without reloading the page.
 
+It is inspired by Struts 2.0 JSP tag library, but has expanded into more than that.
+
 * Supports all major browsers.
-* Supports Node, available in npm repo. Use require("mcomponent")
-* It is very simple to use, any errors are shown directly in the rendering result/DOM.
+* Supports Node.
+* It is very simple to use, simply setup, simple syntax and any errors are shown directly in the rendering result/DOM.
 * It is quite powerful and exposes some really useful functionality.
 * You are in control, nothing is done automagically.
 * It is pretty fast. All views are compiled to Javascript code which is then compiled by the VM.
-
 
 Installation and usage
 ======================
@@ -28,9 +29,21 @@ In the browser
 
 Just download __mcomponent.js__ (from __./src/__) and include it in your web page.
 
-__mcomponent.js__ exposes a method _mcomponent()_ to global namespace. __mcomponent.js__ is required to use mcomponent.
+```html
+	<script src="mcomponent.js"></script>
+```
+
+__mcomponent.js__ exposes a method _mcomponent()_ to global namespace. 
+
+```js
+	var c = mcomponent();
+```
 
 To use mcomponent with jQuery, just include __mcomponent-jquery.js__ as well, and you will get a jQuery-function _$.mcomponent_. 
+
+```js
+	var component = $().mcomponent();
+```
 
 In Node
 -------
@@ -47,7 +60,21 @@ Then in the Javascript code:
 	var mcomponent = require("mcomponent");
 ```
 
+Development vs production
+=========================
 
+mcomponent (and its predecessor) has been in active development since 2008. There are updates almost weekly, but still no official release.
+
+__Should I run it in production?__
+
+Probably not. We do, with 2 million unique visitors each month, so it is working nicely.
+But when problems arise, we know our way around mcomponent and make additions and updates.
+
+I am, however, expecting to be able to make an official release soon.
+
+__What is left?__
+
+Mostly error handling and error reporting. When something goes wrong, the user should know exactly what, why and where. We have come a long way, but I think there are still some improvements that can be made.
 
 Tutorial
 ========
