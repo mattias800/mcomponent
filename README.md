@@ -208,6 +208,8 @@ Lets say you have model.show = true.
 	</script>
 ```
 
+Anyway, lets continue.
+
 Finally, create a user object, add it to the component and render!
 
 ```js
