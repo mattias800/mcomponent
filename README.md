@@ -157,7 +157,7 @@ Then add the view...
 And create and render the component.
 
 ```js
-	var component = $("#myView").mcomponent({placeHolderId:"myPlaceHolder"});
+	var component = $("#myView").mcomponent({ placeHolderId : "myPlaceHolder" });
 	component.render();
 ```
 
@@ -225,8 +225,8 @@ Finally, create a user object, add it to the component and render!
 	};
 	
 	var component = $("#myView").mcomponent({
-		model:user, 
-		placeHolderId:"myPlaceHolder"
+		model : user, 
+		placeHolderId : "myPlaceHolder"
 	});
 	
 	component.render();
@@ -274,28 +274,28 @@ And lets add a model which contains of a list of users and render it.
 
 ```js
 	var model = {
-		userList: [
+		userList : [
 			{ 
-				id:0, 
-				username:"superkiller2k", 
-				email:"superkiller2k@superkiller.com"
+				id : 0, 
+				username : "superkiller2k", 
+				email : "superkiller2k@superkiller.com"
 			},
 			{ 
-				id:1, 
-				username:"megadude", 
-				email:"megadude@mega.com"
+				id : 1, 
+				username : "megadude", 
+				email : "megadude@mega.com"
 			},
 			{ 
-				id:2, 
-				username:"maximus", 
-				email:"maximus@maximus124.com"
+				id : 2, 
+				username : "maximus", 
+				email : "maximus@maximus124.com"
 			},
 		];
 	};
  
 	var component = $("#myView").mcomponent({
-		model:model, 
-		placeHolderId:"myPlaceHolder"
+		model : model, 
+		placeHolderId : "myPlaceHolder"
 	});
 
 	component.render();
@@ -338,31 +338,31 @@ We add a boolean property called 'female'. And then render the component.
 
 ```js
 	var model = {
-		userList: [
+		userList : [
 			{ 
-				id:0, 
-				female:true, 
-				username:"superkiller2k", 
-				email:"superkiller2k@superkiller.com"
+				id : 0, 
+				female : true, 
+				username : "superkiller2k", 
+				email : "superkiller2k@superkiller.com"
 			},
 			{ 
-				id:1, 
-				female:false, 
-				username:"megadude", 
-				email:"megadude@mega.com"
+				id : 1, 
+				female : false, 
+				username : "megadude", 
+				email : "megadude@mega.com"
 			},
 			{ 
-				id:2, 
-				female:true, 
-				username:"maximus", 
-				email:"maximus@maximus124.com"
+				id : 2, 
+				female : true, 
+				username : "maximus", 
+				email : "maximus@maximus124.com"
 			},
 		];
 	};
  
 	var component = $("#myView").mcomponent({
-		model:model, 
-		placeHolderId:"myPlaceHolder"
+		model : model, 
+		placeHolderId : "myPlaceHolder"
 	});
 	
 	component.render();
