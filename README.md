@@ -239,15 +239,7 @@ __Output:__
 You can also set the model on the component after it has been created.
 
 ```js
-	var user = { 
-		id:5, 
-		username:"superkiller2k", 
-		email:"superkiller2k@superkiller.com"
-	};
-	
-	var component = $("#myView").mcomponent({
-		placeHolderId:"myPlaceHolder"
-	});
+	…
 	
 	component.setModel(user);
 	
