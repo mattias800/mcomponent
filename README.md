@@ -235,7 +235,25 @@ Finally, create a user object, add it to the component and render!
 __Output:__
 
 	id:5, username:superkiller2k, email:superkiller2k@superkiller.com
+
+You can also set the model on the component after it has been created.
+
+```js
+	var user = { 
+		id:5, 
+		username:"superkiller2k", 
+		email:"superkiller2k@superkiller.com"
+	};
 	
+	var component = $("#myView").mcomponent({
+		placeHolderId:"myPlaceHolder"
+	});
+	
+	component.setModel(user);
+	
+	component.render();
+```
+
 But what if we have more than one user?
 
 5. Our first iterator
