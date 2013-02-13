@@ -239,7 +239,7 @@ __Output:__
 You can also set the model on the component after it has been created.
 
 ```js
-	…
+	// ...
 	
 	component.setModel(user);
 	
