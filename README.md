@@ -198,7 +198,11 @@ You can omit the "show" tag if you want.
 	</script>
 ```
 
-If the first word in the tag doesn't match a known tag type, it will try to look it up on the model instead. This is usually how we write views. "show" is used when you want to display a property that uses a keyword.
+If the first word in the tag doesn't match a known tag type, it will try to look that word up on the model instead. 
+
+	{{ username }}
+
+This is how we display values on the model usually. "show" is used when you want to display a property whos name is a keyword. For example if, show, iter.
 
 Lets say you have model.show = true.
 
