@@ -1285,6 +1285,7 @@ function mcomponent(args) {
                 result.push("model = " + listVar + "[" + iVar + "]");
                 result.push("context = {" +
                     "index : " + iVar + "," +
+                    "indexOne : " + iVar + " + 1," +
                     "size : " + listVar + ".length," +
                     "isFirst : (" + iVar + " == 0)," +
                     "isLast : (" + iVar + " == " + listVar + ".length - 1)," +
@@ -2587,7 +2588,7 @@ function mcomponent(args) {
             },
 
             getSource : function() {
-                return buildTemplate(getView().tree).getSource().toString();
+                return view.source.full.toString();
             },
 
             getBodySource : function() {

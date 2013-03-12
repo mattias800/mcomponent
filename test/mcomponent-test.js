@@ -1363,6 +1363,12 @@ if (typeof mcomponent === "function") {
         ok(c = mcomponent({
             model : {
                 list : ["mattias", "marcus", "johan"]
+            }, viewHtml : "{{ iter list }}{{ context.indexOne }}{{ enditer }}"}), "Construction OK!");
+        equal(c.assert.assertRender(), "123", "Iterator context should give us '123' in the result when using no tag, and context.");
+
+        ok(c = mcomponent({
+            model : {
+                list : ["mattias", "marcus", "johan"]
             },
             viewHtml : "{{ iter listaxe }}{{ enditer }}",
             throwOnError : true
@@ -3145,6 +3151,7 @@ if (typeof mcomponent === "function") {
             "{{ enditer }}" +
             "{{ endif }}" +
             "{{ endif }}",
+
             model : {
                 users : [
                     {name : "Mattias", isMale : true, age : 31},
@@ -3695,16 +3702,18 @@ var doMcomponentProfiling = function() {
 
 
     console.log(m);
-    console.log(c._.getView().html);
-    console.log(t.getSource());
+    //console.log(c._.getView().html);
+    console.log(c._.getSource());
 
 
     console.log(tcompile.toString());
 
     setTimeout(function() {
-        doMcomponentProfiling();
+        //doMcomponentProfiling();
     }, 1000);
 };
+
+doMcomponentProfiling();
 
 /*
 
