@@ -2719,43 +2719,56 @@ if (typeof mcomponent === "function") {
 
         },
 
-        "test js and showjs tags" : function() {
+        "test showjs with string parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ showjs 'mattias'; }}"});
+            assertEquals("mattias", c.assert.assertRender());
+        },
 
-            var c;
+        "test showjs with Math.sqrt parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ showjs Math.sqrt(9); }}"});
+            assertEquals("3", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ showjs 'mattias'; }}"});
-            assertEqualsQunit(c.assert.assertRender(), "mattias", "'showjs' tag should work.");
+        "test showjs with Math.max parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ showjs Math.max(9, 21); }}"});
+            assertEquals("21", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ showjs Math.sqrt(9); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "3", "Should not throw error.");
+        "test showjs with Math.min parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ showjs Math.min(9, 21); }}"});
+            assertEquals("9", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ showjs Math.max(9, 21); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "21", "Should not throw error.");
+        "test showjs with model parameter" : function() {
+            var c = mcomponent({model : {name : "mattias yo"}, viewHtml : "{{ showjs model.name; }}"});
+            assertEquals("mattias yo", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ showjs Math.min(9, 21); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "9", "Should not throw error.");
+        "test js with Math.sqrt parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ js Math.sqrt(5); }}"});
+            assertEquals("", c.assert.assertRender());
+        },
 
-            c = mcomponent({model : {name : "mattias yo"}, viewHtml : "{{ showjs model.name; }}"});
-            assertEqualsQunit(c.assert.assertRender(), "mattias yo", "Should be able to use model.");
+        "test js with Math.max parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ js Math.max(9, 21); }}"});
+            assertEquals("", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ js Math.sqrt(5); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "", "Should not throw error.");
+        "test js with Math.min parameter" : function() {
+            var c = mcomponent({viewHtml : "{{ js Math.min(9, 21); }}"});
+            assertEquals("", c.assert.assertRender());
+        },
 
-            c = mcomponent({viewHtml : "{{ js Math.max(9, 21); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "", "Should not throw error.");
-
-            c = mcomponent({viewHtml : "{{ js Math.min(9, 21); }}"});
-            assertEqualsQunit(c.assert.assertRender(), "", "Should not throw error.");
-
-            c = mcomponent({throwOnError : true, viewHtml : "{{ js undefined.prutt() }}"});
+        "test js with undefined exception" : function() {
+            var c = mcomponent({throwOnError : true, viewHtml : "{{ js undefined.prutt() }}"});
             assertExceptionQunit(function() {
                 c.assert.assertRender();
             }, "Should throw null pointer exception.");
+        },
 
-            c = mcomponent({viewHtml : "{{ showjs undefined.prutt() }}"});
+        "test showjs with undefined exception" : function() {
+            var c = mcomponent({viewHtml : "{{ showjs undefined.prutt() }}"});
             assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, must contain error.");
-
-
         },
 
         "test setting globals.value string-value and getting it with getGlobals().value" : function() {
@@ -2784,6 +2797,7 @@ if (typeof mcomponent === "function") {
             c.assert.assertRender();
             assertEquals("mattias yeah", c.getGlobals().testing);
         },
+
         "test setting globals number-value with setglobal-tag and showing it in result" : function() {
             var c = mcomponent({viewHtml : "{{ setglobal testing 'mattias yeah' }}{{ globals.testing }}"});
             assertEquals("mattias yeah", c.assert.assertRender());
@@ -2798,7 +2812,7 @@ if (typeof mcomponent === "function") {
                 viewHtml : ""
             });
             assertObject("getModel() should return object.", c.getModel());
-            assertEqualsQunit(c.getModel().age, 80, "getModel() should contain age property.");
+            assertEquals(80, c.getModel().age);
         },
 
         "test getModel() with number" : function() {
@@ -2829,18 +2843,17 @@ if (typeof mcomponent === "function") {
 
     TestCase("Final", {
 
-        "test Clipboard" : function() {
-            var c;
-
-            c = mcomponent({
+        "test clipboard that uses parents model" : function() {
+            var c = mcomponent({
                 clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
                 model : {age : 80},
                 viewHtml : "{{ paste clip1 }}"
             });
+            assertEquals("80", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "80", "Predefined clipboard, should paste and result in '80'.");
-
-            c = mcomponent({
+        "test nested clipboards" : function() {
+            var c = mcomponent({
                 clipboard : {
                     clip1 : "{{ if (model.age) }}{{ paste clip2 }}{{ endif }}",
                     clip2 : "{{ show age }}"
@@ -2848,63 +2861,75 @@ if (typeof mcomponent === "function") {
                 model : {age : 80},
                 viewHtml : "{{ paste clip1 }}"
             });
+            assertEquals("80", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "80", "Predefined clipboard, clip in clip, should paste and result in '80'.");
-
-            c = mcomponent({
+        "test clipboard copied from view, does not remove copied content" : function() {
+            var c = mcomponent({
                 model : {age : 85},
                 viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}"
             });
+            assertEquals("85", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "85", "Copying from inside view, copying should not remove the original.");
-
-            c = mcomponent({
+        "test Copying from inside view, should paste and result in '8080'." : function() {
+            var c = mcomponent({
                 model : {age : 81},
                 viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}{{ paste clip1 }}"
             });
+            assertEquals("8181", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "8181", "Copying from inside view, should paste and result in '8080'.");
-
-
-            c = mcomponent({
-                clipboard : {clip1 : "<div>hej</div>"},
+        "test predefined clipboard" : function() {
+            var c = mcomponent({
+                clipboard : { clip1 : "<div>hej</div>" },
                 model : {age : 80},
                 viewHtml : "<div>{{ paste clip1 }}</div>"
             });
+            assertEquals("<div><div>hej</div></div>", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "<div><div>hej</div></div>", "Predefined clipboard");
-
-            /***********************
-             * Empty clipboard
-             ***********************/
-
-            c = mcomponent({
+        "test empty clipboard yields in empty result" : function() {
+            var c = mcomponent({
                 clipboard : {clip1 : ""},
                 viewHtml : "{{ paste clip1 }}"
             });
-
-            assertEqualsQunit(c.assert.assertRender(), "", "Predefined clipboard is empty, should yield in empty result.");
-
+            assertEquals("", c.assert.assertRender());
         },
 
-        "test Clipboards with errors" : function() {
-            var c;
-
-            c = mcomponent({
+        "test paste clipboards that is missing returns error" : function() {
+            var c = mcomponent({
                 viewHtml : "{{ paste clip1 }}"
             });
+            assertTrue(c.assert.assertRender() !== "");
+        },
 
-            assertTrueQunit(c.assert.assertRender() !== "", "Clipboard item does not exist, should contain error.");
-            //assertEqualsQunit(c.assert.assertRender(), "", "Clipboard item does not exist, should contain error.");
+        "test paste clipboards that is missing throws exception when rendering" : function() {
+            var c = mcomponent({
+                throwOnError : true,
+                viewHtml : "{{ paste clip1 }}"
+            });
+            assertException(function() {
+                c.assert.assertRender()
+            });
+        },
 
-            c = mcomponent({
+        "test paste invalid clipboard returns error" : function() {
+            var c = mcomponent({
                 clipboard : {clip1 : "{{ if model.age) }}{{ endif }}"},
                 viewHtml : "{{ paste clip1 }}"
             });
+            assertTrue(c.assert.assertRender() !== "");
+        },
 
-            assertTrueQunit(c.assert.assertRender() !== "", "Predefined clipboard has an error, should output error.");
-            //assertEqualsQunit(c.assert.assertRender(), "", "Predefined clipboard has an error!");
-
+        "test paste invalid clipboard throws exception when compiling" : function() {
+            assertException(function() {
+                mcomponent({
+                    throwOnError : true,
+                    clipboard : {clip1 : "{{ if model.age) }}{{ endif }}"},
+                    viewHtml : "{{ paste clip1 }}"
+                });
+            });
         }
     });
 
