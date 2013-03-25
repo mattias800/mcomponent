@@ -2935,104 +2935,89 @@ if (typeof mcomponent === "function") {
 
     TestCase("Compiled", {
 
-        "test Construction" : function() {
-            var c;
-
-            c = mcomponent({
-                model : {},
-                viewHtml : ""
-            });
-
-            assertEqualsQunit(c.assert.assertRender(), "", "Empty component code.");
-
+        "test component with empty view renders empty result" : function() {
+            var c = mcomponent({ model : {}, viewHtml : "" });
+            assertEquals("", c.assert.assertRender());
         },
 
-        "test HTML and show tag" : function() {
-
-            var c;
-
-            c = mcomponent({
+        "test component with HTML and model, no tags" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "hohoho"
             });
+            assertEquals("hohoho", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "hohoho", "HTML only");
-
-            c = mcomponent({
+        "test component with HTML and a property tag" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "hoho{{ name }}haha"
             });
+            assertEquals("hohomusthaha", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "hohomusthaha", "HTML mixed with tags.");
-
-            c = mcomponent({
+        "test component with a property tag" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "{{ name }}"
             });
+            assertEquals("must", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "must", "Simple variable output.");
-
-            c = mcomponent({
+        "test component with a show tag" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "{{ show name }}"
             });
-
-            assertEqualsQunit(c.assert.assertRender(), "must", "show name is must");
-
+            assertEquals("must", c.assert.assertRender());
         },
 
-        "test push tag" : function() {
-
-            var c;
-
-            c = mcomponent({
+        "test push tag and property tag when pushed model is on top of stack" : function() {
+            var c = mcomponent({
                 model : {name : "must", hair : {color : "black", styling : "awesome"}},
                 viewHtml : "{{ push hair }}{{ color }}{{ endpush }}"
             });
+            assertEquals("black", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "black", "Push tag is black.");
-
-            c = mcomponent({
+        "test show name is must even with push and no specified name" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "{{ push name }}{{ show }}{{ endpush }}"
             });
-
-            assertEqualsQunit(c.assert.assertRender(), "must", "show name is must even with push and no specified name.");
-
+            assertEquals("must", c.assert.assertRender());
         },
 
-        "test If tag" : function() {
-
-            var c;
-
-            c = mcomponent({
+        "test If tag that evaluates to true and uses model and outputs simple HTML" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
             });
+            assertEquals("ohyes", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "ohyes", "if tag, no else, condition true");
-
-            c = mcomponent({
+        "test If tag that evaluates to false and uses model and outputs simple HTML" : function() {
+            var c = mcomponent({
                 model : {name : "mattias"},
                 viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
             });
+            assertEquals("oh", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "oh", "if tag, no else, condition false");
-
-            c = mcomponent({
+        "test If tag with else case that evaluates to true" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
             });
+            assertEquals("ohyes", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "ohyes", "if tag");
-
-            c = mcomponent({
+        "test If tag with else case that evaluates to false" : function() {
+            var c = mcomponent({
                 model : {name : "mattias"},
                 viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
             });
-
-            assertEqualsQunit(c.assert.assertRender(), "ohno", "if tag");
-
+            assertEquals("ohno", c.assert.assertRender());
         },
 
         "test log and throw tag" : function() {
