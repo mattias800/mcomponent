@@ -35,34 +35,55 @@ TestCase("Startup", {
 
 if (typeof mcomponent === "function") {
 
-    TestCase("General", {
+    TestCase("Property lookups", {
 
-        "test Lookup" : function() {
-
-            var c;
-
-            c = mcomponent();
-
-            assertEquals("Should lookup 'username' properly.", "butters", c.assert.assertLookup("username", {username : "butters"}));
-            assertEquals("Should lookup 'user.username' properly.", "butters", c.assert.assertLookup("user.username", {user : {username : "butters"}}));
-            assertEquals("Should lookup 'user.name.first' properly.", "mattias", c.assert.assertLookup("user.name.first", {user : {name : {first : "mattias", last : "andersson"}}}));
-            assertEquals("Should lookup 'user.name.last' properly.", "andersson", c.assert.assertLookup("user.name.last", {user : {name : {first : "mattias", last : "andersson"}}}));
-            assertTrue("Should lookup 'user.name' object properly.", c.assert.assertLookup("user.name", {user : {name : {first : "mattias", last : "andersson"}}}).first == "mattias");
-            assertTrue("Should lookup 'user.name' object properly.", c.assert.assertLookup("user.name", {user : {name : {first : "mattias", last : "andersson"}}}).last == "andersson");
-
-            assertEquals("Should lookup 'user.name.first' object properly.", "mattias", c.assert.assertLookup("user.name.first", {user : {name : {first : "mattias", last : "andersson"}}}));
-            assertEquals("Should lookup 'user.name.first' should be undefined.", undefined, c.assert.assertLookup("user.name.first", {user : {name : {first : undefined, last : "andersson"}}}));
-
-            assertException("Looking up 'user.name.problem' should fail.", function() {
-                c.assert.assertLookup("user.name.problem.test.hej", {user : {name : undefined}})
-            });
-
-            assertException("Looking up 'user.name.problem' should fail since model is undefined.", function() {
-                c.assert.assertLookup("user.name.problem.test.hej", undefined)
-            });
-
-
+        setUp : function() {
+            this.c = mcomponent();
         },
+
+        "test lookup() with one level property" : function() {
+            assertEquals("butters", this.c.assert.assertLookup("username", {username : "butters"}));
+        },
+
+        "test lookup() with two levels property" : function() {
+            assertEquals("butters", this.c.assert.assertLookup("user.username", {user : {username : "butters"}}));
+        },
+
+        "test lookup() with three levels property where there are two properties available" : function() {
+            assertEquals("mattias", this.c.assert.assertLookup("user.name.first", {user : {name : {first : "mattias", last : "andersson"}}}));
+        },
+
+        "test lookup() second property with three levels property where there are two properties available" : function() {
+            assertEquals("andersson", this.c.assert.assertLookup("user.name.last", {user : {name : {first : "mattias", last : "andersson"}}}));
+        },
+
+        "test lookup() that returns model and verify first field" : function() {
+            assertTrue(this.c.assert.assertLookup("user.name", {user : {name : {first : "mattias", last : "andersson"}}}).first == "mattias");
+        },
+
+        "test lookup() that returns model and verify second field" : function() {
+            assertTrue("Should lookup 'user.name' object properly.", this.c.assert.assertLookup("user.name", {user : {name : {first : "mattias", last : "andersson"}}}).last == "andersson");
+        },
+
+        "test lookup() property that is undefined should return undefined" : function() {
+            assertEquals(undefined, this.c.assert.assertLookup("user.name.first", {user : {name : {first : undefined, last : "andersson"}}}));
+        },
+
+        "test lookup() property that goes deeper into the object than is possible, should throw exception" : function() {
+            assertException(function() {
+                this.c.assert.assertLookup("user.name.problem.test.hej", {user : {name : undefined}})
+            });
+        },
+
+        "test lookup() property in undefined model should throw exception" : function() {
+            assertException(function() {
+                this.c.assert.assertLookup("user.name.problem.test.hej", undefined)
+            });
+        }
+
+    });
+
+    TestCase("General", {
 
         "test Lookup with parent model" : function() {
 
@@ -2841,7 +2862,7 @@ if (typeof mcomponent === "function") {
         }
     });
 
-    TestCase("Final", {
+    TestCase("Clipboards", {
 
         "test clipboard that uses parents model" : function() {
             var c = mcomponent({
@@ -2931,6 +2952,7 @@ if (typeof mcomponent === "function") {
                 });
             });
         }
+
     });
 
     TestCase("Compiled", {
@@ -3020,112 +3042,42 @@ if (typeof mcomponent === "function") {
             assertEquals("ohno", c.assert.assertRender());
         },
 
-        "test log and throw tag" : function() {
-
-            var c;
-
-            c = mcomponent({
+        "test log tag doesn't output any result" : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "{{ log 'hej' }}"
             });
-
-            assertEqualsQunit(c.assert.assertRender(), "", "Outputs only to console.");
-
+            assertEqualsQunit("", c.assert.assertRender());
         },
 
-        "test setglobal tag" : function() {
-
-            var c;
-
-            c = mcomponent({
-                viewHtml : "{{ setglobal aGlobal 'hej' }}"
-            });
-
-            assertEqualsQunit(c.assert.assertRender(), "", "Setting global only");
-
+        "test setglobal tag doesn't render any result" : function() {
+            var c = mcomponent({ viewHtml : "{{ setglobal aGlobal 'hej' }}" });
+            assertEquals("", c.assert.assertRender());
         },
 
-        "test js and showjs tag" : function() {
-
-            var c;
-
-
-            c = mcomponent({
+        "test js doesn't render to result" : function() {
+            var c = mcomponent({
                 viewHtml : "{{ js 'hej' }}"
             });
+            assertEquals("", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "", "Setting global only");
-
-
-            c = mcomponent({
+        "test showjs does render to result" : function() {
+            var c = mcomponent({
                 viewHtml : "{{ showjs 'hej' }}"
             });
+            assertEquals("hej", c.assert.assertRender());
+        },
 
-            assertEqualsQunit(c.assert.assertRender(), "hej", "Setting global only");
-
-
-            /******
-             * context
-             */
-
-            c = mcomponent({
+        "test when context is empty, should return empty result." : function() {
+            var c = mcomponent({
                 model : {name : "must"},
                 viewHtml : "{{ context name }}",
                 throwOnError : true
             });
-
-            assertException("Context is empty, should return empty result.", function() {
+            assertException(function() {
                 c.assert.assertRender();
             });
-
-            c = mcomponent({
-                clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
-                model : {age : 80},
-                viewHtml : "{{ paste clip1 }}"
-            });
-
-            assertEquals("Predefined clipboard, should paste and result in '80'.", "80", c.assert.assertRender());
-
-
-        },
-
-        "test Compiled clipboard" : function() {
-
-            var c;
-
-            c = mcomponent({
-                clipboard : {clip1 : "{{ if (model.age) }}{{ show age }}{{ endif }}"},
-                model : {age : 80},
-                viewHtml : "{{ paste clip1 }}"
-            });
-
-            assertEquals("Predefined clipboard, should paste and result in '80'.", "80", c.assert.assertRender());
-
-            c = mcomponent({
-                clipboard : {
-                    clip1 : "{{ if (model.age) }}{{ paste clip2 }}{{ endif }}",
-                    clip2 : "{{ show age }}"
-                },
-                model : {age : 80},
-                viewHtml : "{{ paste clip1 }}"
-            });
-
-            assertEquals("Predefined clipboard, clip in clip, should paste and result in '80'.", "80", c.assert.assertRender());
-
-            c = mcomponent({
-                model : {age : 85},
-                viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}"
-            });
-
-            assertEquals("Copying from inside view, copying should not remove the original.", "85", c.assert.assertRender());
-
-            c = mcomponent({
-                model : {age : 81},
-                viewHtml : "{{ copy clip1 }}{{ show age }}{{ endcopy }}{{ paste clip1 }}"
-            });
-
-            assertEquals("Copying from inside view, should paste and result in '8080'.", "8181", c.assert.assertRender());
-
         },
 
         "test iter tag" : function() {
