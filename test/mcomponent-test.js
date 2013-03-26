@@ -132,7 +132,45 @@ TestCase("Parent model prefix", {
 
 TestCase("General", {
 
-    "test Lookup with parent model2" : function() {
+    "test push and then lookup from topmost stack model" : function() {
+        var c = mcomponent({
+            model : {
+                user : {
+                    name : "mattias",
+                    awesome : true,
+                    location : {
+                        country : "Awesomeland"
+                    }
+                },
+                location : {
+                    country : "Sweden"
+                }
+            },
+            viewHtml : "{{ push user }}{{ name }}{{ endpush }}"
+        });
+        assertEquals("mattias", c.assert.assertRender());
+    },
+
+    "test push and then lookup one level down in stack model" : function() {
+        var c = mcomponent({
+            model : {
+                user : {
+                    name : "mattias",
+                    awesome : true,
+                    location : {
+                        country : "Awesomeland"
+                    }
+                },
+                location : {
+                    country : "Sweden"
+                }
+            },
+            viewHtml : "{{ push user }}{{ location.country }}{{ endpush }}"
+        });
+        assertEquals("Awesomeland", c.assert.assertRender());
+    },
+
+    "test push and then lookup in both topmost and one level down in stack model" : function() {
         var c = mcomponent({
             model : {
                 user : {
@@ -148,10 +186,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ name }}{{ location.country }}{{ endpush }}"
         });
+        assertEquals("mattiasAwesomeland", c.assert.assertRender());
+    },
 
-        assertEquals("Should lookup 'name' and 'location.country' properly since it will find location on user.", "mattiasAwesomeland", c.assert.assertRender());
-
-        c = mcomponent({
+    "test Should lookup 'name' and 'location.country' properly since it will find location on user" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : "mattias",
@@ -166,10 +205,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ name }}{{ ../location.country }}{{ endpush }}"
         });
+        assertEquals("mattiasSweden", c.assert.assertRender());
+    },
 
-        assertEquals("Should lookup 'name' and 'location.country' properly since it will find location on user.", "mattiasSweden", c.assert.assertRender());
-
-        c = mcomponent({
+    "test nested push with topmost access and parent model prefixed access" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -186,10 +226,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ push name }}{{ first }}{{ ../location.country }}{{ endpush }}{{ endpush }}"
         });
+        assertEquals("mattiasAwesomeland", c.assert.assertRender());
+    },
 
-        assertEquals("Should lookup 'name' and 'location.country' properly since it will find location on user.", "mattiasAwesomeland", c.assert.assertRender());
-
-        c = mcomponent({
+    "test nested push with topmost access and double parent model prefixed access" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -206,10 +247,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ push name }}{{ first }}{{ ../../location.country }}{{ endpush }}{{ endpush }}"
         });
-
         assertEquals("Should lookup 'name' and 'location.country' properly since it will find location on user.", "mattiasSweden", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test nested push two-level property with topmost access and parent model prefixed access" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -226,10 +268,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user.name }}{{ first }}{{ ../location.country }}{{ endpush }}"
         });
+        assertEquals("mattiasSweden", c.assert.assertRender());
+    },
 
-        assertEquals("Should lookup 'name' and 'location.country' properly since it will find location on user.", "mattiasSweden", c.assert.assertRender());
-
-        c = mcomponent({
+    "test push property and then double parent model prefixed access should throw exception" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : "mattias",
@@ -245,33 +288,13 @@ TestCase("General", {
             throwOnError : true,
             viewHtml : "{{ push user }}{{ name }}{{ ../../location.country }}{{ endpush }}"
         });
-
         assertException("Should fail since it goes beyond stack, using compiled code.", function() {
             c.assert.assertRender();
         });
+    },
 
-        c = mcomponent({
-            model : {
-                user : {
-                    name : "mattias",
-                    awesome : true,
-                    location : {
-                        country : "Awesomeland"
-                    }
-                },
-                location : {
-                    country : "Sweden"
-                }
-            },
-            throwOnError : true,
-            viewHtml : "{{ push user }}{{ name }}{{ ../../location.country }}{{ endpush }}"
-        });
-
-        assertException("Should fail since it goes beyond stack, using compiled code.", function() {
-            c.assert.assertRender();
-        });
-
-        c = mcomponent({
+    "test nested push with second push using parent model prefix" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -288,11 +311,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ push ../location }}{{ country }}{{ endpush }}{{ endpush }}"
         });
-
         assertEquals("Using ../ with push.", "Sweden", c.assert.assertRender());
+    },
 
-
-        c = mcomponent({
+    "test push property and then niter with parent model prefixed property" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -304,11 +327,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ iter ../locations }}{{ model }}{{ enditer }}{{ endpush }}"
         });
-
         assertEquals("Using ../ with iter.", "BCAGOT", c.assert.assertRender());
+    },
 
-
-        c = mcomponent({
+    "test nested push property and then niter with parent model prefixed property" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -320,11 +343,11 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ push name }}{{ iter ../locations }}{{ model }}{{ enditer }}{{ endpush }}{{ endpush }}"
         });
-
         assertEquals("Using ../ with iter.", "PARARN", c.assert.assertRender());
+    },
 
-
-        c = mcomponent({
+    "test nested push property and then niter with double parent model prefixed property" : function() {
+        var c = mcomponent({
             model : {
                 user : {
                     name : {
@@ -336,45 +359,64 @@ TestCase("General", {
             },
             viewHtml : "{{ push user }}{{ push name }}{{ iter ../../locations }}{{ model }}{{ enditer }}{{ endpush }}{{ endpush }}"
         });
-
         assertEquals("Using ../../ with iter.", "BCAGOT", c.assert.assertRender());
-
     },
+});
 
-    "test Util functions" : function() {
+TestCase("Parsing tag parameters", {
 
-        var c;
-
-        c = mcomponent();
-
+    "test getTagParameters() with if tag" : function() {
+        var c = mcomponent();
         assertEquals("Should be 'hej'", "hej", c.assert.assertGetTagParameters("if hej"));
+    }
+
+});
+
+TestCase("Parsing niter tag parameters", {
+
+    setUp : function() {
+        this.c = mcomponent();
     },
 
-    "test Util function - getNiterParameters" : function() {
-
-        var c;
-
-        c = mcomponent();
-
-        var p;
-
-        assertObject(p = c._.getNiterParametersFromTagParameter(""));
-        assertEquals(p.iterName, undefined);
-        assertEquals(p.variableName, undefined);
-
-        assertObject("Testing 'name'.", p = c._.getNiterParametersFromTagParameter("name"));
-        assertEquals(p.iterName, "name");
-        assertEquals(p.variableName, undefined);
-
-        assertObject("Testing 'name userlist'.", p = c._.getNiterParametersFromTagParameter("name userlist"));
-        assertEquals(p.iterName, "name");
-        assertEquals(p.variableName, "userlist");
-
-        assertObject(p = c._.getNiterParametersFromTagParameter("name userlist huh", "Testing 'name userlist huh'."));
-        assertEquals(p.iterName, "name");
-        assertEquals(p.variableName, "userlist huh");
-
+    "test getNiterParametersFromTagParameter with empty parameter" : function() {
+        assertObject(this.p = this.c._.getNiterParametersFromTagParameter(""));
+        assertEquals(this.p.iterName, undefined);
+        assertEquals(this.p.variableName, undefined);
     },
+
+    "test getNiterParametersFromTagParameter with property only" : function() {
+        assertObject("Testing 'name'.", this.p = this.c._.getNiterParametersFromTagParameter("name"));
+        assertEquals(this.p.iterName, "name");
+        assertEquals(this.p.variableName, undefined);
+    },
+
+    "test getNiterParametersFromTagParameter with niter name and property" : function() {
+        assertObject("Testing 'name userlist'.", this.p = this.c._.getNiterParametersFromTagParameter("name userlist"));
+        assertEquals(this.p.iterName, "name");
+        assertEquals(this.p.variableName, "userlist");
+    },
+
+    "test getNiterParametersFromTagParameter with niter name with spaces and property" : function() {
+        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name userlist huh"));
+        assertEquals(this.p.iterName, "name");
+        assertEquals(this.p.variableName, "userlist huh");
+    },
+
+    "test getNiterParametersFromTagParameter with niter name with function and property" : function() {
+        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name getList()"));
+        assertEquals(this.p.iterName, "name");
+        assertEquals(this.p.variableName, "getList()");
+    },
+
+    "test getNiterParametersFromTagParameter with niter name with function with argument and property" : function() {
+        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name getList('all users')"));
+        assertEquals(this.p.iterName, "name");
+        assertEquals(this.p.variableName, "getList('all users')");
+    }
+
+});
+
+TestCase("Set view", {
 
     "test Set view" : function() {
 
