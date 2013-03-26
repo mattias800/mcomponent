@@ -2758,11 +2758,12 @@ TestCase("Compiled", {
 
         // Test setViewFromComponent first.
 
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
+        a = mcomponent({id : 1, viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+        b = mcomponent({id : 2, viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+
         assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
         assertEqualsQunit(a.assert.assertRender(), "a true", "");
 
-        assertObject("Creating child.", b = mcomponent({viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
         assertEqualsQunit(b.assert.assertRender(), "b true", "");
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
