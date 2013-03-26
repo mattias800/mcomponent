@@ -840,50 +840,50 @@ TestCase("Rendering result from if cases with else and else-if", {
 
     "test if-else with true condition" : function() {
         var c = mcomponent({viewHtml : "{{ if (true) }}ok{{ else }}fail{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test if-elseif-else with false-true condition" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}ok{{ else }}fail2{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test if-else with false condition" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test nested if-statements with elseif and else" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (true) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test nested if-statements with elseif and else, another structure" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (false) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "innerfail", "Should contain 'innerfail', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("innerfail", c.assert.assertRender());
     },
 
     "test if-elseif-else with many elseifs with no true-condition" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (false) }}fail3{{ elseif (false) }}fail4{{ elseif (false) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test if-elseif-else with many elseifs with a true-condition in one elseif" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (false) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     },
 
     "test if-elseif-else with many elseifs with many true-conditions" : function() {
         var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+        assertEquals(1, c._.getTree().length);
+        assertEquals("ok", c.assert.assertRender());
     }
 
 });
