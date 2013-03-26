@@ -1427,7 +1427,7 @@ function mcomponent(args) {
     };
 
     var _setViewWithHtml = function(html) {
-        if (html !== undefined) {
+        if (html !== undefined && html !== null) {
             var r = compileHtmlToView(html);
             view = r.view;
             view.html = html;

@@ -360,7 +360,7 @@ TestCase("General", {
             viewHtml : "{{ push user }}{{ push name }}{{ iter ../../locations }}{{ model }}{{ enditer }}{{ endpush }}{{ endpush }}"
         });
         assertEquals("Using ../../ with iter.", "BCAGOT", c.assert.assertRender());
-    },
+    }
 });
 
 TestCase("Parsing tag parameters", {
@@ -416,81 +416,125 @@ TestCase("Parsing niter tag parameters", {
 
 });
 
-TestCase("Set view", {
+TestCase("List parsing returns correct list size using shared component", {
 
-    "test Set view" : function() {
+    setUp : function() {
+        this.t = mcomponent();
+    },
 
-        var t;
+    "test listSize is 0 for no view specified" : function() {
+        assertTrue(this.t.assert.assertListSize(0));
+    },
 
-        t = mcomponent();
-        assertTrue("List should be empty after empty construction.", t.assert.assertListSize(0));
+    "test listSize is 0 after setting undefined view" : function() {
+        this.t.setViewWithHtml();
+        assertTrue(this.t.assert.assertListSize(0));
+    },
 
-        t.setViewWithHtml();
-        assertTrue("List should be empty after setViewWithHtml(undefined).", t.assert.assertListSize(0));
+    "test listSize is 0 after setting null view" : function() {
+        this.t.setViewWithHtml(null);
+        assertTrue(this.t.assert.assertListSize(0));
+    },
 
-        t.setViewWithHtml("{{ name }}");
-        assertTrue("List should contain one element after setViewWithHtml('{{ name }}').", t.assert.assertListSize(1));
+    "test listSize is 0 after setting empty string view" : function() {
+        this.t.setViewWithHtml("");
+        assertTrue(this.t.assert.assertListSize(0));
+    },
 
-        t = mcomponent({viewHtml : "{{ name }}"});
-        assertTrue("List should contain one element after args.viewHtml = '{{ name }}'.", t.assert.assertListSize(1));
+    "test listSize is 1 after setting view with 1 tag only" : function() {
+        this.t.setViewWithHtml("{{ name }}");
+        assertTrue(this.t.assert.assertListSize(1));
+    }
 
-        t = mcomponent({viewHtml : "tsa{{ name }}ast"});
-        assertTrue("List should contain three element after args.viewHtml = 'tsa{{ name }}ast'.", t.assert.assertListSize(3));
+});
 
-        t = mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
+TestCase("Setting view creates list with correct number of elements", {
+
+    "test listSize is 1 after setting view in constructor with 1 tag only" : function() {
+        var t = mcomponent({viewHtml : "{{ name }}"});
+        assertTrue(t.assert.assertListSize(1));
+    },
+
+    "test listSize is 3 after setting view in constructor with 1 tag and HTML before and after" : function() {
+        var t = mcomponent({viewHtml : "tsa{{ name }}ast"});
+        assertTrue(t.assert.assertListSize(3));
+    },
+
+    "test listSize is 3 after setting view in constructor with an if case" : function() {
+        var t = mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
         assertTrue("List should contain three element after args.viewHtml = '{{ if (this.model.name) }}{{ name }}{{ endif }}'.", t.assert.assertListSize(3));
+    },
 
-        var t2;
-
-        t2 = mcomponent({viewHtml : "{{ firstName }}"});
+    "test listSize is 1 after replacing view with view from another component" : function() {
+        var t = mcomponent({viewHtml : "{{ if (this.model.name) }}{{ name }}{{ endif }}"});
+        var t2 = mcomponent({viewHtml : "{{ firstName }}"});
         t.setViewFromComponent(t2);
-
-        assertTrue("List should contain one item.", t.assert.assertListSize(1));
-        assertTrue("List should contain tag with name firstName ", t.assert.assertListItemHasTagName(0, "firstName"));
-
-        t = mcomponent({viewFromComponent : t2});
-        assertTrue("List should contain one item.", t.assert.assertListSize(1));
-        assertTrue("List should contain tag with name firstName ", t.assert.assertListItemHasTagName(0, "firstName"));
-
+        assertTrue(t.assert.assertListSize(1));
+        assertTrue(t.assert.assertListItemHasTagName(0, "firstName"));
     },
 
-    "test Set view with special characters" : function() {
-        var c;
-        var v;
+    "test listSize is 1 after setting view at construction, with view from another component" : function() {
+        var t2 = mcomponent({viewHtml : "{{ firstName }}"});
+        var t = mcomponent({viewFromComponent : t2});
+        assertTrue("List should contain one item.", t.assert.assertListSize(1));
+        assertTrue("List should contain tag with name firstName ", t.assert.assertListItemHasTagName(0, "firstName"));
+    }
 
-        v = "<div class=\"animationContainer loadingMedium\"><img src=\"/v/207/49522/system/image/animation/loading_transparent_medium.gif\" alt=\"Laddar...\" title=\"Laddar...\" hspace=\"0\" vspace=\"0\" ></div>";
-        c = mcomponent({viewHtml : v});
+});
+
+TestCase("Setting view with special characters", {
+
+    "test set view with HTML characters" : function() {
+        var v = "<div class=\"animationContainer loadingMedium\"><img src=\"/v/207/49522/system/image/animation/loading_transparent_medium.gif\" alt=\"Laddar...\" title=\"Laddar...\" hspace=\"0\" vspace=\"0\" ></div>";
+        var c = mcomponent({viewHtml : v});
         assertEquals(c.assert.assertRender(), v);
-
-        v = "\t\t\t";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = "\n\n";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = "\r\r";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = "\r\n\t";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = "\n''\n";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = '\n"\t"\n';
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
-        v = "\\ttt\\";
-        c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-
     },
+
+    "test set view with tabs" : function() {
+        var v = "\t\t\t";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks" : function() {
+        var v = "\n\n";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with row breaks" : function() {
+        var v = "\r\r";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks, row breaks and tabs" : function() {
+        var v = "\r\n\t";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks and quotes" : function() {
+        var v = "\n''\n";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with mixed line breaks, tabs and double quotes" : function() {
+        var v = '\n"\t"\n';
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with back slashes" : function() {
+        var v = "\\ttt\\";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    }
+
+});
+
+TestCase("Execution context", {
 
     "test Execution context" : function() {
 
