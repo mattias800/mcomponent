@@ -161,7 +161,7 @@ TestCase("Large views", {
         };
 
         var c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "location and city only");
+        assertString("location and city only", result = c.assert.assertRender());
 
         view = "  {{ if (this.model) }} yay we have a model!\n" +
             "\n" +
@@ -185,7 +185,7 @@ TestCase("Large views", {
             "{{ endif }}\n";
 // Construction location and country only!
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "location and country only!");
+        assertString("location and country only!", result = c.assert.assertRender());
 
         view = "{{ if (this.model) }} yay we have a model!\n" +
 
@@ -237,7 +237,7 @@ TestCase("Large views", {
 
         // "Construction niter with location and both city and country without output and if cases and push city!"
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "niter with location and both city and country without output and if cases and push city!");
+        assertString("niter with location and both city and country without output and if cases and push city!", result = c.assert.assertRender());
 
         view = "{{ if (this.model) }} yay we have a model!\n" +
 
@@ -259,7 +259,7 @@ TestCase("Large views", {
 
         // "Construction niter with location and both city and country without output and if cases!"
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "niter with location and both city and country without output and if cases!");
+        assertString("niter with location and both city and country without output and if cases!", result = c.assert.assertRender());
 
         view = "{{ if (this.model) }} yay we have a model!\n" +
 
@@ -289,7 +289,7 @@ TestCase("Large views", {
 
         // "Construction niter with location and both city and country without output!"
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "niter with location and both city and country without output!");
+        assertString("niter with location and both city and country without output!", result = c.assert.assertRender());
 
         view = "{{ if (this.model) }} yay we have a model!\n" +
             "    \n" +
@@ -324,7 +324,7 @@ TestCase("Large views", {
 
         // "Construction niter with location and both city and country!"
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "niter with location and both city and country!");
+        assertString("niter with location and both city and country!", result = c.assert.assertRender());
 
         view = "  {{ if (this.model) }} yay we have a model!\n" +
             "{{ if (this.model.users) }}\n" +
@@ -364,7 +364,7 @@ TestCase("Large views", {
 
         // "Construction full view!"
         c = mcomponent({viewHtml : view, model : m, iter : {users : {}}});
-        assertStringQunit(result = c.assert.assertRender(), "full view!");
+        assertString("full view!", result = c.assert.assertRender());
 
     }
 

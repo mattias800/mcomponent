@@ -1,15 +1,3 @@
-function assertTrueQunit(real, message) {
-    assertTrue(message, real);
-}
-
-function assertStringQunit(v, msg) {
-    assertString(msg, v);
-}
-
-function assertExceptionQunit(f, msg) {
-    assertException(msg, f);
-}
-
 TestCase("Startup", {
 
     "test mcomponent up and running" : function() {
@@ -196,7 +184,7 @@ TestCase("Compiled", {
             },
             iter : {users : {}}});
 
-        assertStringQunit(result = c.assert.assertRender(), "Rendering of large view should be OK!");
+        assertString("Rendering of large view should be OK!", result = c.assert.assertRender());
         assertEquals("And the result should be correct.", "yay1yay2", result);
 
         c = mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
@@ -371,37 +359,37 @@ TestCase("Execution scope", {
         a = mcomponent({id : 1, viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
         b = mcomponent({id : 2, viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
 
-        assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", a.assert.assertComponentIdEqualsExecutionContextId());
         assertEquals("", "a true", a.assert.assertRender());
 
         assertEquals("", "b true", b.assert.assertRender());
-        assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
         b.setViewFromComponent(a);
         assertEquals("", "a true", b.assert.assertRender());
-        assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
-        assertTrueQunit(a._.getId() !== b._.getId(), "Components must not have same id.");
-        assertTrueQunit(a._.getExecutionContext().id !== b._.getExecutionContext().id, "Execution contexts must not have same id.");
+        assertTrue("Components must not have same id.", a._.getId() !== b._.getId());
+        assertTrue("Execution contexts must not have same id.", a._.getExecutionContext().id !== b._.getExecutionContext().id);
 
         // OK
 
         assertObject("Creating child.", a = mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"}));
-        assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", a.assert.assertComponentIdEqualsExecutionContextId());
 
         assertObject("Creating child.", c = mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
         assertEquals("", "c true", c.assert.assertRender());
-        assertTrueQunit(c.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", c.assert.assertComponentIdEqualsExecutionContextId());
 
         assertObject("Creating child.", b = mcomponent({viewHtml : "b"}));
         assertEquals("Should be b", "b", b.assert.assertRender());
-        assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
         // Test children count with API assertion
 
         b.setViewWithHtml("ok{{ js api._assert.childCount(0) }}");
-        assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
-        assertTrueQunit(b.assert.assertRender() == "ok", "Should have no children in execution context.");
+        assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
+        assertTrue("Should have no children in execution context.", b.assert.assertRender() == "ok");
         assertObject("Adding child", b);
         b.addChild("c", c);
         assertObject("Child should now exist in b-parent.", b.getChild("c"));
@@ -412,14 +400,14 @@ TestCase("Execution scope", {
 
         assertObject("Creating child.", d = mcomponent({viewHtml : "ok{{ js api._assert.childCount(1) }}"}));
         b.setViewFromComponent(d);
-        assertTrueQunit(b.assert.assertRender() == "ok", "Should have 1 child in execution context.");
+        assertTrue("Should have 1 child in execution context.", b.assert.assertRender() == "ok");
         // TODO: Test equal id for context and component.
 
         // Test with real view with {{ component .. }}
 
         b.setViewFromComponent(a);
         assertEquals("Should be ac with new view and child.", "a true c true", b.assert.assertRender());
-        assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
+        assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
     }
 });

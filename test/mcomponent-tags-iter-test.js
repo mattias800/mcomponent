@@ -164,7 +164,7 @@ TestCase("Niter tag - using show more", {
         var a = 3;
         var b = 1;
 
-        assertExceptionQunit(function() {
+        assertException("Construction should fail since there is no iterator config!", function() {
             c = mcomponent({
                 model : {
                     list : ["mattias", "marcus", "johan"]
@@ -172,11 +172,11 @@ TestCase("Niter tag - using show more", {
                 viewHtml : "{{ niter userListIter list }}{{ endniter }}",
                 throwOnError : true
             });
-        }, "Construction should fail since there is no iterator config!");
+        });
 
-        assertExceptionQunit(function() {
+        assertException("Should throw error since we haven't declared an iterator configuration.", function() {
             c.assert.assertRender();
-        }, "Should throw error since we haven't declared an iterator configuration.");
+        });
 
         c = mcomponent({
             model : {
@@ -448,9 +448,9 @@ TestCase("Niter tag - using pages", {
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertExceptionQunit(function() {
+        assertException("showPage should throw exception when usePages == false.", function() {
             i.showPage(1);
-        }, "showPage should throw exception when usePages == false.");
+        });
 
         /*************
          * Test showPageWithItem() and showPageWithItemThat()
@@ -762,11 +762,11 @@ TestCase("Niter tag - using showPageWithItemWhere using an external model", {
         assertObject("Iterator should be available.", i = c.getIterator("userListIter"));
         assertEquals("No page count yet, since there is no model.", 0, i.getPageCount());
         assertEquals("Current page starts at 0.", 0, i.getCurrentPage());
-        assertExceptionQunit(function() {
+        assertException("Should throw exception, it cannot lookup the item on the list, since the list is still undefined.", function() {
             i.showPageWithItemWhere(function(item) {
                 return item == "must";
             });
-        }, "Should throw exception, it cannot lookup the item on the list, since the list is still undefined.");
+        });
 
         i.setModel(model.list);
         i.showPageWithItemWhere(function(item) {
@@ -1069,7 +1069,7 @@ TestCase("Niter tag - pages callbacks", {
         c.assert.assertRender();
         assertEquals("Should be on page 1.", 1, i.getCurrentPage());
         assertEquals(3, i.getPageCount());
-        assertTrueQunit(!i.isOnFirstOrLastPage(), "Should not be isOnFirstOrLastPage");
+        assertTrue("Should not be isOnFirstOrLastPage", !i.isOnFirstOrLastPage());
         assertEquals("Should now be 77.", 77, a);
 
         a = 22;
@@ -1416,21 +1416,21 @@ TestCase("Niter tag - showPageWithItem methods, combined with where function", {
         assertObject("Iterator should exist", i = c.getIterator("list"));
         assertEquals("3 pages when there are 3 items after where has been applied.", 3, i.getPageCount());
 
-        assertExceptionQunit(function() {
+        assertException("Item -1 never exists, so should throw exception.", function() {
             i.getPageWithItem(model.list[-1]);
-        }, "Item -1 never exists, so should throw exception.");
+        });
         assertEquals("Item 0 should be on page 0.", 0, i.getPageWithItem(model.list[0]));
-        assertExceptionQunit(function() {
+        assertException("Item 2 should be on NO page.", function() {
             i.getPageWithItem(model.list[1]);
-        }, "Item 2 should be on NO page.");
+        });
         assertEquals("Item 2 should be on page 1.", 1, i.getPageWithItem(model.list[2]));
         assertEquals("Item 3 should be on page 2.", 2, i.getPageWithItem(model.list[3]));
-        assertExceptionQunit(function() {
+        assertException("Item 4 should be on NO page.", function() {
             i.getPageWithItem(model.list[4]);
-        }, "Item 4 should be on NO page.");
-        assertExceptionQunit(function() {
+        });
+        assertException("Item 5 does not exist.", function() {
             i.getPageWithItem(model.list[5]);
-        }, "Item 5 does not exist.");
+        });
 
     }
 
@@ -1442,21 +1442,21 @@ TestCase("Niter tag - causing compile errors", {
 
         var c;
 
-        assertExceptionQunit(function() {
+        assertException("Construction fails and with throwOnError, there should be an exception.", function() {
             c = mcomponent({
                 viewHtml : "{{ niter list list }}{{ enditer }}",
                 throwOnError : true
             });
-        }, "Construction fails and with throwOnError, there should be an exception.");
+        });
 
         assertObject("Compiling fails, but should not throw an exception.",
             c = mcomponent({
                 viewHtml : "{{ niter list list }}{{ enditer }}"
             }));
 
-        assertTrueQunit(c.assert.assertRender() !== "", "niter and enditer mismatch. Should output error in DOM, so result can not be empty.");
-        assertTrueQunit(c.hasCompileError(), "Should contain compile errors because of enditer mismatch.");
-        assertTrueQunit(c.hasRenderErrors(), "Should contain render errors as well, since all compile errors cause a render error.");
+        assertTrue("niter and enditer mismatch. Should output error in DOM, so result can not be empty.", c.assert.assertRender() !== "");
+        assertTrue("Should contain compile errors because of enditer mismatch.", c.hasCompileError());
+        assertTrue("Should contain render errors as well, since all compile errors cause a render error.", c.hasRenderErrors());
 
     }
 

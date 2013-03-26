@@ -56,7 +56,7 @@ TestCase("Push tag", {
                 testyeah : "yeah"
             }
         }, viewHtml : "{{ push db.user }}{{ show testyeah }}{{ endpush }}"});
-        assertTrueQunit(c.assert.assertRender() !== "", "Pushing two level property. Should contain something since model stack lookup should fail and cause error.");
+        assertTrue("Pushing two level property. Should contain something since model stack lookup should fail and cause error.", c.assert.assertRender() !== "");
 
         c = mcomponent({
                 model : {
@@ -71,9 +71,9 @@ TestCase("Push tag", {
                 throwOnError : true
             }
         );
-        assertExceptionQunit(function() {
+        assertException("Pushing two level property. Should contain something since model stack lookup should fail and cause error.", function() {
             c.assert.assertRender();
-        }, "Pushing two level property. Should contain something since model stack lookup should fail and cause error.")
+        })
 
         c = mcomponent({model : {
             db : {

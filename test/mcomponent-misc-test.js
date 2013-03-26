@@ -398,7 +398,7 @@ TestCase("Invalid tags", {
         var c = mcomponent({
             viewHtml : '{{ if true }}{{ * showjs alert("hej") }}{{ endif }}'
         });
-        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, should contain an error message.");
+        assertTrue("Should not be empty, should contain an error message.", c.assert.assertRender() !== "");
     }
 
 });
@@ -424,7 +424,7 @@ TestCase("Showing other things than model properties", {
     "test showing model properties that doesn't exist" : function() {
         var model = {name : "mattias"};
         var c = mcomponent({ model : model, viewHtml : "{{ age }}" });
-        assertTrueQunit(c.assert.assertRender() !== "", "Should contain an error message after API lookup.");
+        assertTrue("Should contain an error message after API lookup.", c.assert.assertRender() !== "");
         model.age = 32;
         assertEquals("Should now contain lookup result.", "32", c.assert.assertRender());
     }

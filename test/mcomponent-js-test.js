@@ -42,14 +42,14 @@ TestCase("showjs and js", {
 
     "test js with undefined exception" : function() {
         var c = mcomponent({throwOnError : true, viewHtml : "{{ js undefined.prutt() }}"});
-        assertExceptionQunit(function() {
+        assertException("Should throw null pointer exception.", function() {
             c.assert.assertRender();
-        }, "Should throw null pointer exception.");
+        });
     },
 
     "test showjs with undefined exception" : function() {
         var c = mcomponent({viewHtml : "{{ showjs undefined.prutt() }}"});
-        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, must contain error.");
+        assertTrue("Should not be empty, must contain error.", c.assert.assertRender() !== "");
     },
 
     "test setting globals.value string-value and getting it with getGlobals().value" : function() {
