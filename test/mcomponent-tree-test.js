@@ -1,4 +1,4 @@
-TestCase("Tree for if cases", {
+TestCase("Complex syntax tree for if cases", {
 
     "test if tag" : function() {
         var c = mcomponent({viewHtml : "{{ if (true) }}baibai{{ endif }}"});
@@ -84,3 +84,56 @@ TestCase("Tree for if cases", {
         assertEqualsQunit(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
     }
 });
+
+TestCase("Syntax tree for mixed tag types", {
+
+    "test General" : function() {
+        var c = mcomponent({viewHtml : "{{ if (name) }}{{ push age }}test{{ endpush }}{{ endif }}"});
+        assertEquals("Root contains only one element.", 1, c._.getTree().length);
+        assertEquals("First root tag should be if tag.", "if", c._.getTree()[0].tagName);
+        assertEquals("Second level should be a push.", "push", c._.getTree()[0].content[0].tagName);
+        assertEquals("Second level should be HTML 'test'.", "test", c._.getTree()[0].content[0].content[0].html);
+    }
+
+});
+
+TestCase("Syntax tree for push tags", {
+
+    "test General" : function() {
+        var c = mcomponent({viewHtml : "{{ push age }}test{{ endpush }}"});
+        assertEquals("Root contains only one element.", 1, c._.getTree().length);
+        assertEquals("First root tag should be push tag.", "push", c._.getTree()[0].tagName);
+        assertEquals("Second level should be HTML 'test'.", "test", c._.getTree()[0].content[0].html);
+    }
+
+});
+
+TestCase("Syntax tree for if tags", {
+
+    "test if, elseif, else tags" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}1{{ else }}2{{ endif }}"});
+        assertTrue("List size is 5.", c.assert.assertListSize(5));
+        assertEquals("Only one condition in if case.", 1, c._.getTree()[0].conditions.length);
+        assertEquals("Only one conditioned root.", 1, c._.getTree()[0].contentRoots.length);
+        assertEquals("Only one element in the true-conditioned root.", 1, c._.getTree()[0].contentRoots[0].length);
+        assertEquals("True case contains '1'.", 1, c._.getTree()[0].contentRoots[0][0].html);
+        assertEquals("Else contains one element", 1, c._.getTree()[0].elseContent.length);
+        assertEquals("Else contains '2'.", 2, c._.getTree()[0].elseContent[0].html);
+    },
+
+    "test nested if tags" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"});
+        assertTrue("List size is 6.", c.assert.assertListSize(6));
+        assertEquals("Should find outer 'endif' tag on index 5.", 5, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
+        assertEquals("Should find inner 'endif' tag on index 4.", 4, c._.findBlockEnd(2, {endTags : ["else", "elseif"]}));
+        assertEquals("Only one condition on outer if case.", 1, c._.getTree()[0].conditions.length);
+        assertEquals("Only one content list also, on outer if case.", 1, c._.getTree()[0].contentRoots.length);
+        assertEquals("No else content on outer if case.", 0, c._.getTree()[0].elseContent.length);
+        assertEquals("Content for outer if case should have two elements. '1' and inner if.", 2, c._.getTree()[0].contentRoots[0].length);
+        assertEquals("First content element is HTML '1'.", "1", c._.getTree()[0].contentRoots[0][0].html);
+        assertEquals("Second content element is 'if' tag", "if", c._.getTree()[0].contentRoots[0][1].tag.tagName);
+    }
+
+});
+
+
