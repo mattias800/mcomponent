@@ -2528,7 +2528,7 @@ TestCase("Compiled", {
 
         var c;
 
-        assertExceptionQunit(function() {
+        assertException(function() {
             c = mcomponent({
                 model : {
                     list : ["mattias", "marcus", "johan"]
@@ -2633,92 +2633,26 @@ TestCase("Compiled", {
         assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should show all elements.");
         assertEqualsQunit(a, 5, "a should now be 5 since callback changed the value.");
 
+    }
+
+});
+
+TestCase("Execution scope", {
+
+    "test component and execution context have same id using component.assert" : function() {
+        assertTrue(mcomponent({viewHtml : ""}).assert.assertComponentIdEqualsExecutionContextId());
     },
 
-    "test Invalid tags" : function() {
-
-        var c;
-
-        /***********************
-         * Using exceptions
-         ***********************/
-
-        assertExceptionQunit(function() {
-            c = mcomponent({
-                viewHtml : '{{ showjs "mattias }}',
-                throwOnError : true
-            })
-        });
-
-        assertExceptionQunit(function() {
-            c = mcomponent({
-                viewHtml : '{{ * showjs alert("hej") }}',
-                throwOnError : true
-            })
-        });
-
-        assertExceptionQunit(function() {
-            c = mcomponent({
-                viewHtml : '{{ Å showjs alert("hej") }}',
-                throwOnError : true
-            })
-        });
-
-        /***********************
-         * Using error messages
-         ***********************/
-
-        c = mcomponent({
-            viewHtml : '{{ showjs "mattias }}'
-        });
-
-        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, should contain an error message.");
-        //assertEqualsQunit(c.assert.assertRender(), "", "Should not be empty, should contain an error message.");
-
-        c = mcomponent({
-            viewHtml : '{{ * showjs alert("hej") }}'
-        });
-
-        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, should contain an error message.");
-        //assertEqualsQunit(c.assert.assertRender(), "", "Should not be empty, should contain an error message.");
-
-        /**************************************
-         * Using error messages in nested tags
-         **************************************/
-
-        c = mcomponent({
-            viewHtml : '{{ if true }}{{ * showjs alert("hej") }}{{ endif }}'
-        });
-
-        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, should contain an error message.");
-        //assertEqualsQunit(c.assert.assertRender(), "", "Should not be empty, should contain an error message.");
-
-
+    "test component and execution context have same id using api._assert" : function() {
+        var a = mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+        assertEqualsQunit("true", a.assert.assertRender());
     },
 
-    "test Tag assertion" : function() {
-
-        var a, b, c;
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
-        assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context from mcomponent scope.");
-        assertEqualsQunit(a.assert.assertRender(), "true", "Correct execution context in execution scope as well.");
-
-    },
-
-    "test Check child count from execution context" : function() {
-
-        var a, b;
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a {{ showjs api._assert.getExecutionContext().getChildCount() }}"}));
-        assertEqualsQunit(a.assert.assertRender(), "a 0", "0 children");
-
-        assertObject("Creating child.", b = mcomponent({viewHtml : "b"}));
-
-        a.addChild("b", b);
-
-        assertEqualsQunit(a.assert.assertRender(), "a 1", "1 child");
-
+    "test child count from execution context is increased correctly by rendering the value" : function() {
+        var a = mcomponent({viewHtml : "a {{ showjs api._assert.getExecutionContext().getChildCount() }}"});
+        assertEquals("a 0", a.assert.assertRender());
+        a.addChild("b", mcomponent({viewHtml : "b"}));
+        assertEquals("a 1", a.assert.assertRender());
     },
 
     "test Execution context scope" : function() {
@@ -2787,18 +2721,14 @@ TestCase("Compiled", {
     }
 });
 
-TestCase("Setting view", {
+TestCase("Setting view repeatedly", {
 
     "test Set view, render, change view, render again" : function() {
-
-        var c;
-
-        c = mcomponent({viewHtml : "heyhey"});
+        var c = mcomponent({viewHtml : "heyhey"});
         assertEqualsQunit(c.assert.assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
         c.setViewWithHtml("ojoj");
         assertEqualsQunit(c.assert.assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
-
-    },
+    }
 
 });
 
@@ -2854,7 +2784,7 @@ TestCase("Setting view with special characters", {
 
 });
 
-TestCase("Weird HTML", {
+TestCase("Set view with weird HTML", {
 
     "test set view via construction with weird HTML" : function() {
         var a = mcomponent({viewHtml : "ÅÄÖ=#€%"});
@@ -2869,6 +2799,58 @@ TestCase("Weird HTML", {
     "test set view via construction with weird really really HTML" : function() {
         var a = mcomponent({viewHtml : '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   '});
         assertEqualsQunit(a.assert.assertRender(), '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   ');
+    }
+
+});
+
+TestCase("Invalid tags", {
+
+    "test showjs with unterminated js string throws exception" : function() {
+        assertException(function() {
+            mcomponent({
+                viewHtml : '{{ showjs "mattias }}',
+                throwOnError : true
+            });
+        });
+    },
+
+    "test invalid tag name that is also incorrect JS syntax throws exception" : function() {
+        assertException(function() {
+            mcomponent({
+                viewHtml : '{{ * showjs alert("hej") }}',
+                throwOnError : true
+            });
+        });
+    },
+
+    "test invalid tag name that is also invalid JS code throws exception" : function() {
+        assertException(function() {
+            mcomponent({
+                viewHtml : '{{ Å showjs alert("hej") }}',
+                throwOnError : true
+            });
+        });
+    },
+
+    "test showjs with unterminated js string renders error message" : function() {
+        var c = mcomponent({
+            viewHtml : '{{ showjs "mattias }}'
+        });
+        assertTrue(c.assert.assertRender() !== "");
+    },
+
+    "test invalid tag name that is also incorrect JS syntax renders error message" : function() {
+        var c = mcomponent({
+            viewHtml : '{{ * showjs alert("hej") }}'
+        });
+        assertTrue(c.assert.assertRender() !== "");
+    },
+
+    "test inside true if case, invalid tag name that is also incorrect JS syntax renders error message" : function() {
+        var c = mcomponent({
+            viewHtml : '{{ if true }}{{ * showjs alert("hej") }}{{ endif }}'
+        });
+        assertTrueQunit(c.assert.assertRender() !== "", "Should not be empty, should contain an error message.");
     }
 
 });

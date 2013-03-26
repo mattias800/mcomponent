@@ -1,31 +1,31 @@
 TestCase("List parsing returns correct list size using shared component", {
 
     setUp : function() {
-        this.t = mcomponent();
+        this.c = mcomponent();
     },
 
     "test listSize is 0 for no view specified" : function() {
-        assertTrue(this.t.assert.assertListSize(0));
+        assertTrue(this.c.assert.assertListSize(0));
     },
 
     "test listSize is 0 after setting undefined view" : function() {
-        this.t.setViewWithHtml();
-        assertTrue(this.t.assert.assertListSize(0));
+        this.c.setViewWithHtml();
+        assertTrue(this.c.assert.assertListSize(0));
     },
 
     "test listSize is 0 after setting null view" : function() {
-        this.t.setViewWithHtml(null);
-        assertTrue(this.t.assert.assertListSize(0));
+        this.c.setViewWithHtml(null);
+        assertTrue(this.c.assert.assertListSize(0));
     },
 
     "test listSize is 0 after setting empty string view" : function() {
-        this.t.setViewWithHtml("");
-        assertTrue(this.t.assert.assertListSize(0));
+        this.c.setViewWithHtml("");
+        assertTrue(this.c.assert.assertListSize(0));
     },
 
     "test listSize is 1 after setting view with 1 tag only" : function() {
-        this.t.setViewWithHtml("{{ name }}");
-        assertTrue(this.t.assert.assertListSize(1));
+        this.c.setViewWithHtml("{{ name }}");
+        assertTrue(this.c.assert.assertListSize(1));
     }
 
 });
