@@ -96,7 +96,6 @@ TestCase("Find blocks", {
         assertEquals(2, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
         assertEquals(4, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}));
         assertEquals(6, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 4}));
-
     }
 });
 
