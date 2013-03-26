@@ -834,50 +834,61 @@ TestCase("Execution", {
 
     },
 
-    "test else, elseif tags" : function() {
-        var c;
+});
 
-        c = mcomponent({viewHtml : "{{ if (true) }}ok{{ else }}fail{{ endif }}"});
+TestCase("Rendering result from if cases with else and else-if", {
+
+    "test if-else with true condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}ok{{ else }}fail{{ endif }}"});
         assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
         assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
 
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}ok{{ else }}fail2{{ endif }}"});
+    "test if-elseif-else with false-true condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}ok{{ else }}fail2{{ endif }}"});
         assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
         assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
 
-        c = mcomponent({viewHtml : "{{ if (false) }}fail{{ else }}ok{{ endif }}"});
+    "test if-else with false condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail{{ else }}ok{{ endif }}"});
         assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
         assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
 
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (true) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
+    "test nested if-statements with elseif and else" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (true) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
         assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
         assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
 
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (false) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
+    "test nested if-statements with elseif and else, another structure" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (true) }}{{ if (false) }}ok{{ else }}innerfail{{ endif }}{{ else }}fail2{{ endif }}"});
         assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
         assertEqualsQunit(c.assert.assertRender(), "innerfail", "Should contain 'innerfail', since if case is true.");
-
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (false) }}fail3{{ elseif (false) }}fail4{{ elseif (false) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
-
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (false) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
-
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
-
-        // Malformed
-        //{{ if (this.model.users }}
-
-        c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
-        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
-        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
-
-
     },
+
+    "test if-elseif-else with many elseifs with no true-condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (false) }}fail3{{ elseif (false) }}fail4{{ elseif (false) }}fail5{{ else }}ok{{ endif }}"});
+        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
+        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
+
+    "test if-elseif-else with many elseifs with a true-condition in one elseif" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (false) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
+        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
+        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    },
+
+    "test if-elseif-else with many elseifs with many true-conditions" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}fail1{{ elseif (false) }}fail2{{ elseif (true) }}ok{{ elseif (true) }}fail4{{ elseif (true) }}fail5{{ else }}ok{{ endif }}"});
+        assertEqualsQunit(c._.getTree().length, 1, "Root contains only one element.");
+        assertEqualsQunit(c.assert.assertRender(), "ok", "Should contain 'ok', since if case is true.");
+    }
+
+});
+
+TestCase("API", {
 
     "test API" : function() {
         var model = {
@@ -3655,21 +3666,24 @@ TestCase("Compiled", {
         assertEqualsQunit(b.assert.assertRender(), "a true c true", "Should be ac with new view and child.");
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
+    }
+});
+
+TestCase("Weird HTML", {
+
+    "test set view via construction with weird HTML" : function() {
+        var a = mcomponent({viewHtml : "ÅÄÖ=#€%"});
+        assertEquals("ÅÄÖ=#€%", a.assert.assertRender());
     },
 
-    "test Weird HTML" : function() {
-
-        var a;
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "ÅÄÖ=#€%"}));
-        assertEqualsQunit(a.assert.assertRender(), "ÅÄÖ=#€%");
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : '!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈'}));
+    "test set view via construction with really weird HTML" : function() {
+        var a = mcomponent({viewHtml : '!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈'});
         assertEqualsQunit(a.assert.assertRender(), '!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈');
+    },
 
-        assertObject("Creating child.", a = mcomponent({viewHtml : '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   '}));
+    "test set view via construction with weird really really HTML" : function() {
+        var a = mcomponent({viewHtml : '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   '});
         assertEqualsQunit(a.assert.assertRender(), '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   ');
-
     }
 
 });
