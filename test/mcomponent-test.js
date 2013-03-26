@@ -2197,7 +2197,7 @@ TestCase("Set/get model", {
         assertEquals(80, c.getModel().age);
     },
 
-    "test getModel() with number" : function() {
+    "test getModel() with string" : function() {
         var c = mcomponent({
             model : {name : "mattias"},
             viewHtml : ""
@@ -2635,17 +2635,6 @@ TestCase("Compiled", {
 
     },
 
-    "test Set view, render, change view, render again" : function() {
-
-        var c;
-
-        c = mcomponent({viewHtml : "heyhey"});
-        assertEqualsQunit(c.assert.assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
-        c.setViewWithHtml("ojoj");
-        assertEqualsQunit(c.assert.assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
-
-    },
-
     "test Invalid tags" : function() {
 
         var c;
@@ -2714,22 +2703,6 @@ TestCase("Compiled", {
         assertObject("Creating child.", a = mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
         assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context from mcomponent scope.");
         assertEqualsQunit(a.assert.assertRender(), "true", "Correct execution context in execution scope as well.");
-
-    },
-
-    "test API assertion" : function() {
-        var a;
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a{{ js api._assert.childCount(0) }}"}));
-        assertEqualsQunit(a.assert.assertRender(), "a", "No error!");
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a{{ js api._assert.childCount(1) }}"}));
-        assertTrueQunit(a.assert.assertRender() !== "a", "Should contain error.");
-
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a{{ js api._assert.childCount(1) }}", throwOnError : true}));
-        assertExceptionQunit(function() {
-            a.assert.assertRender()
-        }, "Should throw exception.");
 
     },
 
@@ -2812,6 +2785,21 @@ TestCase("Compiled", {
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
     }
+});
+
+TestCase("Setting view", {
+
+    "test Set view, render, change view, render again" : function() {
+
+        var c;
+
+        c = mcomponent({viewHtml : "heyhey"});
+        assertEqualsQunit(c.assert.assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
+        c.setViewWithHtml("ojoj");
+        assertEqualsQunit(c.assert.assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
+
+    },
+
 });
 
 TestCase("Setting view with special characters", {

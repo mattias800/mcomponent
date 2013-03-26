@@ -132,6 +132,27 @@ TestCase("API", {
         });
         assertEqualsQunit(c.assert.assertRender(), "mattias", "api.getRootModel() should return root model.");
 
+    },
+
+});
+
+TestCase("Assertion via API object", {
+
+    "test childCount(0) when there are no children" : function() {
+        var c = mcomponent({viewHtml : "a{{ js api._assert.childCount(0) }}"});
+        assertEquals("a", c.assert.assertRender());
+    },
+
+    "test childCount(1) fails to render result when there are no children" : function() {
+        var c = mcomponent({viewHtml : "a{{ js api._assert.childCount(1) }}"});
+        assertTrue(c.assert.assertRender() !== "a");
+    },
+
+    "test childCount(1) fails with exception result when there are no children" : function() {
+        var c = mcomponent({throwOnError : true, viewHtml : "a{{ js api._assert.childCount(1) }}"});
+        assertException(function() {
+            c.assert.assertRender();
+        });
     }
 
 });

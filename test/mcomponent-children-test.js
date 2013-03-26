@@ -26,7 +26,6 @@ TestCase("Child components", {
         });
         assertEquals("black", c.assert.assertRender());
         assertEquals("The color : black", parent.assert.assertRender());
-
     },
 
     "test including child that doesn't exist throws exception" : function() {
