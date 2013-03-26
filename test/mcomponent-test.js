@@ -687,13 +687,10 @@ TestCase("Syntax tree for if tags", {
 
 });
 
-TestCase("Execution", {
+TestCase("Render execution", {
 
-    "test lookup from models not on top of stack" : function() {
-
-        var c;
-
-        c = mcomponent({
+    "test push and iter" : function() {
+        var c = mcomponent({
             model : {
                 photos : {
                     list : ["test1", "test2"],
@@ -701,9 +698,11 @@ TestCase("Execution", {
                 }},
             viewHtml : "ok{{ push photos }}{{ length }}{{ iter photos.list }}{{ show }}{{ enditer }}{{ endpush }}"
         });
-        assertEquals("Should contain 'ok2test1test2', all lookups should be ok.", "ok2test1test2", c.assert.assertRender());
+        assertEquals("ok2test1test2", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test push, push, iter, show" : function() {
+        var c = mcomponent({
             model : {
                 data : {
                     photos : {
@@ -714,9 +713,11 @@ TestCase("Execution", {
             },
             viewHtml : "ok{{ push data }}{{ push data.photos }}{{ length }}{{ iter photos.list }}{{ show }}{{ enditer }}{{ endpush }}{{ endpush }}"
         });
-        assertEquals("Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.", "ok2test1test2", c.assert.assertRender());
+        assertEquals("ok2test1test2", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test push, push two-level property, iter three-level property, show" : function() {
+        var c = mcomponent({
             model : {
                 data : {
                     photos : {
@@ -727,117 +728,77 @@ TestCase("Execution", {
             },
             viewHtml : "ok{{ push data }}{{ push data.photos }}{{ length }}{{ iter data.photos.list }}{{ show }}{{ enditer }}{{ endpush }}{{ endpush }}"
         });
-        assertEquals("Pushing model that is not on top of stack should work. Should contain 'ok2test1test2', all lookups should be ok.", "ok2test1test2", c.assert.assertRender());
-
+        assertEquals("ok2test1test2", c.assert.assertRender());
     },
 
-    "test if tag" : function() {
+});
 
-        var c;
+TestCase("Render execution for if tags", {
 
-        c = mcomponent({viewHtml : "heyhey"});
-        assertEquals("Should contain 'heyhey', have no tags.", "heyhey", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "{{ if (true) }}baibai{{ endif }}"});
-        assertEquals("Root contains only one element.", 1, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "if", c._.getTree()[0].tagName);
-        assertEquals("Second level should be HTML 'baibai'.", "baibai", c._.getTree()[0].content[0].html);
-        assertEquals("Should contain 'baibai', since if case is true.", "baibai", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (true) }}2{{ endif }}{{ endif }}"});
-        assertTrue("Root contains 6 elements.", c.assert.assertListSize(6));
-        assertEquals("Root contains 1 elements.", 1, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "if", c._.getTree()[0].tagName);
-        assertEquals("Second level should be HTML '1'.", "1", c._.getTree()[0].content[0].html);
-        assertEquals("Second level should also have an if tag 1.", "if", c._.getTree()[0].content[1].tagName);
-        assertEquals("Should contain '12', since both if cases are true.", "12", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"});
-        assertTrue("Root contains 6 elements.", c.assert.assertListSize(6));
-        assertEquals("Root contains 1 elements.", 1, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "if", c._.getTree()[0].tagName);
-        assertEquals("Second level should be HTML '1'.", "1", c._.getTree()[0].content[0].html);
-        assertEquals("Second level should also have an if tag 2.", "if", c._.getTree()[0].content[1].tagName);
-        assertEquals("Should contain '1', since only first if case is true.", "1", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "{{ if (false) }}1{{ if (true) }}2{{ endif }}{{ endif }}"});
-        assertTrue("Root contains 6 elements.", c.assert.assertListSize(6));
-        assertEquals("Root contains 1 elements.", 1, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "if", c._.getTree()[0].tagName);
-        assertEquals("Second level should be HTML '1'.", "1", c._.getTree()[0].content[0].html);
-        assertEquals("Second level should also have an if tag 3.", "if", c._.getTree()[0].content[1].tagName);
-        assertEquals("Should contain '', since only second if case is true.", "", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "1{{ if (true) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"});
-        assertTrue("Root contains 9 elements.", c.assert.assertListSize(9));
-        assertEquals("Root contains 3 elements.", 3, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "1", c._.getTree()[0].html);
-        assertEquals("Second root tag should be if tag.", "if", c._.getTree()[1].tagName);
-        assertEquals("Second level should be HTML '2'.", "2", c._.getTree()[1].content[0].html);
-        assertEquals("Second level should also have an if tag 4.", "if", c._.getTree()[1].content[1].tagName);
-        assertEquals("Should contain '12345'.", "12345", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "1{{ if (true) }}2{{ if (false) }}3{{ endif }}4{{ endif }}5"});
-        assertTrue("Root contains 9 elements.", c.assert.assertListSize(9));
-        assertEquals("Root contains 3 elements.", 3, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "1", c._.getTree()[0].html);
-        assertEquals("Second root tag should be if tag.", "if", c._.getTree()[1].tagName);
-        assertEquals("Second level should be HTML '2'.", "2", c._.getTree()[1].content[0].html);
-        assertEquals("Second level should also have an if tag.", "if", c._.getTree()[1].content[1].tagName);
-        assertEquals("Should contain '1245'.", "1245", c.assert.assertRender());
-
-        c = mcomponent({viewHtml : "1{{ if (false) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"});
-        assertTrue("Root contains 9 elements.", c.assert.assertListSize(9));
-        assertEquals("Root contains 3 elements.", 3, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "1", c._.getTree()[0].html);
-        assertEquals("Second root tag should be if tag.", "if", c._.getTree()[1].tagName);
-        assertEquals("Second level should be HTML '2'.", "2", c._.getTree()[1].content[0].html);
-        assertEquals("Second level should also have an if tag 5.", "if", c._.getTree()[1].content[1].tagName);
-        assertEquals("Should contain '15'.", "15", c.assert.assertRender());
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"});
-        assertTrue("Root contains 9 elements.", c.assert.assertListSize(9));
-        assertEquals("Root contains 3 elements.", 3, c._.getTree().length);
-        assertEquals("First root tag should be if tag.", "1", c._.getTree()[0].html);
-        assertEquals("Second root tag should be if tag.", "if", c._.getTree()[1].tagName);
-        assertEquals("Second level should be HTML '2'.", "2", c._.getTree()[1].content[0].html);
-        assertEquals("Second level should also have an if tag 6.", "if", c._.getTree()[1].content[1].tagName);
-        assertEquals("Should contain '12345', then if with this.model works.", "12345", c.assert.assertRender());
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"});
-        assertTrueQunit(c.assert.assertListSize(9), "Root contains 9 elements.");
-        assertEqualsQunit(c._.getTree().length, 3, "Root contains 3 elements.");
-        assertEqualsQunit(c._.getTree()[0].html, "1", "First root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-        assertEqualsQunit(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
-        assertEqualsQunit(c.assert.assertRender(), "1245", "Should contain '1245', then if with this.model works.");
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"});
-        assertTrueQunit(c.assert.assertListSize(9), "Root contains 9 elements.");
-        assertEqualsQunit(c._.getTree().length, 3, "Root contains 3 elements.");
-        assertEqualsQunit(c._.getTree()[0].html, "1", "First root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-        assertEqualsQunit(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 8.");
-        assertEqualsQunit(c.assert.assertRender(), "12345", "Should contain '12345', then if with model (without this.model) works.");
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"});
-        assertTrueQunit(c.assert.assertListSize(9), "Root contains 9 elements.");
-        assertEqualsQunit(c._.getTree().length, 3, "Root contains 3 elements.");
-        assertEqualsQunit(c._.getTree()[0].html, "1", "First root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-        assertEqualsQunit(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 9.");
-        assertEqualsQunit(c.assert.assertRender(), "1245", "Should contain '1245', then if with model (without this.model) works.");
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (this.model.name == 'mattias') }}2{{ endif }}3"});
-        assertEqualsQunit(c.assert.assertRender(), "123", "If with 'this.model.name'.");
-
-        c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (model.name == 'mattias') }}2{{ endif }}3"});
-        assertEqualsQunit(c.assert.assertRender(), "123", "Same again, but with 'model.name' instead of 'this.model.name'.");
-
+    "test if tag with true condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}baibai{{ endif }}"});
+        assertEquals("baibai", c.assert.assertRender());
     },
+
+    "test nested if tag with true conditions" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (true) }}2{{ endif }}{{ endif }}"});
+        assertEquals("12", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner false condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"});
+        assertEquals("1", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer false, inner true condition" : function() {
+        var c = mcomponent({viewHtml : "{{ if (false) }}1{{ if (true) }}2{{ endif }}{{ endif }}"});
+        assertEquals("", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner true condition" : function() {
+        var c = mcomponent({viewHtml : "1{{ if (true) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("12345", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner false condition, mixed with HTML" : function() {
+        var c = mcomponent({viewHtml : "1{{ if (true) }}2{{ if (false) }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("1245", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer false, inner true condition, mixed with HTML" : function() {
+        var c = mcomponent({viewHtml : "1{{ if (false) }}2{{ if (true) }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("15", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner this.model lookup true condition, mixed with HTML" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("12345", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner this.model lookup false condition, mixed with HTML" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("1245", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner model lookup true condition, mixed with HTML" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name == 'mattias') }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("12345", c.assert.assertRender());
+    },
+
+    "test nested if tags with outer true, inner model lookup false condition, mixed with HTML" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"});
+        assertEquals("1245", c.assert.assertRender());
+    },
+
+    "test if tag with this.model lookup" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (this.model.name == 'mattias') }}2{{ endif }}3"});
+        assertEquals("123", c.assert.assertRender());
+    },
+
+    "test if tag with model (no this.model) lookup" : function() {
+        var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (model.name == 'mattias') }}2{{ endif }}3"});
+        assertEqualsQunit("123", c.assert.assertRender());
+    }
 
 });
 
