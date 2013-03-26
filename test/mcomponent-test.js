@@ -266,111 +266,6 @@ TestCase("General", {
     }
 });
 
-TestCase("Parsing tag parameters", {
-
-    "test getTagParameters() with if tag" : function() {
-        var c = mcomponent();
-        assertEquals("Should be 'hej'", "hej", c.assert.assertGetTagParameters("if hej"));
-    }
-
-});
-
-TestCase("Parsing niter tag parameters", {
-
-    setUp : function() {
-        this.c = mcomponent();
-    },
-
-    "test getNiterParametersFromTagParameter with empty parameter" : function() {
-        assertObject(this.p = this.c._.getNiterParametersFromTagParameter(""));
-        assertEquals(this.p.iterName, undefined);
-        assertEquals(this.p.variableName, undefined);
-    },
-
-    "test getNiterParametersFromTagParameter with property only" : function() {
-        assertObject("Testing 'name'.", this.p = this.c._.getNiterParametersFromTagParameter("name"));
-        assertEquals(this.p.iterName, "name");
-        assertEquals(this.p.variableName, undefined);
-    },
-
-    "test getNiterParametersFromTagParameter with niter name and property" : function() {
-        assertObject("Testing 'name userlist'.", this.p = this.c._.getNiterParametersFromTagParameter("name userlist"));
-        assertEquals(this.p.iterName, "name");
-        assertEquals(this.p.variableName, "userlist");
-    },
-
-    "test getNiterParametersFromTagParameter with niter name with spaces and property" : function() {
-        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name userlist huh"));
-        assertEquals(this.p.iterName, "name");
-        assertEquals(this.p.variableName, "userlist huh");
-    },
-
-    "test getNiterParametersFromTagParameter with niter name with function and property" : function() {
-        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name getList()"));
-        assertEquals(this.p.iterName, "name");
-        assertEquals(this.p.variableName, "getList()");
-    },
-
-    "test getNiterParametersFromTagParameter with niter name with function with argument and property" : function() {
-        assertObject(this.p = this.c._.getNiterParametersFromTagParameter("name getList('all users')"));
-        assertEquals(this.p.iterName, "name");
-        assertEquals(this.p.variableName, "getList('all users')");
-    }
-
-});
-
-TestCase("Setting view with special characters", {
-
-    "test set view with HTML characters" : function() {
-        var v = "<div class=\"animationContainer loadingMedium\"><img src=\"/v/207/49522/system/image/animation/loading_transparent_medium.gif\" alt=\"Laddar...\" title=\"Laddar...\" hspace=\"0\" vspace=\"0\" ></div>";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with tabs" : function() {
-        var v = "\t\t\t";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with line breaks" : function() {
-        var v = "\n\n";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with row breaks" : function() {
-        var v = "\r\r";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with line breaks, row breaks and tabs" : function() {
-        var v = "\r\n\t";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with line breaks and quotes" : function() {
-        var v = "\n''\n";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with mixed line breaks, tabs and double quotes" : function() {
-        var v = '\n"\t"\n';
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    },
-
-    "test set view with back slashes" : function() {
-        var v = "\\ttt\\";
-        var c = mcomponent({viewHtml : v});
-        assertEquals(c.assert.assertRender(), v);
-    }
-
-});
-
 TestCase("Large view", {
 
     "test large view test" : function() {
@@ -2812,106 +2707,6 @@ TestCase("Compiled", {
 
     },
 
-    "test Child components" : function() {
-
-        var c;
-        var parent;
-
-        c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should contain 'mattias'.");
-        assertObject(parent = mcomponent({model : {username : "jenny"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(parent.assert.assertRender(), "jenny", "Should contain 'jenny'.");
-
-        assertObject("Creating child.", c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Child render result should be 'mattias'.");
-        assertObject("Creating parent.", parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}));
-        parent.addChild("mata", c);
-        assertEqualsQunit(parent.assert.assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
-
-        c = mcomponent({model : {color : "black"}, viewHtml : "{{ color }}"});
-        assertEqualsQunit(c.assert.assertRender(), "black", "Should contain 'black'.");
-        assertObject(parent = mcomponent({
-            model : {label : "The color : "},
-            viewHtml : "{{ label }}{{ component testChild }}",
-            children : {
-                "testChild" : c
-            }
-        }));
-        assertEqualsQunit(parent.assert.assertRender(), "The color : black", "Should contain '3 mattias'.");
-
-        assertExceptionQunit(function() {
-            parent = mcomponent({
-                model : {label : "The color : "},
-                viewHtml : "{{ label }}{{ component testChild }}",
-                children : {
-                    "test Child" : c
-                }
-            });
-        }, "Id with space should fail at construction.");
-
-        c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should contain 'mattias'.");
-        assertObject(parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mat }}"}));
-        assertException("Should raise exception since id contains space.", function() {
-            parent.addChild("mat tias", c);
-        });
-
-        assertException("Should raise exception since id contains space.", function() {
-            parent.addChild("mat!tias", c);
-        });
-
-        assertException("Should raise exception since id contains space.", function() {
-            parent.addChild("mat#tias", c);
-        });
-
-
-    },
-
-    "test Child components - adding and removing children and rerendering" : function() {
-        var parent, c;
-
-        assertObject("Creating child.", c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Child render result should be 'mattias'.");
-        assertObject("Creating parent.", parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}));
-        parent.addChild("mata", c);
-        assertEqualsQunit(parent.assert.assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
-        parent.removeChild("mata");
-        parent.assert.assertRender();
-        assertTrueQunit(parent.hasRenderErrors(), "Should have a render error since child no longer exists.");
-        assertEqualsQunit(parent.hasRenderErrors(), true, "Should have a render error.");
-
-        parent.addChild("mata", c);
-        assertEqualsQunit(parent.assert.assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
-        assertEqualsQunit(parent.hasRenderErrors(), false, "Should NOT have a render error since child exists again.");
-
-    },
-
-    "test Child components - notrequired" : function() {
-
-        var c;
-        var parent;
-
-        assertObject("Creating child.", c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Child render result should be 'mattias'.");
-        assertObject("Creating parent.", parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata }}"}));
-        parent.addChild("mata", c);
-        assertEqualsQunit(parent.assert.assertRender(), "3 mattias", "Parent, with child, should contain '3 mattias'.");
-
-        assertObject("Creating child.", c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Child render result should be 'mattias'.");
-        assertObject("Creating parent.", parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata notrequired }}"}));
-        assertEqualsQunit(parent.assert.assertRender(), "3 ", "Parent, with child, should contain '3 ', no error message since component is not required.");
-
-        // Test notrequired misspelled
-        assertObject("Creating child.", c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Child render result should be 'mattias'.");
-        assertObject("Creating parent.", parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mata notrequiredd }}"}));
-        parent.addChild("mata", c);
-        parent.assert.assertRender();
-        assertTrueQunit(parent.hasRenderErrors(), "Parent should now have render errors, given by the misspelled notrequired parameter.");
-
-    },
-
     "test Tag assertion" : function() {
 
         var a, b, c;
@@ -3016,6 +2811,58 @@ TestCase("Compiled", {
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
     }
+});
+
+TestCase("Setting view with special characters", {
+
+    "test set view with HTML characters" : function() {
+        var v = "<div class=\"animationContainer loadingMedium\"><img src=\"/v/207/49522/system/image/animation/loading_transparent_medium.gif\" alt=\"Laddar...\" title=\"Laddar...\" hspace=\"0\" vspace=\"0\" ></div>";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with tabs" : function() {
+        var v = "\t\t\t";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks" : function() {
+        var v = "\n\n";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with row breaks" : function() {
+        var v = "\r\r";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks, row breaks and tabs" : function() {
+        var v = "\r\n\t";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with line breaks and quotes" : function() {
+        var v = "\n''\n";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with mixed line breaks, tabs and double quotes" : function() {
+        var v = '\n"\t"\n';
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    },
+
+    "test set view with back slashes" : function() {
+        var v = "\\ttt\\";
+        var c = mcomponent({viewHtml : v});
+        assertEquals(c.assert.assertRender(), v);
+    }
+
 });
 
 TestCase("Weird HTML", {
