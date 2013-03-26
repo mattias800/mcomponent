@@ -57,27 +57,30 @@ TestCase("Find blocks", {
 
     },
 
-    "test Find block end, for if cases" : function() {
-
-        var c;
-
-        c = mcomponent({viewHtml : "{{ if (test) }}{{ else }}{{ endif }}"});
+    "test findBlockEnd() for if-else cases with no HTML" : function() {
+        var c = mcomponent({viewHtml : "{{ if (test) }}{{ else }}{{ endif }}"});
         assertTrue("List size is 3.", c.assert.assertListSize(3));
         assertEquals("Should find 'else' tag on index 1.", 1, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
         assertEquals("Should find 'endif' tag on index 2.", 2, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}));
+    },
 
-        c = mcomponent({viewHtml : "{{ if (test) }}testtrue{{ else }}testfalse{{ endif }}"});
+    "test findBlockEnd() for if-else cases with HTML" : function() {
+        var c = mcomponent({viewHtml : "{{ if (test) }}testtrue{{ else }}testfalse{{ endif }}"});
         assertTrue("List size is 5.", c.assert.assertListSize(5));
         assertEquals("Should find 'else' tag on index 1.", 2, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
         assertEquals("Should find 'endif' tag on index 2.", 4, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}));
+    },
 
-        c = mcomponent({viewHtml : "{{ if (test) }}{{ elseif (test2) }}{{ else }}{{ endif }}"});
+    "test findBlockEnd() for if-elseif-else cases with no HTML" : function() {
+        var c = mcomponent({viewHtml : "{{ if (test) }}{{ elseif (test2) }}{{ else }}{{ endif }}"});
         assertTrue(c.assert.assertListSize(4));
         assertEquals(1, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
         assertEquals(2, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 1}));
         assertEquals(3, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}));
+    },
 
-        c = mcomponent({viewHtml : "{{ if (test) }}testIsTrue{{ elseif (test2) }}test2IsTrue{{ else }}neitherIsTrue{{ endif }}"});
+    "test findBlockEnd() for if-elseif-else cases with HTML" : function() {
+        var c = mcomponent({viewHtml : "{{ if (test) }}testIsTrue{{ elseif (test2) }}test2IsTrue{{ else }}neitherIsTrue{{ endif }}"});
         assertTrue(c.assert.assertListSize(7));
         assertEquals(2, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
         assertEquals(4, c._.findBlockEnd(0, {endTags : ["else", "elseif"], startIndex : 2}));
