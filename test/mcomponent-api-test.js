@@ -1,7 +1,7 @@
 TestCase("API", {
 
-    "test API" : function() {
-        var model = {
+    "test api.lookup() with three-level property" : function() {
+        var c = mcomponent({model : {
             displaySettings : {
                 list : {
                     showName : "yes"
@@ -10,129 +10,134 @@ TestCase("API", {
             user : {
                 name : "mattias"
             }
-        };
-        var view = "{{ push user }}" +
-            "{{ if api.lookup('displaySettings.list.showName') == 'yes' }}" +
-            "funkar" +
-            "{{ else }}" +
-            "funkar inte" +
-            "{{ endif }}" +
-            "{{ endpush }}";
-
-        var c;
-
-        c = mcomponent({model : model, viewHtml : view});
-        assertEqualsQunit(c.assert.assertRender(), "funkar", "api.lookup() should result in 'funkar'.");
-
-        view = "{{ push user }}" +
+        }, viewHtml : "{{ push user }}" +
             "{{ showjs api.lookup('displaySettings.list.showName') }}" +
-            "{{ endpush }}";
+            "{{ endpush }}"});
+        assertEquals("yes", c.assert.assertRender());
+    },
 
-        c = mcomponent({model : model, viewHtml : view});
-        assertEqualsQunit(c.assert.assertRender(), "yes", "api.lookup() should find 'yes'.");
-
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsPerPage = 1" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1", "Should contain 1 one times.");
+        assertEquals("1", c.assert.assertRender());
+    },
 
-
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsPerPage = 2" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 2 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "22", "Should contain 2 two times.");
+        assertEquals("22", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsPerPage = 3" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 3 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsPerPage }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "333", "Should contain 3 three times.");
+        assertEquals("333", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsShowing = 3" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 3 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "333", "Should contain 333. Ok!");
+        assertEquals("333", c.assert.assertRender());
+    },
 
-        var i;
-
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsShowing, with 1 item on page at first, then showing all" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1", "Should contain 1 at first.");
-        assertObject("Getting iterator should work, after compiling and running the view at least once.", i = c.getIterator('userListIter'));
+        assertEquals("1", c.assert.assertRender());
+        var i = c.getIterator('userListIter');
         if (i) i.showAllItems();
-        assertEqualsQunit(c.assert.assertRender(), "333", "Should contain 333.");
+        assertEquals("333", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.showingAllItems" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1{{ showingAllItems }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1false", "Should contain false at first.");
-        assertObject("Getting iterator should work, after compiling and running the view at least once.", i = c.getIterator('userListIter'));
+        assertEquals("1false", c.assert.assertRender());
+        var i = c.getIterator('userListIter');
         if (i) i.showAllItems();
-        assertEqualsQunit(c.assert.assertRender(), "1true1true1true", "Should contain truetruetrue.");
+        assertEquals("1true1true1true", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsTotal = 3" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"]},
             iter : {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1_{{ itemsTotal }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1_3", "itemsTotal = 3");
+        assertEquals("1_3", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsTotal = 4" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan", "prutt"]},
             iter : {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1_{{ itemsTotal }}{{ endpush }}{{ endniter }}"});
         assertEqualsQunit(c.assert.assertRender(), "1_4", "itemsTotal = 4");
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsTotal = 4 and all items per page" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan", "prutt"]},
             iter : {
                 userListIter : { itemsPerPage : 10 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsTotal }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "4444", "itemsTotal = 4 when itemsPerPage is higher than model.length");
+        assertEquals("4444", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsShowing = 4 and all items per page" : function() {
+        var c = mcomponent({
             model : { list : ["mattias", "marcus", "johan", "prutt"]},
             iter : {
                 userListIter : { itemsPerPage : 10 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}{{ itemsShowing }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "4444", "itemsShowing = 4 when itemsPerPage is higher than model.length");
+        assertEquals("4444", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getRootModel() with a string" : function() {
+        var c = mcomponent({
             model : "mattias",
             viewHtml : "{{ showjs api.getRootModel() }}"
         });
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "api.getRootModel() should return root model.");
+        assertEquals("mattias", c.assert.assertRender());
+    },
 
-        c = mcomponent({
+    "test api.getRootModel() with an object, and reading a property on it" : function() {
+        var c = mcomponent({
             model : { name : "mattias"},
             viewHtml : "{{ showjs api.getRootModel().name }}"
         });
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "api.getRootModel() should return root model.");
+        assertEquals("mattias", c.assert.assertRender());
 
-    },
+    }
 
 });
 
