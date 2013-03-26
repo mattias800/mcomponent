@@ -44,7 +44,7 @@ TestCase("Child components", {
     "test addChild() fails when adding component with id with space" : function() {
         var c = mcomponent({model : {username : "mattias"}, viewHtml : "{{ username }}"});
         var parent = mcomponent({model : {userNumber : "3"}, viewHtml : "{{ userNumber }} {{ component mat }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should contain 'mattias'.");
+        assertEquals("Should contain 'mattias'.", "mattias", c.assert.assertRender());
         assertException("Should raise exception since id contains space.", function() {
             parent.addChild("mat tias", c);
         });

@@ -108,7 +108,7 @@ TestCase("Render execution for if tags", {
 
     "test if tag with model (no this.model) lookup" : function() {
         var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (model.name == 'mattias') }}2{{ endif }}3"});
-        assertEqualsQunit("123", c.assert.assertRender());
+        assertEquals("123", c.assert.assertRender());
     }
 
 });

@@ -77,11 +77,11 @@ TestCase("Complex syntax tree for if cases", {
     "test nested if tags with outer true, inner model lookup false conditions and HTML around" : function() {
         var c = mcomponent({model : {name : "mattias"}, viewHtml : "1{{ if (true) }}2{{ if (this.model.name != 'mattias') }}3{{ endif }}4{{ endif }}5"});
         assertTrueQunit(c.assert.assertListSize(9), "Root contains 9 elements.");
-        assertEqualsQunit(c._.getTree().length, 3, "Root contains 3 elements.");
-        assertEqualsQunit(c._.getTree()[0].html, "1", "First root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].tagName, "if", "Second root tag should be if tag.");
-        assertEqualsQunit(c._.getTree()[1].content[0].html, "2", "Second level should be HTML '2'.");
-        assertEqualsQunit(c._.getTree()[1].content[1].tagName, "if", "Second level should also have an if tag 7.");
+        assertEquals("Root contains 3 elements.", 3, c._.getTree().length);
+        assertEquals("First root tag should be if tag.", "1", c._.getTree()[0].html);
+        assertEquals("Second root tag should be if tag.", "if", c._.getTree()[1].tagName);
+        assertEquals("Second level should be HTML '2'.", "2", c._.getTree()[1].content[0].html);
+        assertEquals("Second level should also have an if tag 7.", "if", c._.getTree()[1].content[1].tagName);
     }
 });
 

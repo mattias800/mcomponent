@@ -186,7 +186,7 @@ TestCase("Niter tag - using show more", {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "", "Should contain nothing.");
+        assertEquals("Should contain nothing.", "", c.assert.assertRender());
 
         c = mcomponent({
             model : {list : ["mattias", "marcus", "johan"]},
@@ -202,18 +202,18 @@ TestCase("Niter tag - using show more", {
                 }
             },
             viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(b, 1, "b should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
-        assertEqualsQunit(b, 2, "b should be 2 after whenNotAllItemsAreShowing has been run.");
+        assertEquals("b should be 1 first.", 1, b);
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
+        assertEquals("b should be 2 after whenNotAllItemsAreShowing has been run.", 2, b);
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should contain one more element.");
-        assertEqualsQunit(a, 3, "a should be 3 first.");
+        assertEquals("Should contain one more element.", "mattiasmarcus", c.assert.assertRender());
+        assertEquals("a should be 3 first.", 3, a);
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should contain all three elements.");
-        assertEqualsQunit(a, 5, "a should now be 5 since callback changed the value.");
+        assertEquals("Should contain all three elements.", "mattiasmarcusjohan", c.assert.assertRender());
+        assertEquals("a should now be 5 since callback changed the value.", 5, a);
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should contain all three elements again.");
+        assertEquals("Should contain all three elements again.", "mattiasmarcusjohan", c.assert.assertRender());
 
         a = 3;
 
@@ -228,13 +228,13 @@ TestCase("Niter tag - using show more", {
                 }
             },
             viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
-        assertEqualsQunit(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
-        assertEqualsQunit(a, 3, "a should be 3 first.");
+        assertEquals("Trying to get iterator context that doesn't exist should return undefined.", undefined, c.getIterator("userListIterYeahASFSA"));
+        assertEquals("a should be 3 first.", 3, a);
         i.showAllItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should show all elements.");
-        assertEqualsQunit(a, 5, "a should now be 5 since callback changed the value.");
+        assertEquals("Should show all elements.", "mattiasmarcusjohan", c.assert.assertRender());
+        assertEquals("a should now be 5 since callback changed the value.", 5, a);
 
         // TODO: Add variable that flips back and fourth between showing not all/all.
     }
@@ -259,25 +259,25 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "", "Should be empty.");
+        assertEquals("Should be empty.", "", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 0);
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals(0, i.getPageCount());
+        assertEquals(0, i.getCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "", "Should still be empty.");
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals("Should still be empty.", "", c.assert.assertRender());
+        assertEquals(0, i.getCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "", "Should still be empty.");
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals("Should still be empty.", "", c.assert.assertRender());
+        assertEquals(0, i.getCurrentPage());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "", "Should still be empty.");
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals("Should still be empty.", "", c.assert.assertRender());
+        assertEquals(0, i.getCurrentPage());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "", "Should still be empty.");
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals("Should still be empty.", "", c.assert.assertRender());
+        assertEquals(0, i.getCurrentPage());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "", "Should still be empty.");
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals("Should still be empty.", "", c.assert.assertRender());
+        assertEquals(0, i.getCurrentPage());
 
         c = mcomponent({
             model : {
@@ -290,19 +290,19 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should show first two element.");
+        assertEquals("Should show first two element.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
+        assertEquals(3, i.getPageCount());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should show first two again since it is first page.");
+        assertEquals("Should show first two again since it is first page.", "mattiasmarcus", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters", "Should show second two elements.");
+        assertEquals("Should show second two elements.", "johanbutters", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "stan", "Should show second two elements.");
+        assertEquals("Should show second two elements.", "stan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "stan", "Next page should be same, since it is last page.");
+        assertEquals("Next page should be same, since it is last page.", "stan", c.assert.assertRender());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters", "And now we go back to previous page.");
+        assertEquals("And now we go back to previous page.", "johanbutters", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -315,17 +315,17 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 2);
+        assertEquals(2, i.getPageCount());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should show first two again since it is first page.");
+        assertEquals("Should show first two again since it is first page.", "mattiasmarcusjohan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "buttersstan", "Should show page 2.");
+        assertEquals("Should show page 2.", "buttersstan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "buttersstan", "Same again.");
+        assertEquals("Same again.", "buttersstan", c.assert.assertRender());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "And now we go back to previous page.");
+        assertEquals("And now we go back to previous page.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -338,23 +338,23 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 5);
+        assertEquals(5, i.getPageCount());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattias");
+        assertEquals("mattias", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "marcus");
+        assertEquals("marcus", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "johan");
+        assertEquals("johan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "butters");
+        assertEquals("butters", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "stan");
+        assertEquals("stan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "stan", "Next page should be same, since it is last page.");
+        assertEquals("Next page should be same, since it is last page.", "stan", c.assert.assertRender());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "butters", "And now we go back to previous page.");
+        assertEquals("And now we go back to previous page.", "butters", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -367,21 +367,21 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
+        assertEquals(1, i.getPageCount());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan");
+        assertEquals("mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan");
+        assertEquals("mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan");
+        assertEquals("mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan");
+        assertEquals("mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan");
+        assertEquals("mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "And now we go back to previous page.");
+        assertEquals("And now we go back to previous page.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -394,23 +394,23 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "", "Should first element only.");
+        assertEquals("Should first element only.", "", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 0);
+        assertEquals(0, i.getPageCount());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
         i.showPrevPage();
-        assertEqualsQunit(c.assert.assertRender(), "");
+        assertEquals("", c.assert.assertRender());
 
         /*************
          * Test showPage()
@@ -427,11 +427,11 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
-        assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
+        i = c.getIterator("userListIter");
+        assertEquals(3, i.getPageCount());
         i.showPage(1);
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters", "Should first element only.");
+        assertEquals("Should first element only.", "johanbutters", c.assert.assertRender());
 
         /* Check that usePages = false causes showPage() to throw exception. */
 
@@ -446,7 +446,7 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertExceptionQunit(function() {
             i.showPage(1);
@@ -467,18 +467,18 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.getIndexForItem("johan"), 2, "getIndexForItem() should work.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("getIndexForItem() should work.", 2, i.getIndexForItem("johan"));
         i.showPageWithItem("johan");
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters", "Should first element only.");
+        assertEquals("Should first element only.", "johanbutters", c.assert.assertRender());
         i.showPageWithItem("butters");
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters", "Should first element only.");
+        assertEquals("Should first element only.", "johanbutters", c.assert.assertRender());
         i.showPageWithItem("stan");
-        assertEqualsQunit(c.assert.assertRender(), "stan", "Should first element only.");
+        assertEquals("Should first element only.", "stan", c.assert.assertRender());
         i.showPageWithItem("marcus");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
 
         /************************
          *  Test showPageWithItemWhere()
@@ -501,76 +501,76 @@ TestCase("Niter tag - using pages", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ name }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
+        assertEquals(3, i.getPageCount());
 
         /* getIndexForItemWhere() */
 
-        assertEqualsQunit(i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 3, i.getIndexForItemWhere(function(item) {
             return item.age == 6;
-        }), 3, "getIndexForItemWhere() should work.");
+        }));
 
-        assertEqualsQunit(i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function(item) {
             return item.selected == true;
-        }), 0, "getIndexForItemWhere() should work.");
+        }));
 
-        assertEqualsQunit(i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function(item) {
             return item.age == 32;
-        }), 0, "getIndexForItemWhere() should work.");
+        }));
 
         /* showPageWithItemIndex() */
 
         i.showPageWithItemIndex(-1);
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
 
         i.showPageWithItemIndex(0);
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
 
         i.showPageWithItemIndex(1);
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
 
         i.showPageWithItemIndex(2);
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters");
+        assertEquals("johanbutters", c.assert.assertRender());
 
         i.showPageWithItemIndex(3);
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters");
+        assertEquals("johanbutters", c.assert.assertRender());
 
         i.showPageWithItemIndex(4);
-        assertEqualsQunit(c.assert.assertRender(), "stan");
+        assertEquals("stan", c.assert.assertRender());
 
         i.showPageWithItemIndex(5);
-        assertEqualsQunit(c.assert.assertRender(), "stan");
+        assertEquals("stan", c.assert.assertRender());
 
         i.showPageWithItemIndex(6);
-        assertEqualsQunit(c.assert.assertRender(), "stan");
+        assertEquals("stan", c.assert.assertRender());
 
         /* showPageWithItemWhere() */
 
         i.showPageWithItemWhere(function(item) {
             return item.age == 6;
         });
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters");
+        assertEquals("johanbutters", c.assert.assertRender());
 
         i.showPageWithItemWhere(function(item) {
             return item.age == 8;
         });
-        assertEqualsQunit(c.assert.assertRender(), "stan");
+        assertEquals("stan", c.assert.assertRender());
 
         i.showPageWithItemWhere(function(item) {
             return item.age == 32;
         });
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
 
         i.showPageWithItemWhere(function(item) {
             return item.age == 31;
         });
-        assertEqualsQunit(c.assert.assertRender(), "johanbutters");
+        assertEquals("johanbutters", c.assert.assertRender());
 
         i.showPageWithItemWhere(function(item) {
             return item.selected == true;
         });
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus");
+        assertEquals("mattiasmarcus", c.assert.assertRender());
 
 
     }
@@ -599,29 +599,29 @@ TestCase("Niter tag - misc iterator functions", {
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.isOnFirstPage(), true, "Should be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
-        assertEqualsQunit(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on first.");
-        assertEqualsQunit(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("Should be on first page.", true, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
+        assertEquals("Is on first OR last page, since we are on first.", true, i.isOnFirstOrLastPage());
+        assertEquals("Is NOT on first AND last page, since we are on first only.", false, i.isOnFirstAndLastPage());
 
         /* Then second page */
 
         i.showNextPage();
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
-        assertEqualsQunit(i.isOnFirstOrLastPage(), false, "Is NOT on first OR last page, since we are on first.");
-        assertEqualsQunit(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
+        assertEquals("Is NOT on first OR last page, since we are on first.", false, i.isOnFirstOrLastPage());
+        assertEquals("Is NOT on first AND last page, since we are on first only.", false, i.isOnFirstAndLastPage());
 
         /* Then third and last page */
 
         i.showNextPage();
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), true, "Should be on last page.");
-        assertEqualsQunit(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on last.");
-        assertEqualsQunit(i.isOnFirstAndLastPage(), false, "Is NOT on first AND last page, since we are on first only.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should be on last page.", true, i.isOnLastPage());
+        assertEquals("Is on first OR last page, since we are on last.", true, i.isOnFirstOrLastPage());
+        assertEquals("Is NOT on first AND last page, since we are on first only.", false, i.isOnFirstAndLastPage());
 
         /********************************************************
          * Check isOnFirstPage, etc, when only one page.
@@ -640,11 +640,11 @@ TestCase("Niter tag - misc iterator functions", {
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
-        assertEqualsQunit(i.isOnFirstPage(), true, "Should be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), true, "Should be on last page.");
-        assertEqualsQunit(i.isOnFirstOrLastPage(), true, "Is on first OR last page, since we are on first.");
-        assertEqualsQunit(i.isOnFirstAndLastPage(), true, "Is on first AND last page.");
+        assertEquals(1, i.getPageCount());
+        assertEquals("Should be on first page.", true, i.isOnFirstPage());
+        assertEquals("Should be on last page.", true, i.isOnLastPage());
+        assertEquals("Is on first OR last page, since we are on first.", true, i.isOnFirstOrLastPage());
+        assertEquals("Is on first AND last page.", true, i.isOnFirstAndLastPage());
 
         /********************************************************
          * Check getFirstIndexForCurrentPage, etc
@@ -665,20 +665,20 @@ TestCase("Niter tag - misc iterator functions", {
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
 
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals(3, i.getPageCount());
+        assertEquals(0, i.getCurrentPage());
 
-        assertEqualsQunit(i.getFirstIndexForCurrentPage(), 0);
-        assertEqualsQunit(i.getLastIndexForCurrentPage(), 1);
+        assertEquals(0, i.getFirstIndexForCurrentPage());
+        assertEquals(1, i.getLastIndexForCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstIndexForCurrentPage(), 2);
-        assertEqualsQunit(i.getLastIndexForCurrentPage(), 3);
+        assertEquals(2, i.getFirstIndexForCurrentPage());
+        assertEquals(3, i.getLastIndexForCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstIndexForCurrentPage(), 4);
-        assertEqualsQunit(i.getLastIndexForCurrentPage(), 5);
+        assertEquals(4, i.getFirstIndexForCurrentPage());
+        assertEquals(5, i.getLastIndexForCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstIndexForCurrentPage(), 4);
-        assertEqualsQunit(i.getLastIndexForCurrentPage(), 5);
+        assertEquals(4, i.getFirstIndexForCurrentPage());
+        assertEquals(5, i.getLastIndexForCurrentPage());
 
         /********************************************************
          * Check getFirstItemForCurrentPage, etc
@@ -699,20 +699,20 @@ TestCase("Niter tag - misc iterator functions", {
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
 
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals(3, i.getPageCount());
+        assertEquals(0, i.getCurrentPage());
 
-        assertEqualsQunit(i.getFirstItemOnCurrentPage(), "mattias");
-        assertEqualsQunit(i.getLastItemOnCurrentPage(), "marcus");
+        assertEquals("mattias", i.getFirstItemOnCurrentPage());
+        assertEquals("marcus", i.getLastItemOnCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstItemOnCurrentPage(), "must");
-        assertEqualsQunit(i.getLastItemOnCurrentPage(), "johan");
+        assertEquals("must", i.getFirstItemOnCurrentPage());
+        assertEquals("johan", i.getLastItemOnCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstItemOnCurrentPage(), "kurt");
-        assertEqualsQunit(i.getLastItemOnCurrentPage(), "korv");
+        assertEquals("kurt", i.getFirstItemOnCurrentPage());
+        assertEquals("korv", i.getLastItemOnCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getFirstItemOnCurrentPage(), "kurt");
-        assertEqualsQunit(i.getLastItemOnCurrentPage(), "korv");
+        assertEquals("kurt", i.getFirstItemOnCurrentPage());
+        assertEquals("korv", i.getLastItemOnCurrentPage());
 
     }
 });
@@ -732,11 +732,11 @@ TestCase("Niter tag - using getIterator() before rendering", {
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 0);
-        assertEqualsQunit(i.getCurrentPage(), 0);
+        assertEquals(0, i.getPageCount());
+        assertEquals(0, i.getCurrentPage());
         i.showNextPage();
-        assertEqualsQunit(i.getCurrentPage(), 1);
-        assertEqualsQunit(c.assert.assertRender(), "mustjohan", "Should contain page 2.");
+        assertEquals(1, i.getCurrentPage());
+        assertEquals("Should contain page 2.", "mustjohan", c.assert.assertRender());
 
     }
 
@@ -760,8 +760,8 @@ TestCase("Niter tag - using showPageWithItemWhere using an external model", {
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertObject("Iterator should be available.", i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 0, "No page count yet, since there is no model.");
-        assertEqualsQunit(i.getCurrentPage(), 0, "Current page starts at 0.");
+        assertEquals("No page count yet, since there is no model.", 0, i.getPageCount());
+        assertEquals("Current page starts at 0.", 0, i.getCurrentPage());
         assertExceptionQunit(function() {
             i.showPageWithItemWhere(function(item) {
                 return item == "must";
@@ -773,12 +773,12 @@ TestCase("Niter tag - using showPageWithItemWhere using an external model", {
             return item == "must";
         });
 
-        assertEqualsQunit(i.getCurrentPage(), 1);
-        assertEqualsQunit(c.assert.assertRender(), "mustjohan", "Should contain second page.");
+        assertEquals(1, i.getCurrentPage());
+        assertEquals("Should contain second page.", "mustjohan", c.assert.assertRender());
 
         i.showNextPage();
-        assertEqualsQunit(i.getCurrentPage(), 1);
-        assertEqualsQunit(c.assert.assertRender(), "mustjohan", "Should contain page 2.");
+        assertEquals(1, i.getCurrentPage());
+        assertEquals("Should contain page 2.", "mustjohan", c.assert.assertRender());
     }
 
 });
@@ -804,11 +804,11 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 1, "Should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should be 1 first.", 1, a);
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 5);
-        assertEqualsQunit(a, 2, "Should be 2 after callback has run.");
+        assertEquals(5, i.getPageCount());
+        assertEquals("Should be 2 after callback has run.", 2, a);
 
         a = 1;
         c = mcomponent({
@@ -825,44 +825,43 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 1, "Should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should be 1 first.", 1, a);
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 5);
-        assertEqualsQunit(a, 1, "Should be 1 after callback has run.");
+        assertEquals(5, i.getPageCount());
+        assertEquals("Should be 1 after callback has run.", 1, a);
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "marcus", "Should first element only.");
-        assertEqualsQunit(a, 2, "Should be 2 after callback has run.");
+        assertEquals("Should first element only.", "marcus", c.assert.assertRender());
+        assertEquals("Should be 2 after callback has run.", 2, a);
 
 
         a = 1;
-        assertObject("Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!",
-            c = mcomponent({
-                model : {
-                    list : ["mattias", "marcus", "johan", "butters", "stan"]
-                },
-                iter : {
-                    userListIter : {
-                        itemsPerPage : 3,
-                        usePages : true,
-                        whenNotLastPageIsShowing : function(api) {
-                            a = 2;
-                        },
-                        whenLastPageIsShowing : function(api) {
-                            a = 3;
-                        }
+        c = mcomponent({
+            model : {
+                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            },
+            iter : {
+                userListIter : {
+                    itemsPerPage : 3,
+                    usePages : true,
+                    whenNotLastPageIsShowing : function(api) {
+                        a = 2;
+                    },
+                    whenLastPageIsShowing : function(api) {
+                        a = 3;
                     }
-                },
-                viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"}));
+                }
+            },
+            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
 
-        assertEqualsQunit(a, 1, "Should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
+        assertEquals("Should be 1 first.", 1, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 2);
-        assertEqualsQunit(a, 2, "Should be 2 after callback has run.");
+        assertEquals(2, i.getPageCount());
+        assertEquals("Should be 2 after callback has run.", 2, a);
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "buttersstan", "Should first element only.");
-        assertEqualsQunit(a, 3, "Should be 3 after callback has run.");
+        assertEquals("Should first element only.", "buttersstan", c.assert.assertRender());
+        assertEquals("Should be 3 after callback has run.", 3, a);
 
         a = 1;
         assertObject("Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!",
@@ -885,13 +884,13 @@ TestCase("Niter tag - pages callbacks", {
                 viewHtml : "{{ niter iterBeforeRender list }}{{ show }}{{ endniter }}"}));
 
         assertObject("Should be able to use iterator before rendering the component.", i = c.getIterator("iterBeforeRender"));
-        assertEqualsQunit(a, 1, "Should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
-        assertEqualsQunit(i.getPageCount(), 2);
-        assertEqualsQunit(a, 2, "Should be 2 after callback has run.");
+        assertEquals("Should be 1 first.", 1, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
+        assertEquals(2, i.getPageCount());
+        assertEquals("Should be 2 after callback has run.", 2, a);
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "buttersstan", "Should first element only.");
-        assertEqualsQunit(a, 3, "Should be 3 after callback has run.");
+        assertEquals("Should first element only.", "buttersstan", c.assert.assertRender());
+        assertEquals("Should be 3 after callback has run.", 3, a);
 
 
         a = 2;
@@ -909,53 +908,53 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 2, "Should be 2 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should be 2 first.", 2, a);
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 5);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(i.isOnFirstPage(), true, "Should be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
-        assertEqualsQunit(a, 2, "Should still be 2 after callback has run.");
+        assertEquals(5, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be on first page.", true, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
+        assertEquals("Should still be 2 after callback has run.", 2, a);
 
         i.showPrevPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should not go past page 0.");
-        assertEqualsQunit(i.getPageCount(), 5);
+        assertEquals("Should not go past page 0.", 0, i.getCurrentPage());
+        assertEquals(5, i.getPageCount());
 
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 1, "Should be on page 1.");
-        assertEqualsQunit(a, 2, "Should still be 2.");
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
+        assertEquals("Should be on page 1.", 1, i.getCurrentPage());
+        assertEquals("Should still be 2.", 2, a);
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
 
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 2, "Should be on page 2.");
-        assertEqualsQunit(a, 2, "Should still be 2.");
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
+        assertEquals("Should be on page 2.", 2, i.getCurrentPage());
+        assertEquals("Should still be 2.", 2, a);
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
 
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 3, "Should be on page 3.");
-        assertEqualsQunit(a, 2, "Should still be 2.");
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), false, "Should NOT be on last page.");
+        assertEquals("Should be on page 3.", 3, i.getCurrentPage());
+        assertEquals("Should still be 2.", 2, a);
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should NOT be on last page.", false, i.isOnLastPage());
 
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 4, "Should be on page 4.");
-        assertEqualsQunit(i.getPageCount(), 5);
-        assertEqualsQunit(a, 3, "Should now be 3.");
-        assertEqualsQunit(i.isOnFirstPage(), false, "Should NOT be on first page.");
-        assertEqualsQunit(i.isOnLastPage(), true, "Should be on last page.");
+        assertEquals("Should be on page 4.", 4, i.getCurrentPage());
+        assertEquals(5, i.getPageCount());
+        assertEquals("Should now be 3.", 3, a);
+        assertEquals("Should NOT be on first page.", false, i.isOnFirstPage());
+        assertEquals("Should be on last page.", true, i.isOnLastPage());
 
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 4, "Should not go past page 4.");
-        assertEqualsQunit(i.getPageCount(), 5);
+        assertEquals("Should not go past page 4.", 4, i.getCurrentPage());
+        assertEquals(5, i.getPageCount());
 
         a = 22;
         c = mcomponent({
@@ -972,12 +971,12 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 3, "Should be 3.");
+        assertEquals(1, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 3.", 3, a);
 
         a = 22;
         c = mcomponent({
@@ -994,12 +993,12 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 3, "Should be 3.");
+        assertEquals(1, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 3.", 3, a);
 
         a = 22;
         c = mcomponent({
@@ -1016,12 +1015,12 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 3, "Should be 3.");
+        assertEquals(1, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 3.", 3, a);
 
         a = 22;
         c = mcomponent({
@@ -1038,12 +1037,12 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohanbuttersstan", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 1);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 3, "Should be 3.");
+        assertEquals(1, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 3.", 3, a);
 
         a = 22;
         c = mcomponent({
@@ -1060,18 +1059,18 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 22, "Should be 22.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 22.", 22, a);
         i.showNextPage();
         c.assert.assertRender();
-        assertEqualsQunit(i.getCurrentPage(), 1, "Should be on page 1.");
-        assertEqualsQunit(i.getPageCount(), 3);
+        assertEquals("Should be on page 1.", 1, i.getCurrentPage());
+        assertEquals(3, i.getPageCount());
         assertTrueQunit(!i.isOnFirstOrLastPage(), "Should not be isOnFirstOrLastPage");
-        assertEqualsQunit(a, 77, "Should now be 77.");
+        assertEquals("Should now be 77.", 77, a);
 
         a = 22;
         c = mcomponent({
@@ -1091,19 +1090,19 @@ TestCase("Niter tag - pages callbacks", {
                 }
             },
             viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(a, 22, "Should be 22 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should be 22 first.", 22, a);
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertEqualsQunit(i.getPageCount(), 3);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 77, "Should be 77.");
+        assertEquals(3, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 77.", 77, a);
         c.setModel({list : []});
-        assertEqualsQunit(a, 77, "Should be 77.");
-        assertEqualsQunit(c.assert.assertRender(), "", "Empty since the list is empty.");
-        assertEqualsQunit(a, 88, "Should be 88.");
-        assertEqualsQunit(i.getPageCount(), 0);
-        assertEqualsQunit(i.getCurrentPage(), 0, "Should be on page 0.");
-        assertEqualsQunit(a, 88, "Should be 88.");
+        assertEquals("Should be 77.", 77, a);
+        assertEquals("Empty since the list is empty.", "", c.assert.assertRender());
+        assertEquals("Should be 88.", 88, a);
+        assertEquals(0, i.getPageCount());
+        assertEquals("Should be on page 0.", 0, i.getCurrentPage());
+        assertEquals("Should be 88.", 88, a);
 
     }
 
@@ -1135,7 +1134,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1158,7 +1157,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1181,7 +1180,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1204,7 +1203,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should first element only.");
+        assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1227,7 +1226,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "buttersstan", "Should first element only.");
+        assertEquals("Should first element only.", "buttersstan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1250,7 +1249,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "stan", "Should contain stan only.");
+        assertEquals("Should contain stan only.", "stan", c.assert.assertRender());
 
         c = mcomponent({
             model : {
@@ -1273,7 +1272,7 @@ TestCase("Niter tag - filter function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "", "Should be empty.");
+        assertEquals("Should be empty.", "", c.assert.assertRender());
 
     }
 
@@ -1305,9 +1304,9 @@ TestCase("Niter tag - filter function and getPageCount() in iterator", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should be empty.");
+        assertEquals("Should be empty.", "mattias", c.assert.assertRender());
         i = c.getIterator("filteredUserListIter");
-        assertEqualsQunit(i.getPageCount(), 3, "3 pages when there are 3 items after where has been applied.");
+        assertEquals("3 pages when there are 3 items after where has been applied.", 3, i.getPageCount());
 
         c = mcomponent({
             model : {
@@ -1330,9 +1329,9 @@ TestCase("Niter tag - filter function and getPageCount() in iterator", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "", "Should be empty.");
+        assertEquals("Should be empty.", "", c.assert.assertRender());
         i = c.getIterator("filteredUserListIter");
-        assertEqualsQunit(i.getPageCount(), 0, "0 page when there are 0 items.");
+        assertEquals("0 page when there are 0 items.", 0, i.getPageCount());
 
 
     }
@@ -1368,18 +1367,18 @@ TestCase("Niter tag - prevent page overflow when using where function", {
             },
             viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Start state.");
+        assertEquals("Start state.", "mattiasmarcus", c.assert.assertRender());
         assertObject("Iterator should exist.", i = c.getIterator("filteredUserListIter"));
 
         // Go to page 2/2
         i.showNextPage();
-        assertEqualsQunit(c.assert.assertRender(), "johan", "Second page.");
+        assertEquals("Second page.", "johan", c.assert.assertRender());
 
         // Now change model, so that we only have 1 item in the list, and thus, only one page!
         model.list[2].age = 13;
         model.list[3].age = 14;
 
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Second page.");
+        assertEquals("Second page.", "mattias", c.assert.assertRender());
 
     }
 
@@ -1413,19 +1412,19 @@ TestCase("Niter tag - showPageWithItem methods, combined with where function", {
             },
             viewHtml : "{{ niter list list }}{{ name }}{{ endniter }}"});
 
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should be empty.");
+        assertEquals("Should be empty.", "mattias", c.assert.assertRender());
         assertObject("Iterator should exist", i = c.getIterator("list"));
-        assertEqualsQunit(i.getPageCount(), 3, "3 pages when there are 3 items after where has been applied.");
+        assertEquals("3 pages when there are 3 items after where has been applied.", 3, i.getPageCount());
 
         assertExceptionQunit(function() {
             i.getPageWithItem(model.list[-1]);
         }, "Item -1 never exists, so should throw exception.");
-        assertEqualsQunit(i.getPageWithItem(model.list[0]), 0, "Item 0 should be on page 0.");
+        assertEquals("Item 0 should be on page 0.", 0, i.getPageWithItem(model.list[0]));
         assertExceptionQunit(function() {
             i.getPageWithItem(model.list[1]);
         }, "Item 2 should be on NO page.");
-        assertEqualsQunit(i.getPageWithItem(model.list[2]), 1, "Item 2 should be on page 1.");
-        assertEqualsQunit(i.getPageWithItem(model.list[3]), 2, "Item 3 should be on page 2.");
+        assertEquals("Item 2 should be on page 1.", 1, i.getPageWithItem(model.list[2]));
+        assertEquals("Item 3 should be on page 2.", 2, i.getPageWithItem(model.list[3]));
         assertExceptionQunit(function() {
             i.getPageWithItem(model.list[4]);
         }, "Item 4 should be on NO page.");

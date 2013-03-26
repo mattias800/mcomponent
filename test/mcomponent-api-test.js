@@ -99,7 +99,7 @@ TestCase("API", {
                 userListIter : { itemsPerPage : 1 }
             },
             viewHtml : "{{ niter userListIter list }}{{ push api.getIterator('userListIter') }}1_{{ itemsTotal }}{{ endpush }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1_4", "itemsTotal = 4");
+        assertEquals("itemsTotal = 4", "1_4", c.assert.assertRender());
     },
 
     "test api.getIterator(), pushing iterator to stack and then showing iterator.itemsTotal = 4 and all items per page" : function() {

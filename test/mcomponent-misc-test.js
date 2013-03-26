@@ -273,9 +273,9 @@ TestCase("Setting view repeatedly", {
 
     "test Set view, render, change view, render again" : function() {
         var c = mcomponent({viewHtml : "heyhey"});
-        assertEqualsQunit(c.assert.assertRender(), "heyhey", "Should contain 'heyhey', have no tags.");
+        assertEquals("Should contain 'heyhey', have no tags.", "heyhey", c.assert.assertRender());
         c.setViewWithHtml("ojoj");
-        assertEqualsQunit(c.assert.assertRender(), "ojoj", "Should contain 'ojoj' after changing view.");
+        assertEquals("Should contain 'ojoj' after changing view.", "ojoj", c.assert.assertRender());
     }
 
 });
@@ -341,12 +341,12 @@ TestCase("Set view with weird HTML", {
 
     "test set view via construction with really weird HTML" : function() {
         var a = mcomponent({viewHtml : '!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈'});
-        assertEqualsQunit(a.assert.assertRender(), '!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈');
+        assertEquals('!2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈', a.assert.assertRender());
     },
 
     "test set view via construction with weird really really HTML" : function() {
         var a = mcomponent({viewHtml : '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   '});
-        assertEqualsQunit(a.assert.assertRender(), '{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   ');
+        assertEquals('{ { !2394839835€)(%!##€&!#/€!#")!""#!"#)£§|∞§©£@][≈£≈ } }   ', a.assert.assertRender());
     }
 
 });
@@ -408,17 +408,17 @@ TestCase("Showing other things than model properties", {
 
     "test showing api.lookup()" : function() {
         var c = mcomponent({model : {name : "mattias"}, viewHtml : "{{ show api.lookup('name'); }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should contain 'mattias' after API lookup.");
+        assertEquals("Should contain 'mattias' after API lookup.", "mattias", c.assert.assertRender());
     },
 
     "test showing Math.floor()" : function() {
         var c = mcomponent({model : {name : "mattias"}, viewHtml : "{{ show Math.floor(1.5); }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1", "Should contain '1' after Math.floor.");
+        assertEquals("Should contain '1' after Math.floor.", "1", c.assert.assertRender());
     },
 
     "test showing Math.floor() without specifying 'show' tag" : function() {
         var c = mcomponent({model : {name : "mattias"}, viewHtml : "{{ Math.floor(1.5) }}"});
-        assertEqualsQunit(c.assert.assertRender(), "1", "Should contain '1' after Math.floor.");
+        assertEquals("Should contain '1' after Math.floor.", "1", c.assert.assertRender());
     },
 
     "test showing model properties that doesn't exist" : function() {
@@ -426,7 +426,7 @@ TestCase("Showing other things than model properties", {
         var c = mcomponent({ model : model, viewHtml : "{{ age }}" });
         assertTrueQunit(c.assert.assertRender() !== "", "Should contain an error message after API lookup.");
         model.age = 32;
-        assertEqualsQunit(c.assert.assertRender(), "32", "Should now contain lookup result.");
+        assertEquals("Should now contain lookup result.", "32", c.assert.assertRender());
     }
 
 });

@@ -1,27 +1,13 @@
-function assertEqualsQunit(real, expected, message) {
-    if (message) {
-        assertEquals(message, expected, real);
-    } else {
-        assertEquals(expected, real);
-    }
-}
-
 function assertTrueQunit(real, message) {
-    if (message) {
-        assertTrue(message, real);
-    } else {
-        assertTrue(real);
-    }
+    assertTrue(message, real);
 }
 
 function assertStringQunit(v, msg) {
-    if (msg) assertString(msg, v);
-    else assertString(v);
+    assertString(msg, v);
 }
 
 function assertExceptionQunit(f, msg) {
-    if (msg) assertException(msg, f);
-    else assertException(f);
+    assertException(msg, f);
 }
 
 TestCase("Startup", {
@@ -125,7 +111,7 @@ TestCase("Compiled", {
             model : {name : "must"},
             viewHtml : "{{ log 'hej' }}"
         });
-        assertEqualsQunit("", c.assert.assertRender());
+        assertEquals("", c.assert.assertRender());
     },
 
     "test setglobal tag doesn't render any result" : function() {
@@ -168,14 +154,14 @@ TestCase("Compiled", {
             viewHtml : "{{ iter list }}{{ enditer }}"})
         ;
 
-        assertEqualsQunit(c.assert.assertRender(), "", "Should contain nothing.");
+        assertEquals("Should contain nothing.", "", c.assert.assertRender());
 
         c = mcomponent({
             model : { list : ["mattias", "marcus", "johan"] },
             viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"})
         ;
 
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should contain mattiasmarcusjohan.");
+        assertEquals("Should contain mattiasmarcusjohan.", "mattiasmarcusjohan", c.assert.assertRender());
 
 
         c = mcomponent({
@@ -187,7 +173,7 @@ TestCase("Compiled", {
             viewHtml : "{{ iter list }}{{ show name }}{{ iter nums }}{{ show }}{{ enditer }}{{ enditer }}"})
         ;
 
-        assertEqualsQunit(c.assert.assertRender(), "mattias123marcus456johan987", "Should contain mattiasmarcusjohan.");
+        assertEquals("Should contain mattiasmarcusjohan.", "mattias123marcus456johan987", c.assert.assertRender());
 
         /***
          * Larger view
@@ -211,7 +197,7 @@ TestCase("Compiled", {
             iter : {users : {}}});
 
         assertStringQunit(result = c.assert.assertRender(), "Rendering of large view should be OK!");
-        assertEqualsQunit(result, "yay1yay2", "And the result should be correct.");
+        assertEquals("And the result should be correct.", "yay1yay2", result);
 
         c = mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
             "{{ if (this.model.users) }}yay2" +
@@ -316,18 +302,18 @@ TestCase("Compiled", {
                 }
             },
             viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(b, 1, "b should be 1 first.");
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
-        assertEqualsQunit(b, 2, "b should be 2 after whenNotAllItemsAreShowing has been run.");
+        assertEquals("b should be 1 first.", 1, b);
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
+        assertEquals("b should be 2 after whenNotAllItemsAreShowing has been run.", 2, b);
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcus", "Should contain one more element.");
-        assertEqualsQunit(a, 3, "a should be 3 first.");
+        assertEquals("Should contain one more element.", "mattiasmarcus", c.assert.assertRender());
+        assertEquals("a should be 3 first.", 3, a);
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should contain all three elements.");
-        assertEqualsQunit(a, 5, "a should now be 5 since callback changed the value.");
+        assertEquals("Should contain all three elements.", "mattiasmarcusjohan", c.assert.assertRender());
+        assertEquals("a should now be 5 since callback changed the value.", 5, a);
         i.showMoreItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should contain all three elements again.");
+        assertEquals("Should contain all three elements again.", "mattiasmarcusjohan", c.assert.assertRender());
 
         a = 3;
 
@@ -342,13 +328,13 @@ TestCase("Compiled", {
                 }
             },
             viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
-        assertEqualsQunit(c.assert.assertRender(), "mattias", "Should first element only.");
+        assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
-        assertEqualsQunit(c.getIterator("userListIterYeahASFSA"), undefined, "Trying to get iterator context that doesn't exist should return undefined.");
-        assertEqualsQunit(a, 3, "a should be 3 first.");
+        assertEquals("Trying to get iterator context that doesn't exist should return undefined.", undefined, c.getIterator("userListIterYeahASFSA"));
+        assertEquals("a should be 3 first.", 3, a);
         i.showAllItems();
-        assertEqualsQunit(c.assert.assertRender(), "mattiasmarcusjohan", "Should show all elements.");
-        assertEqualsQunit(a, 5, "a should now be 5 since callback changed the value.");
+        assertEquals("Should show all elements.", "mattiasmarcusjohan", c.assert.assertRender());
+        assertEquals("a should now be 5 since callback changed the value.", 5, a);
 
     }
 
@@ -362,7 +348,7 @@ TestCase("Execution scope", {
 
     "test component and execution context have same id using api._assert" : function() {
         var a = mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
-        assertEqualsQunit("true", a.assert.assertRender());
+        assertEquals("true", a.assert.assertRender());
     },
 
     "test child count from execution context is increased correctly by rendering the value" : function() {
@@ -386,13 +372,13 @@ TestCase("Execution scope", {
         b = mcomponent({id : 2, viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
 
         assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
-        assertEqualsQunit(a.assert.assertRender(), "a true", "");
+        assertEquals("", "a true", a.assert.assertRender());
 
-        assertEqualsQunit(b.assert.assertRender(), "b true", "");
+        assertEquals("", "b true", b.assert.assertRender());
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
         b.setViewFromComponent(a);
-        assertEqualsQunit(b.assert.assertRender(), "a true", "");
+        assertEquals("", "a true", b.assert.assertRender());
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
         assertTrueQunit(a._.getId() !== b._.getId(), "Components must not have same id.");
@@ -404,11 +390,11 @@ TestCase("Execution scope", {
         assertTrueQunit(a.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
         assertObject("Creating child.", c = mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
-        assertEqualsQunit(c.assert.assertRender(), "c true", "");
+        assertEquals("", "c true", c.assert.assertRender());
         assertTrueQunit(c.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
         assertObject("Creating child.", b = mcomponent({viewHtml : "b"}));
-        assertEqualsQunit(b.assert.assertRender(), "b", "Should be b");
+        assertEquals("Should be b", "b", b.assert.assertRender());
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
         // Test children count with API assertion
@@ -432,7 +418,7 @@ TestCase("Execution scope", {
         // Test with real view with {{ component .. }}
 
         b.setViewFromComponent(a);
-        assertEqualsQunit(b.assert.assertRender(), "a true c true", "Should be ac with new view and child.");
+        assertEquals("Should be ac with new view and child.", "a true c true", b.assert.assertRender());
         assertTrueQunit(b.assert.assertComponentIdEqualsExecutionContextId(), "Correct execution context.");
 
     }
