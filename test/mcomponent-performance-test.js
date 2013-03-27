@@ -1,0 +1,5 @@
+TestCase("Rendering performance", {
+
+
+
+});
