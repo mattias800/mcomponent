@@ -519,9 +519,18 @@ var invalidHotelView = "<div class=\"tripItemContainer\">\n" +
 
 TestCase("Invalid hotel", {
 
-    "test it" : function() {
+    "test it with throwOnError" : function() {
         var c = mcomponent({throwOnError : true, viewHtml : invalidHotelView, model : invalidHotelModel});
-        jstestdriver.console.log(c.assert.assertRender());
+        assertException(function() {
+            c.assert.assertRender();
+        });
+    },
+
+    "test it with no throwOnError" : function() {
+        var c = mcomponent({viewHtml : invalidHotelView, model : invalidHotelModel});
+        var r = c.assert.assertRender();
+        assertTrue(r.indexOf("Error at tag {{ tripAdvisorRating }}:") >= 0);
+        assertTrue(c.hasRenderErrors());
     }
 
 });

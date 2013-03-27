@@ -2012,8 +2012,8 @@ function mcomponent(args) {
                             console.log("model", _getModel());
                         }
 
-                        throwError(renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()}));
                         executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
+                        throwError(renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()}));
                     }
                 } else {
                     /**
@@ -2025,7 +2025,6 @@ function mcomponent(args) {
                     }
 
                     executionContext.renderResult = [localCompilationContext.getCompileError()];
-
                     throwError(localCompilationContext.getCompileError());
                 }
 
@@ -2137,6 +2136,7 @@ function mcomponent(args) {
         //var iVar = getUncompiledVariableName("i");
         r.push("var " + lookupVar + " = function() {");
         innerFunction.push("// lookup name=" + name);
+        innerFunction.push("if (executionContext.executionStack.length == 0) throw \"Property '" + replaceStringTokens(name) + "' not found on model stack, there is no model on stack.\"");
         if (parentPrefix.count > 0) {
             innerFunction.push("if (executionContext.executionStack.length <= " + parentPrefix.count + ") throw 'Trying to lookup \"" + originalName + "\", but stack is smaller than that (' + executionContext.executionStack.length + ').'");
         }
