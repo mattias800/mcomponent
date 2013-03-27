@@ -1904,9 +1904,13 @@ function mcomponent(args) {
                  *************************************************************/
 
                 if (tagOk) {
+                    result.push("try {");
                     result.pushCompiledSource(tagCompiledSource);
+                    result.push("} catch (e) {");
+                    result.push("    executionContext.pushCurrentRenderError(e)");
+                    if (mainArgs.throwOnError) result.push("throw e");
+                    result.push("}");
                 }
-
 
             }
         }
@@ -1962,7 +1966,7 @@ function mcomponent(args) {
     var buildTemplate = function(sourceObj, localCompilationContext) {
         var debugEnabled = false;
 
-        if (sourceObj == undefined && localCompilationContext == undefined) throw "Severe error: buildTemplate() must get sourceObj and/or compilation context. May not ommit both.";
+        if (sourceObj == undefined && localCompilationContext == undefined) throw "Severe error: buildTemplate() must get sourceObj and/or compilation context. May not omit both.";
         if (sourceObj == undefined && !localCompilationContext.hasCompileError()) throw "Severe error: buildTemplate() got no sourceObj but compilation context indicates no compilation errors.";
 
         var f;
