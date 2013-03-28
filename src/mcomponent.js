@@ -33,6 +33,7 @@ function mcomponent(args) {
 
     args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false;
     args.logOnError = args.logOnError !== undefined ? args.logOnError : false;
+    args.renderError = args.renderError !== undefined ? args.renderError : true;
 
     /************************************************************
      * Arguments used for testing purposes only
@@ -254,9 +255,10 @@ function mcomponent(args) {
                 tag : tagName
             };
             this.renderErrors.push(error);
-            this.renderResult.push(renderErrorToString(error));
 
-            if (args.throwOnError) {
+            if (mainArgs.renderError) this.renderResult.push(renderErrorToString(error));
+
+            if (mainArgs.throwOnError) {
                 throw renderErrorToString(error);
             }
         };
@@ -1935,7 +1937,6 @@ function mcomponent(args) {
      * @return {{full: CompiledSource, body: *}}
      */
     var compileTreeToSourceWithBaseCodeIncluded = function(tree) {
-
         var result = new CompiledSource();
         // executionContext is available at all times.
         result.push("var globals = executionContext.getGlobals()");
@@ -1947,7 +1948,6 @@ function mcomponent(args) {
             full : result,
             body : body
         };
-
     };
 
     var buildSource = function(tree) {
@@ -2035,7 +2035,11 @@ function mcomponent(args) {
                         localCompilationContext.setCompileError(createGenericCompileErrorMessage("Critical error, no compiled result, and no error."));
                     }
 
-                    executionContext.renderResult = [localCompilationContext.getCompileError()];
+                    if (mainArgs.renderError) {
+                        executionContext.renderResult = [localCompilationContext.getCompileError()];
+                    } else {
+                        executionContext.renderResult = [""];
+                    }
                     throwError(localCompilationContext.getCompileError());
                 }
 
