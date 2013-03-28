@@ -28,10 +28,16 @@ function mcomponent(args) {
     args.afterRender = args.afterRender || undefined;
 
     /************************************************************
-     * Arguments used for testing purposes only
+     * Error reporting
      ************************************************************/
 
     args.throwOnError = args.throwOnError !== undefined ? args.throwOnError : false;
+    args.logOnError = args.logOnError !== undefined ? args.logOnError : false;
+
+    /************************************************************
+     * Arguments used for testing purposes only
+     ************************************************************/
+
     args.debugEnabled = args.debugEnabled ? true : false;
 
     var validateChild = function(id, child) {
@@ -73,6 +79,7 @@ function mcomponent(args) {
      * @param e
      */
     var throwError = function(e) {
+        if (mainArgs.logOnError && typeof console == "object") console.error(e);
         if (mainArgs.throwOnError) throw e;
     };
 
