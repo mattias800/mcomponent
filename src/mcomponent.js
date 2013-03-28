@@ -957,6 +957,30 @@ function mcomponent(args) {
             }
         },
 
+        tag_showif : {
+            token : "showif",
+            hasBlock : false,
+            compileTagInstance : function(tagInstance, executionContext, args) {
+                var result = new CompiledSource();
+                var name = tagInstance.tag.parameters;
+                if (name) {
+                    var compiledLookup = compileLookup(name, true);
+                    result.pushCompiledSource(compiledLookup.compiledSource);
+                    result.pushBufferEmptyStringIfUndefined(compiledLookup.varName);
+                } else {
+                    result.pushBuffer("model !== undefined ? model : ''");
+                }
+                return result;
+            },
+            createTagInstance : function(args) {
+                return {
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
+                };
+            }
+        },
+
         tag_context : {
             token : "context",
             hasBlock : false,
@@ -2063,7 +2087,7 @@ function mcomponent(args) {
         };
     };
 
-    var compileLookup = function(name) {
+    var compileLookup = function(name, allowMissingProperty) {
         var r = new CompiledSource();
 
         var names = name.split(".");
@@ -2084,7 +2108,7 @@ function mcomponent(args) {
         } else {
 
             var prefixResult = findParentPrefix(name);
-            var compiledLookup = _compileLookupFunctionForVariableWithName(name);
+            var compiledLookup = _compileLookupFunctionForVariableWithName(name, allowMissingProperty);
             var lookupVar = compiledLookup.lookupFunctionName;
             r.pushCompiledSource(compiledLookup.compiledSource);
             name = prefixResult.name;
@@ -2131,7 +2155,7 @@ function mcomponent(args) {
      * This does a lookupOnObject, implemented in compiler instead of in runtime.
      * @param name
      */
-    var _compileLookupFunctionForVariableWithName = function(name) {
+    var _compileLookupFunctionForVariableWithName = function(name, allowMissingProperty) {
 
         var originalName = name;
         var names = name.split(".");
@@ -2151,7 +2175,11 @@ function mcomponent(args) {
         //var iVar = getUncompiledVariableName("i");
         r.push("var " + lookupVar + " = function() {");
         innerFunction.push("// lookup name=" + name);
-        innerFunction.push("if (executionContext.executionStack.length == 0) throw \"Property '" + replaceStringTokens(name) + "' not found on model stack, there is no model on stack.\"");
+        if (allowMissingProperty) {
+            innerFunction.push("if (executionContext.executionStack.length == 0) return \"\"");
+        } else {
+            innerFunction.push("if (executionContext.executionStack.length == 0) throw \"Property '" + replaceStringTokens(name) + "' not found on model stack, there is no model on stack.\"");
+        }
         if (parentPrefix.count > 0) {
             innerFunction.push("if (executionContext.executionStack.length <= " + parentPrefix.count + ") throw 'Trying to lookup \"" + originalName + "\", but stack is smaller than that (' + executionContext.executionStack.length + ').'");
         }
@@ -2164,7 +2192,6 @@ function mcomponent(args) {
 
         insideDo.push("if (" + ifCondition + ") { ");
         insideIf.push("return " + tempVar + "." + name);
-        insideIf.push("break");
         insideIf.indent();
         insideDo.pushCompiledSource(insideIf);
         insideDo.push("}");
@@ -2172,7 +2199,11 @@ function mcomponent(args) {
         insideDo.indent();
         innerFunction.pushCompiledSource(insideDo);
         innerFunction.push("} while (" + iVar + " >= 0)");
-        innerFunction.push("throw \"Property '" + replaceStringTokens(name) + "' not found on model stack.\"");
+        if (allowMissingProperty) {
+            innerFunction.push("return \"\"");
+        } else {
+            innerFunction.push("throw \"Property '" + replaceStringTokens(name) + "' not found on model stack.\"");
+        }
         innerFunction.indent();
         r.pushCompiledSource(innerFunction);
         r.push("}");
