@@ -164,3 +164,14 @@ TestCase("No rendering of error messages to result", {
     }
 
 });
+
+TestCase("Error message format when invalid expressions", {
+
+    "test invalid expressions result in correctly formatted error messages" : function() {
+        var c = mcomponent({debugEnabled : true, viewHtml : "{{ if model.displaySettings.boundInfoTextEnabled && model.displaySettings.showOutBoundInfoText) }}{{ endif }}"});
+        var r = c.assert.assertRender();
+        assertTrue(r.indexOf("Error compiling tag") >= 0);
+    }
+
+});
+

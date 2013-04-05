@@ -344,7 +344,11 @@ TestCase("Execution scope", {
         assertEquals("a 0", a.assert.assertRender());
         a.addChild("b", mcomponent({viewHtml : "b"}));
         assertEquals("a 1", a.assert.assertRender());
-    },
+    }
+
+});
+
+TestCase("Execution scope isolation", {
 
     "test Execution context scope" : function() {
 
@@ -374,14 +378,14 @@ TestCase("Execution scope", {
 
         // OK
 
-        assertObject("Creating child.", a = mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"}));
+        a = mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"});
         assertTrue("Correct execution context.", a.assert.assertComponentIdEqualsExecutionContextId());
 
-        assertObject("Creating child.", c = mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"}));
+        c = mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
         assertEquals("", "c true", c.assert.assertRender());
         assertTrue("Correct execution context.", c.assert.assertComponentIdEqualsExecutionContextId());
 
-        assertObject("Creating child.", b = mcomponent({viewHtml : "b"}));
+        b = mcomponent({viewHtml : "b"});
         assertEquals("Should be b", "b", b.assert.assertRender());
         assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
@@ -398,7 +402,7 @@ TestCase("Execution scope", {
 
         // Test with API assertion, but with viewFromComponent
 
-        assertObject("Creating child.", d = mcomponent({viewHtml : "ok{{ js api._assert.childCount(1) }}"}));
+        d = mcomponent({viewHtml : "ok{{ js api._assert.childCount(1) }}"});
         b.setViewFromComponent(d);
         assertTrue("Should have 1 child in execution context.", b.assert.assertRender() == "ok");
         // TODO: Test equal id for context and component.
@@ -410,4 +414,5 @@ TestCase("Execution scope", {
         assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
     }
+
 });

@@ -418,6 +418,7 @@ function mcomponent(args) {
                     value = this.runFunction(f);
                     foundValue = true;
                 } catch (e) {
+                    throw e;
                 }
             }
 
@@ -1093,18 +1094,22 @@ function mcomponent(args) {
             createTagInstance : function(args) {
                 if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: " + startTagToken + " if model.isNice " + endTagToken, args.tag);
                 var condition = args.tag.parameters;
-                var conditionFunction = createExpressionFunction(args.tag.parameters);
-                var c = createIfTag(args.subList, condition);
+                try {
+                    var conditionFunction = createExpressionFunction(args.tag.parameters);
+                    var c = createIfTag(args.subList, condition);
 
-                return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content,
-                    condition : condition,
-                    conditions : c.conditions,
-                    contentRoots : c.contentRoots,
-                    elseContent : c.elseContent
-                };
+                    return {
+                        tagName : this.token,
+                        tag : args.tag,
+                        content : args.content,
+                        condition : condition,
+                        conditions : c.conditions,
+                        contentRoots : c.contentRoots,
+                        elseContent : c.elseContent
+                    };
+                } catch (e) {
+                    throw e;
+                }
             }
         },
 
@@ -1362,7 +1367,7 @@ function mcomponent(args) {
         try {
             return new Function("model", "context", "globals", "api", "return " + exp);
         } catch (e) {
-            throw "Invalid expression: " + exp;
+            throw "Invalid expression " + exp + ": " + e.toString();
         }
     };
 
@@ -1562,12 +1567,17 @@ function mcomponent(args) {
                         throw e;
                     }
                     subList = list.slice(i + 1, endIndexTag.index);
-                    root.push(tagType.createTagInstance({
-                        tag : item,
-                        subList : subList,
-                        content : buildTree(subList)
-                    }));
-                    i = endIndexTag.index;
+                    try {
+                        var tagInstance = tagType.createTagInstance({
+                            tag : item,
+                            subList : subList,
+                            content : buildTree(subList)
+                        });
+                        root.push(tagInstance);
+                        i = endIndexTag.index;
+                    } catch (e) {
+                        throw compileErrorToString({tag : item.tag, message : e.toString()});
+                    }
 
                 } else if (tagType && tagType.hasBlock) {
 
