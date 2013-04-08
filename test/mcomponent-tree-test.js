@@ -136,4 +136,25 @@ TestCase("Syntax tree for if tags", {
 
 });
 
+TestCase("Finding floating end tags", {
+
+    c : mcomponent({viewHtml : "{{ endpush }}"}),
+
+    "test endpush is end tag token" : function() {
+        assertTrue(this.c.assert.assertIsTagTokenEndTagToken("endpush"));
+    },
+
+    "test epush is not end tag token" : function() {
+        assertFalse(this.c.assert.assertIsTagTokenEndTagToken("epush"));
+    },
+
+    "test endif is end tag token" : function() {
+        assertTrue(this.c.assert.assertIsTagTokenEndTagToken("endif"));
+    },
+
+    "test eif is end tag token" : function() {
+        assertFalse(this.c.assert.assertIsTagTokenEndTagToken("eif"));
+    }
+
+});
 

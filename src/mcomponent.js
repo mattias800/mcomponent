@@ -1538,6 +1538,25 @@ function mcomponent(args) {
         return list;
     };
 
+    var getStartTagTokenFromEndTagToken = function(endTagToken) {
+        return endTagToken.substr(3);
+    };
+
+    var isTagTokenEndTagToken = function(tagToken) {
+        if (tagToken.substr(0, 3) != "end") {
+            return false;
+        } else {
+            var token = getStartTagTokenFromEndTagToken(tagToken);
+            for (var tagId in tagTypes) {
+                var tagType = tagTypes[tagId];
+                if (tagType.hasBlock && tagType.token == token) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+
     /**
      * Builds a tree out of a list.
      * @param list
@@ -1551,7 +1570,8 @@ function mcomponent(args) {
             if (item.html) {
                 root.push(item);
             } else {
-                var tagType = getTagType(item.tagName);
+                var tagName = item.tagName;
+                var tagType = getTagType(tagName);
                 var endIndex, subList, endIndexTag;
 
                 /***************************************************
@@ -1603,6 +1623,8 @@ function mcomponent(args) {
                         tag : item
                     }));
 
+                } else if (isTagTokenEndTagToken(tagName)) {
+                    throw createCompileExceptionMessage("Found closing tag without starting '" + getStartTagTokenFromEndTagToken(tagName) + "' tag.", item);
                 } else {
                     // Is not a system tag
                     root.push({tag : item});
@@ -2531,6 +2553,10 @@ function mcomponent(args) {
                 }
             },
 
+            assertIsTagTokenEndTagToken : function(tagToken) {
+                return isTagTokenEndTagToken(tagToken);
+            },
+
             assertListItemHasHtml : function(i, html) {
                 var item = getView().list[i];
                 if (item && item.html && item.html === html) {
@@ -2644,6 +2670,7 @@ function mcomponent(args) {
             },
 
             getSource : function() {
+                if (view.source == undefined) throw "Component has not been compiled properly, source not available.";
                 return view.source.full.toString();
             },
 

@@ -175,3 +175,13 @@ TestCase("Error message format when invalid expressions", {
 
 });
 
+TestCase("Source is not available when compilation failed", {
+
+    "test source is not available with only one endpush" : function() {
+        var c = mcomponent({viewHtml : "{{ endpush }}"});
+        assertException(function() {
+            c._.getSource()
+        });
+    }
+
+});
