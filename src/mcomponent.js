@@ -21,6 +21,7 @@ function mcomponent(args) {
     args.viewFromComponent = args.viewFromComponent || undefined;
     args.model = args.model || undefined;
     args.clipboard = args.clipboard || {};
+    args.globals = args.globals || {};
     args.children = args.children || {};
     args.iter = args.iter || {};
     args.maxTagCount = args.maxTagCount || 1000;
@@ -212,7 +213,7 @@ function mcomponent(args) {
         this.id = id;
         this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
         this.children = mainArgs.children;
-        this.globals = {};
+        this.globals = mainArgs.globals; // TODO: Dependency injection instead.
         this.clipboard = {};
         this.clipboardError = {}; // If adding a clipboard failed, the error will be inserted here.
         this.iterators = {};
@@ -224,7 +225,7 @@ function mcomponent(args) {
         var that = this;
 
         this.makeReadyForRender = function() {
-            this.globals = {};
+            this.globals = mainArgs.globals; // TODO: Dependency injection instead.
             this.renderResult = [];
             this.renderErrors = [];
             this.currentTag = {};

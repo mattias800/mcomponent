@@ -1,13 +1,18 @@
 TestCase("Globals", {
 
+    "test globals in args is part of getGlobals()" : function() {
+        var c = mcomponent({globals : {name : "must" }});
+        assertEquals("must", c.getGlobals().name);
+    },
+
+    "test globals in args is not empty when rendering" : function() {
+        var c = mcomponent({globals : {name : "must" }, viewHtml : "{{ showjs JSON.stringify(globals) }}"});
+        assertNotEquals("{}", c.assert.assertRender());
+    },
+
     "test globals in args is rendered correctly" : function() {
         var c = mcomponent({globals : {name : "must" }, viewHtml : "{{ showjs globals.name }}"});
         assertEquals("must", c.assert.assertRender());
-    },
-
-    "test globals in args is part of getGlobals()" : function() {
-        var c = mcomponent({globals : {name : "must" }, viewHtml : "{{ showjs globals.name }}"});
-        assertEquals("must", c.getGlobals().name);
     },
 
     "test setting globals.value string-value and getting it with getGlobals().value" : function() {
