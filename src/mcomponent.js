@@ -1750,9 +1750,9 @@ function mcomponent(args) {
                                 endTag : item.tagName
                             };
                         }
-                    } else if (item.tagName.substring(0, 3) == "end") {
+                    } else if (item.tagName.substring(0, "end".length) == "end") {
                         // Is end* tag
-                        var tagName = item.tagName.substring(3, item.length);
+                        var tagName = item.tagName.substring("end".length);
                         if (stack[stack.length - 1].tagName == tagName) {
                             stack.pop();
                             if (stack.length == 0) {
@@ -2647,7 +2647,11 @@ function mcomponent(args) {
                 return buildTemplate(getView().tree);
             },
 
-            findBlockEnd : function(i, args) {
+            findBlockEnd : function(list, i, args) {
+                return findBlockEnd(list, i, args);
+            },
+
+            findBlockEndIndex : function(i, args) {
                 var list = getView().list;
                 return findBlockEnd(list, i, args).index;
             },

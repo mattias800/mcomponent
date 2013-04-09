@@ -1,4 +1,4 @@
-TestCase("Iter tag", {
+TestCase("Iter tag render result", {
 
     "test iter tag with simple list and no output" : function() {
         var c = mcomponent({model : {
@@ -1464,7 +1464,7 @@ TestCase("Niter tag - causing compile errors", {
 
 TestCase("Niter/iter tag - looking up properties in objects in different ways", {
 
-    "test iter tag with property lookup using [''] compiling correctly" : function() {
+    "test iter tag with property lookup using single fnutts compiling correctly" : function() {
         assertNoException(function() {
             mcomponent({
                 viewHtml : "{{ iter bounds['out'] }}{{ enditer }}"
@@ -1472,7 +1472,7 @@ TestCase("Niter/iter tag - looking up properties in objects in different ways", 
         });
     },
 
-    'test iter tag with property lookup using [""] compiling correctly' : function() {
+    'test iter tag with property lookup using double fnutts compiling correctly' : function() {
         assertNoException(function() {
             mcomponent({
                 viewHtml : '{{ iter bounds["out"] }}{{ enditer }}',

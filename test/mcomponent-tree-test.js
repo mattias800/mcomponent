@@ -124,8 +124,8 @@ TestCase("Syntax tree for if tags", {
     "test nested if tags" : function() {
         var c = mcomponent({viewHtml : "{{ if (true) }}1{{ if (false) }}2{{ endif }}{{ endif }}"});
         assertTrue("List size is 6.", c.assert.assertListSize(6));
-        assertEquals("Should find outer 'endif' tag on index 5.", 5, c._.findBlockEnd(0, {endTags : ["else", "elseif"]}));
-        assertEquals("Should find inner 'endif' tag on index 4.", 4, c._.findBlockEnd(2, {endTags : ["else", "elseif"]}));
+        assertEquals("Should find outer 'endif' tag on index 5.", 5, c._.findBlockEndIndex(0, {endTags : ["else", "elseif"]}));
+        assertEquals("Should find inner 'endif' tag on index 4.", 4, c._.findBlockEndIndex(2, {endTags : ["else", "elseif"]}));
         assertEquals("Only one condition on outer if case.", 1, c._.getTree()[0].conditions.length);
         assertEquals("Only one content list also, on outer if case.", 1, c._.getTree()[0].contentRoots.length);
         assertEquals("No else content on outer if case.", 0, c._.getTree()[0].elseContent.length);
