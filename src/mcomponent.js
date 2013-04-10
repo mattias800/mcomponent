@@ -259,9 +259,7 @@ function mcomponent(args) {
 
             if (mainArgs.renderError) this.renderResult.push(renderErrorToString(error));
 
-            if (mainArgs.throwOnError) {
-                throw renderErrorToString(error);
-            }
+            throwError(error);
         };
 
         this.hasRenderErrors = function() {
@@ -410,7 +408,6 @@ function mcomponent(args) {
                 if (value !== undefined) return value;
 
             }
-
 
             // Only create expression function if there is no "../" prefix.
             if (parentPrefixResult.count == 0) {
@@ -1199,8 +1196,12 @@ function mcomponent(args) {
                 if (ss.length > 0) {
                     parameter = ss[1];
                     if (parameter) {
-                        if (parameter == "notrequired") required = false;
-                        else invalidParameter = true;
+                        if (parameter == "notrequired") {
+                            required = false;
+                        }
+                        else {
+                            invalidParameter = true;
+                        }
                     }
                 }
                 if (invalidParameter) {
@@ -1883,7 +1884,6 @@ function mcomponent(args) {
         return s;
     };
 
-
     var compileTreeToSource = function(tree) {
 
         var result = new CompiledSource();
@@ -1974,6 +1974,7 @@ function mcomponent(args) {
                     result.pushCompiledSource(tagCompiledSource);
                     result.push("} catch (e) {");
                     result.push("    executionContext.pushCurrentRenderError(e)");
+                    if (mainArgs.logOnError) result.push("console.log(e)");
                     if (mainArgs.throwOnError) result.push("throw e");
                     result.push("}");
                 }
@@ -2290,7 +2291,6 @@ function mcomponent(args) {
         return r;
     };
 
-
     var CompiledSource = function() {
         var stack = [];
 
@@ -2460,7 +2460,6 @@ function mcomponent(args) {
 
         return result;
     };
-
 
     init();
 
