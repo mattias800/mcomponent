@@ -1,4 +1,4 @@
-TestCase("Iter tag render result", {
+TestCase("Iter tag - render result", {
 
     "test iter tag with simple list and no output" : function() {
         var c = mcomponent({model : {
@@ -1467,7 +1467,8 @@ TestCase("Niter/iter tag - looking up properties in objects in different ways", 
     "test iter tag with property lookup using single fnutts compiling correctly" : function() {
         assertNoException(function() {
             mcomponent({
-                viewHtml : "{{ iter bounds['out'] }}{{ enditer }}"
+                viewHtml : "{{ iter bounds['out'] }}{{ enditer }}",
+                throwOnError : true
             });
         });
     },
@@ -1479,6 +1480,26 @@ TestCase("Niter/iter tag - looking up properties in objects in different ways", 
                 throwOnError : true
             });
         });
+    }
+
+});
+
+TestCase("Iter tag - without specified model", {
+
+    "test iter with no model does not throw exception" : function() {
+        assertNoException(function() {
+            var c = mcomponent({ throwOnError : true, viewHtml : "{{ iter }}{{ enditer }}" });
+        });
+    },
+
+    "test iter with no model renders correctly" : function() {
+        var c = mcomponent({ model : ["ab", "cd"], viewHtml : "{{ iter }}{{ enditer }}" });
+        assertEquals("abcd", c.assert.assertRender());
+        logstr(c._.getSource());
+    },
+
+    "test it" : function() {
+
     }
 
 });
