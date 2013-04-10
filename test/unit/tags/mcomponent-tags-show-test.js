@@ -23,3 +23,17 @@ TestCase("Tag - showif", {
     }
 
 });
+
+TestCase("Property lookup with falsy properties", {
+
+    "test property lookup with 0 result" : function() {
+        var c = mcomponent({model : { age : 0}, viewHtml : "{{ age }}"});
+        assertEquals("0", c.assert.assertRender());
+    },
+
+    "test property lookup with false result" : function() {
+        var c = mcomponent({model : { age : false}, viewHtml : "{{ age }}"});
+        assertEquals("false", c.assert.assertRender());
+    }
+
+});
