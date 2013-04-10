@@ -31,8 +31,19 @@ TestCase("Property lookup with falsy properties", {
         assertEquals("0", c.assert.assertRender());
     },
 
+    "test property lookup with 0 result and more than one level" : function() {
+        var c = mcomponent({model : { age : 0, name : {}}, viewHtml : "{{ push name }}{{ age }}{{ endpush }}"});
+        logstr(c._.getSource());
+        assertEquals("0", c.assert.assertRender());
+    },
+
     "test property lookup with false result" : function() {
         var c = mcomponent({model : { age : false}, viewHtml : "{{ age }}"});
+        assertEquals("false", c.assert.assertRender());
+    },
+
+    "test property lookup with false result and more than one level" : function() {
+        var c = mcomponent({model : { age : false, name : {}}, viewHtml : "{{ push name }}{{ age }}{{ endpush }}"});
         assertEquals("false", c.assert.assertRender());
     }
 

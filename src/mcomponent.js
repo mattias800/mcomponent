@@ -260,6 +260,7 @@ function mcomponent(args) {
             if (mainArgs.renderError) this.renderResult.push(renderErrorToString(error));
 
             throwError(error);
+
         };
 
         this.hasRenderErrors = function() {
@@ -1974,8 +1975,8 @@ function mcomponent(args) {
                     result.pushCompiledSource(tagCompiledSource);
                     result.push("} catch (e) {");
                     result.push("    executionContext.pushCurrentRenderError(e)");
-                    if (mainArgs.logOnError) result.push("console.log(e)");
-                    if (mainArgs.throwOnError) result.push("throw e");
+                    if (mainArgs.logOnError) result.push("    console.log(e)");
+                    if (mainArgs.throwOnError) result.push("    throw e");
                     result.push("}");
                 }
 
@@ -2148,7 +2149,7 @@ function mcomponent(args) {
             name = prefixResult.name;
             if (prefixResult.count == 0) {
                 // There is no parent "../" prefix, so check model as usual.
-                r.push(varName + " = " + "(" + createConditionForValueExists("model", name) + " !== undefined ? model." + name + " : " + lookupVar + "())");
+                r.push(varName + " = " + "(" + createConditionForValueExists("model", name) + " ? model." + name + " : " + lookupVar + "())");
             } else {
                 // There is at least one "../" prefix, so no need to check model. Use lookup function immediately.
                 r.push(varName + " = " + lookupVar + "()");
@@ -2172,14 +2173,14 @@ function mcomponent(args) {
 
         var ifConditions = [];
 
-        ifConditions.push(tempVar);
+        ifConditions.push(tempVar + " !== undefined");
         for (var i = 0; i < names.length; i++) {
             var c = [];
             c.push(tempVar);
             for (var j = 0; j <= i; j++) {
                 c.push(names[j]);
             }
-            ifConditions.push(c.join('.'));
+            ifConditions.push(c.join('.') + " !== undefined");
         }
         return ifConditions.join(" && ");
 
