@@ -1,3 +1,36 @@
+TestCase("Show tag", {
+    "test show tag": function () {
+
+        var c = mcomponent({model: {name: "mattias"}, viewHtml: "{{ show name }}"});
+        assertEquals("Should contain 'mattias'.", "mattias", c.assert.assertRender());
+
+        var c = mcomponent({model: {user: {name: "marcus"}}, viewHtml: "{{ show user.name }}"});
+        assertEquals("Should contain 'marcus'.", "marcus", c.assert.assertRender());
+
+        var c = mcomponent({model: "marcus", viewHtml: "{{ show }}"});
+        assertEquals("Should contain 'marcus'.", "marcus", c.assert.assertRender());
+
+        var c = mcomponent({model: { list: [
+            {url: "www.google.com" },
+            {url: "www.facebook.com"}
+        ]}, viewHtml: "{{ model.list[0].url }}"});
+        assertEquals("Should contain 'www.google.com' using lookup with runFunction().", "www.google.com", c.assert.assertRender());
+
+        var c = mcomponent({model: { list: [
+            {url: "www.google.com" },
+            {url: "www.facebook.com"}
+        ]}, viewHtml: "{{ model.list[1].url }}"});
+        assertEquals("Should contain 'www.facebook.com' using lookup with runFunction().", "www.facebook.com", c.assert.assertRender());
+
+        var c = mcomponent({model: { list: [
+            {url: "www.google.com" },
+            {url: "www.facebook.com"}
+        ]}, viewHtml: "{{ showjs model.list[0].url }}"});
+        assertEquals("Should contain 'www.google.com' using showjs.", "www.google.com", c.assert.assertRender());
+
+    }
+});
+
 TestCase("Tag - showif", {
 
     "test showif doesn't output error message when missing property": function () {

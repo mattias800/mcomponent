@@ -1,6 +1,6 @@
 TestCase("Startup", {
 
-    "test mcomponent up and running" : function() {
+    "test mcomponent up and running": function () {
         assertFunction("mcomponent is available in global scope.", mcomponent);
         assertEquals("mcomponent is a function.", "function", typeof mcomponent);
     }
@@ -9,156 +9,140 @@ TestCase("Startup", {
 
 TestCase("Compiled", {
 
-    "test component with empty view renders empty result" : function() {
-        var c = mcomponent({ model : {}, viewHtml : "" });
+    "test component with empty view renders empty result": function () {
+        var c = mcomponent({ model: {}, viewHtml: "" });
         assertEquals("", c.assert.assertRender());
     },
 
-    "test component with HTML and model, no tags" : function() {
+    "test component with HTML and model, no tags": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "hohoho"
+            model: {name: "must"},
+            viewHtml: "hohoho"
         });
         assertEquals("hohoho", c.assert.assertRender());
     },
 
-    "test component with HTML and a property tag" : function() {
+    "test component with HTML and a property tag": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "hoho{{ name }}haha"
+            model: {name: "must"},
+            viewHtml: "hoho{{ name }}haha"
         });
         assertEquals("hohomusthaha", c.assert.assertRender());
     },
 
-    "test component with a property tag" : function() {
+    "test component with a property tag": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "{{ name }}"
+            model: {name: "must"},
+            viewHtml: "{{ name }}"
         });
         assertEquals("must", c.assert.assertRender());
     },
 
-    "test component with a show tag" : function() {
+    "test component with a show tag": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "{{ show name }}"
+            model: {name: "must"},
+            viewHtml: "{{ show name }}"
         });
         assertEquals("must", c.assert.assertRender());
     },
 
-    "test push tag and property tag when pushed model is on top of stack" : function() {
+    "test If tag that evaluates to true and uses model and outputs simple HTML": function () {
         var c = mcomponent({
-            model : {name : "must", hair : {color : "black", styling : "awesome"}},
-            viewHtml : "{{ push hair }}{{ color }}{{ endpush }}"
-        });
-        assertEquals("black", c.assert.assertRender());
-    },
-
-    "test show name is must even with push and no specified name" : function() {
-        var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "{{ push name }}{{ show }}{{ endpush }}"
-        });
-        assertEquals("must", c.assert.assertRender());
-    },
-
-    "test If tag that evaluates to true and uses model and outputs simple HTML" : function() {
-        var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
+            model: {name: "must"},
+            viewHtml: "oh{{ if model.name == 'must' }}yes{{ endif }}"
         });
         assertEquals("ohyes", c.assert.assertRender());
     },
 
-    "test If tag that evaluates to false and uses model and outputs simple HTML" : function() {
+    "test If tag that evaluates to false and uses model and outputs simple HTML": function () {
         var c = mcomponent({
-            model : {name : "mattias"},
-            viewHtml : "oh{{ if model.name == 'must' }}yes{{ endif }}"
+            model: {name: "mattias"},
+            viewHtml: "oh{{ if model.name == 'must' }}yes{{ endif }}"
         });
         assertEquals("oh", c.assert.assertRender());
     },
 
-    "test If tag with else case that evaluates to true" : function() {
+    "test If tag with else case that evaluates to true": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
+            model: {name: "must"},
+            viewHtml: "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
         });
         assertEquals("ohyes", c.assert.assertRender());
     },
 
-    "test If tag with else case that evaluates to false" : function() {
+    "test If tag with else case that evaluates to false": function () {
         var c = mcomponent({
-            model : {name : "mattias"},
-            viewHtml : "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
+            model: {name: "mattias"},
+            viewHtml: "oh{{ if model.name == 'must' }}yes{{ else }}no{{ endif }}"
         });
         assertEquals("ohno", c.assert.assertRender());
     },
 
-    "test log tag doesn't output any result" : function() {
+    "test log tag doesn't output any result": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "{{ log 'hej' }}"
+            model: {name: "must"},
+            viewHtml: "{{ log 'hej' }}"
         });
         assertEquals("", c.assert.assertRender());
     },
 
-    "test setglobal tag doesn't render any result" : function() {
-        var c = mcomponent({ viewHtml : "{{ setglobal aGlobal 'hej' }}" });
+    "test setglobal tag doesn't render any result": function () {
+        var c = mcomponent({ viewHtml: "{{ setglobal aGlobal 'hej' }}" });
         assertEquals("", c.assert.assertRender());
     },
 
-    "test js doesn't render to result" : function() {
+    "test js doesn't render to result": function () {
         var c = mcomponent({
-            viewHtml : "{{ js 'hej' }}"
+            viewHtml: "{{ js 'hej' }}"
         });
         assertEquals("", c.assert.assertRender());
     },
 
-    "test showjs does render to result" : function() {
+    "test showjs does render to result": function () {
         var c = mcomponent({
-            viewHtml : "{{ showjs 'hej' }}"
+            viewHtml: "{{ showjs 'hej' }}"
         });
         assertEquals("hej", c.assert.assertRender());
     },
 
-    "test when context is empty, should return empty result." : function() {
+    "test when context is empty, should return empty result.": function () {
         var c = mcomponent({
-            model : {name : "must"},
-            viewHtml : "{{ context name }}",
-            throwOnError : true
+            model: {name: "must"},
+            viewHtml: "{{ context name }}",
+            throwOnError: true
         });
-        assertException(function() {
+        assertException(function () {
             c.assert.assertRender();
         });
     },
 
-    "test iter tag" : function() {
+    "test iter tag": function () {
 
         var c;
         var result;
 
         c = mcomponent({
-            model : { list : ["mattias", "marcus", "johan"] },
-            viewHtml : "{{ iter list }}{{ enditer }}"})
+            model: { list: ["mattias", "marcus", "johan"] },
+            viewHtml: "{{ iter list }}{{ enditer }}"})
         ;
 
         assertEquals("Should contain nothing.", "", c.assert.assertRender());
 
         c = mcomponent({
-            model : { list : ["mattias", "marcus", "johan"] },
-            viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"})
+            model: { list: ["mattias", "marcus", "johan"] },
+            viewHtml: "{{ iter list }}{{ show }}{{ enditer }}"})
         ;
 
         assertEquals("Should contain mattiasmarcusjohan.", "mattiasmarcusjohan", c.assert.assertRender());
 
 
         c = mcomponent({
-            model : { list : [
-                {name : "mattias", nums : [1, 2, 3]},
-                {name : "marcus", nums : [4, 5, 6]},
-                {name : "johan", nums : [9, 8, 7]}
+            model: { list: [
+                {name: "mattias", nums: [1, 2, 3]},
+                {name: "marcus", nums: [4, 5, 6]},
+                {name: "johan", nums: [9, 8, 7]}
             ] },
-            viewHtml : "{{ iter list }}{{ show name }}{{ iter nums }}{{ show }}{{ enditer }}{{ enditer }}"})
+            viewHtml: "{{ iter list }}{{ show name }}{{ iter nums }}{{ show }}{{ enditer }}{{ enditer }}"})
         ;
 
         assertEquals("Should contain mattiasmarcusjohan.", "mattias123marcus456johan987", c.assert.assertRender());
@@ -167,27 +151,27 @@ TestCase("Compiled", {
          * Larger view
          */
 
-        c = mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
+        c = mcomponent({viewHtml: "{{ if (this.model) }}yay1" +
             "{{ if (this.model.users) }}yay2" +
             "{{ endif }}" +
             "{{ endif }}",
-            model : {
-                users : [
-                    {name : "Mattias", isMale : true, age : 31},
-                    {name : "Must", isMale : true, age : 28},
-                    {name : "Jenny", isMale : false, age : 27}
+            model: {
+                users: [
+                    {name: "Mattias", isMale: true, age: 31},
+                    {name: "Must", isMale: true, age: 28},
+                    {name: "Jenny", isMale: false, age: 27}
                 ],
-                location : {
-                    city : {name : "G?teborg"},
-                    country : {name : "Sweden"}
+                location: {
+                    city: {name: "G?teborg"},
+                    country: {name: "Sweden"}
                 }
             },
-            iter : {users : {}}});
+            iter: {users: {}}});
 
         assertString("Rendering of large view should be OK!", result = c.assert.assertRender());
         assertEquals("And the result should be correct.", "yay1yay2", result);
 
-        c = mcomponent({viewHtml : "{{ if (this.model) }}yay1" +
+        c = mcomponent({viewHtml: "{{ if (this.model) }}yay1" +
             "{{ if (this.model.users) }}yay2" +
             "{{ iter users }}" +
             "Name:{{ name }}" +
@@ -197,73 +181,73 @@ TestCase("Compiled", {
             "{{ endif }}" +
             "{{ endif }}",
 
-            model : {
-                users : [
-                    {name : "Mattias", isMale : true, age : 31},
-                    {name : "Must", isMale : true, age : 28},
-                    {name : "Jenny", isMale : false, age : 27}
+            model: {
+                users: [
+                    {name: "Mattias", isMale: true, age: 31},
+                    {name: "Must", isMale: true, age: 28},
+                    {name: "Jenny", isMale: false, age: 27}
                 ],
-                location : {
-                    city : {name : "G?teborg"},
-                    country : {name : "Sweden"}
+                location: {
+                    city: {name: "G?teborg"},
+                    country: {name: "Sweden"}
                 }
             },
-            iter : {users : {}}});
+            iter: {users: {}}});
 
         result = c.assert.assertRender();
         assertEquals("And the result should be correct.", "yay1yay2Name:MattiasMale:YesAge:31Name:MustMale:YesAge:28Name:JennyMale:NoAge:27", result);
 
     },
 
-    "test niter tag" : function() {
+    "test niter tag": function () {
 
         var c;
 
-        assertException(function() {
+        assertException(function () {
             c = mcomponent({
-                model : {
-                    list : ["mattias", "marcus", "johan"]
-                }, viewHtml : "{{ niter userListIter list }}{{ endniter }}",
-                throwOnError : true
+                model: {
+                    list: ["mattias", "marcus", "johan"]
+                }, viewHtml: "{{ niter userListIter list }}{{ endniter }}",
+                throwOnError: true
             })
         });
 
-        assertException("Should throw error since we haven't declared an iterator configuration.", function() {
+        assertException("Should throw error since we haven't declared an iterator configuration.", function () {
             c.assert.assertRender();
         });
 
         c = mcomponent({
-            model : { list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIter : { itemsPerPage : 1 }
+            model: { list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIter: { itemsPerPage: 1 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ endniter }}"});
 
         assertEquals("Should contain nothing.", "", c.assert.assertRender());
 
         var a, b, i;
 
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only since itemsPerPage is 1.", "mattias", c.assert.assertRender());
 
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1,
-                    whenAllItemsAreShowing : function() {
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1,
+                    whenAllItemsAreShowing: function () {
                         a = 5;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
 
         a = 3;
@@ -277,19 +261,19 @@ TestCase("Compiled", {
         a = 3;
         b = 1;
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1,
-                    whenAllItemsAreShowing : function() {
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1,
+                    whenAllItemsAreShowing: function () {
                         a = 5;
                     },
-                    whenNotAllItemsAreShowing : function() {
+                    whenNotAllItemsAreShowing: function () {
                         b = 2;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("b should be 1 first.", 1, b);
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertEquals("b should be 2 after whenNotAllItemsAreShowing has been run.", 2, b);
@@ -306,16 +290,16 @@ TestCase("Compiled", {
         a = 3;
 
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1,
-                    whenAllItemsAreShowing : function() {
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1,
+                    whenAllItemsAreShowing: function () {
                         a = 5;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
         assertEquals("Trying to get iterator context that doesn't exist should return undefined.", undefined, c.getIterator("userListIterYeahASFSA"));
@@ -330,19 +314,19 @@ TestCase("Compiled", {
 
 TestCase("Execution scope", {
 
-    "test component and execution context have same id using component.assert" : function() {
-        assertTrue(mcomponent({viewHtml : ""}).assert.assertComponentIdEqualsExecutionContextId());
+    "test component and execution context have same id using component.assert": function () {
+        assertTrue(mcomponent({viewHtml: ""}).assert.assertComponentIdEqualsExecutionContextId());
     },
 
-    "test component and execution context have same id using api._assert" : function() {
-        var a = mcomponent({viewHtml : "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+    "test component and execution context have same id using api._assert": function () {
+        var a = mcomponent({viewHtml: "{{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
         assertEquals("true", a.assert.assertRender());
     },
 
-    "test child count from execution context is increased correctly by rendering the value" : function() {
-        var a = mcomponent({viewHtml : "a {{ showjs api._assert.getExecutionContext().getChildCount() }}"});
+    "test child count from execution context is increased correctly by rendering the value": function () {
+        var a = mcomponent({viewHtml: "a {{ showjs api._assert.getExecutionContext().getChildCount() }}"});
         assertEquals("a 0", a.assert.assertRender());
-        a.addChild("b", mcomponent({viewHtml : "b"}));
+        a.addChild("b", mcomponent({viewHtml: "b"}));
         assertEquals("a 1", a.assert.assertRender());
     }
 
@@ -350,7 +334,7 @@ TestCase("Execution scope", {
 
 TestCase("Execution scope isolation", {
 
-    "test Execution context scope" : function() {
+    "test Execution context scope": function () {
 
         /**
          * When having children and setting view with other component, ensure that components still have their own execution context.
@@ -360,8 +344,8 @@ TestCase("Execution scope isolation", {
 
         // Test setViewFromComponent first.
 
-        a = mcomponent({id : 1, viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
-        b = mcomponent({id : 2, viewHtml : "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+        a = mcomponent({id: 1, viewHtml: "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+        b = mcomponent({id: 2, viewHtml: "b {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
 
         assertTrue("Correct execution context.", a.assert.assertComponentIdEqualsExecutionContextId());
         assertEquals("", "a true", a.assert.assertRender());
@@ -378,14 +362,14 @@ TestCase("Execution scope isolation", {
 
         // OK
 
-        a = mcomponent({viewHtml : "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"});
+        a = mcomponent({viewHtml: "a {{ showjs api._assert.componentIdEqualsExecutionContextId() }} {{ component c }}"});
         assertTrue("Correct execution context.", a.assert.assertComponentIdEqualsExecutionContextId());
 
-        c = mcomponent({viewHtml : "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
+        c = mcomponent({viewHtml: "c {{ showjs api._assert.componentIdEqualsExecutionContextId() }}"});
         assertEquals("", "c true", c.assert.assertRender());
         assertTrue("Correct execution context.", c.assert.assertComponentIdEqualsExecutionContextId());
 
-        b = mcomponent({viewHtml : "b"});
+        b = mcomponent({viewHtml: "b"});
         assertEquals("Should be b", "b", b.assert.assertRender());
         assertTrue("Correct execution context.", b.assert.assertComponentIdEqualsExecutionContextId());
 
@@ -402,7 +386,7 @@ TestCase("Execution scope isolation", {
 
         // Test with API assertion, but with viewFromComponent
 
-        d = mcomponent({viewHtml : "ok{{ js api._assert.childCount(1) }}"});
+        d = mcomponent({viewHtml: "ok{{ js api._assert.childCount(1) }}"});
         b.setViewFromComponent(d);
         assertTrue("Should have 1 child in execution context.", b.assert.assertRender() == "ok");
         // TODO: Test equal id for context and component.
