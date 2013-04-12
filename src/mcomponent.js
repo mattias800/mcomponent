@@ -44,15 +44,15 @@ function mcomponent(args) {
 
     var validateChild = function (id, child) {
         if (id.indexOf(" ") >= 0) {
-            return { result: false, message: "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
+            return { result : false, message : "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
         } else if (/[^a-zA-Z0-9]/.test(id)) {
-            return { result: false, message: "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
+            return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
         } else if (typeof child._.isComponent !== "function") {
-            return { result: false, message: "Child is not an mcomponent object."};
+            return { result : false, message : "Child is not an mcomponent object."};
         } else if (!child._.isComponent()) {
-            return { result: false, message: "Child is not an mcomponent object."};
+            return { result : false, message : "Child is not an mcomponent object."};
         }
-        return { result: true };
+        return { result : true };
     };
 
     /************************
@@ -252,8 +252,8 @@ function mcomponent(args) {
 
         this.addRenderError = function (message, tagName) {
             var error = {
-                message: message,
-                tag: tagName
+                message : message,
+                tag : tagName
             };
             this.renderErrors.push(error);
 
@@ -491,30 +491,30 @@ function mcomponent(args) {
         this.getTagApi = function () {
             var that = this;
             return {
-                lookup: function (name) {
+                lookup : function (name) {
                     try {
                         return that.lookup(name);
                     } catch (e) {
                         return undefined;
                     }
                 },
-                getRootModel: function () {
+                getRootModel : function () {
                     return that.executionStack[0].model;
                 },
-                getIterator: function (iteratorName) {
+                getIterator : function (iteratorName) {
                     var i = executionContext.getIteratorWithName(iteratorName);
                     return i ? i.getPublicInterface() : undefined;
                 },
-                _assert: {
-                    componentIdEqualsExecutionContextId: function () {
+                _assert : {
+                    componentIdEqualsExecutionContextId : function () {
                         return id == executionContext.id ?
                             true :
                             id + " != " + executionContext.id;
                     },
-                    getExecutionContext: function () {
+                    getExecutionContext : function () {
                         return executionContext;
                     },
-                    childCount: function (expectedCount) {
+                    childCount : function (expectedCount) {
                         var got = executionContext.getChildCount();
                         if (got !== expectedCount) throw "Wrong number of children. Expected " + expectedCount + ", got " + got + ".";
                     }
@@ -552,7 +552,7 @@ function mcomponent(args) {
         };
 
         this.pushModel = function (model) {
-            this.executionStack.push({model: model});
+            this.executionStack.push({model : model});
             this.updateLocalState();
         };
 
@@ -809,53 +809,53 @@ function mcomponent(args) {
 
             return {
 
-                showingAllItems: showingAllItems,
-                currentPage: currentPage,
-                itemsShowing: Math.min(getModelLength(), itemsShowing),
-                itemsPerPage: config.itemsPerPage,
-                itemsTotal: getModelLength(),
+                showingAllItems : showingAllItems,
+                currentPage : currentPage,
+                itemsShowing : Math.min(getModelLength(), itemsShowing),
+                itemsPerPage : config.itemsPerPage,
+                itemsTotal : getModelLength(),
 
-                showMoreItems: function () {
+                showMoreItems : function () {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showMoreItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
                     itemsShowing += config.itemsPerPage;
                     if (itemsShowing >= model.length) itemsShowing = model.length;
                     showingAllItems = itemsShowing == model.length;
                 },
-                showAllItems: function () {
+                showAllItems : function () {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showAllItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
                     itemsShowing = getModelLength();
                     showingAllItems = true;
                 },
-                getCurrentPage: function () {
+                getCurrentPage : function () {
                     return currentPage;
                 },
-                getPageCount: function () {
+                getPageCount : function () {
                     return getPageCount();
                 },
-                showNextPage: function () {
+                showNextPage : function () {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage++;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                showPrevPage: function () {
+                showPrevPage : function () {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage--;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                showPage: function (index) {
+                showPage : function (index) {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage = index;
                     if (currentPage < 0) currentPage = 0;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                getIndexForItem: function (item) {
+                getIndexForItem : function (item) {
                     if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
                     if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
                     for (var i = 0; i < filteredModel.length; i++) if (filteredModel[i] == item) return i;
                     throw "Unable to find specified item in iterators list.";
                 },
-                getIndexForItemWhere: function (where) {
+                getIndexForItemWhere : function (where) {
                     if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
                     if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
@@ -868,19 +868,19 @@ function mcomponent(args) {
                     }
                     throw "Unable to find item that matches where function in iterators list.";
                 },
-                getPageWithItem: function (item) {
+                getPageWithItem : function (item) {
                     return this.getPageIndexForItemIndex(this.getIndexForItem(item));
                 },
-                getPageWithItemWhere: function (where) {
+                getPageWithItemWhere : function (where) {
                     return this.getPageIndexForItemIndex(this.getIndexForItemWhere(where));
                 },
-                getPageIndexForItemIndex: function (itemIndex) {
+                getPageIndexForItemIndex : function (itemIndex) {
                     return Math.floor(itemIndex / this.itemsPerPage)
                 },
-                showPageWithItemIndex: function (index) {
+                showPageWithItemIndex : function (index) {
                     this.showPage(this.getPageIndexForItemIndex(index));
                 },
-                showPageWithItem: function (item) {
+                showPageWithItem : function (item) {
                     try {
                         var pageWithItem = this.getPageWithItem(item);
                         this.showPage(pageWithItem);
@@ -888,7 +888,7 @@ function mcomponent(args) {
                         throw "Trying to show page with specified item, but no such item was found.";
                     }
                 },
-                showPageWithItemWhere: function (where) {
+                showPageWithItemWhere : function (where) {
                     try {
                         var pageWithItemWhere = this.getPageWithItemWhere(where);
                         this.showPage(pageWithItemWhere);
@@ -896,31 +896,31 @@ function mcomponent(args) {
                         throw "Trying to show page with item that passes where-function, but no such item was found.";
                     }
                 },
-                isOnFirstPage: function () {
+                isOnFirstPage : function () {
                     return isOnFirstPage();
                 },
-                isOnLastPage: function () {
+                isOnLastPage : function () {
                     return isOnLastPage();
                 },
-                isOnFirstOrLastPage: function () {
+                isOnFirstOrLastPage : function () {
                     return isOnFirstOrLastPage();
                 },
-                isOnFirstAndLastPage: function () {
+                isOnFirstAndLastPage : function () {
                     return isOnFirstAndLastPage();
                 },
-                getFirstIndexForCurrentPage: function () {
+                getFirstIndexForCurrentPage : function () {
                     return getFirstIndexForCurrentPage();
                 },
-                getLastIndexForCurrentPage: function () {
+                getLastIndexForCurrentPage : function () {
                     return getLastIndexForCurrentPage();
                 },
-                getFirstItemOnCurrentPage: function () {
+                getFirstItemOnCurrentPage : function () {
                     return getFirstItemOnCurrentPage();
                 },
-                getLastItemOnCurrentPage: function () {
+                getLastItemOnCurrentPage : function () {
                     return getLastItemOnCurrentPage();
                 },
-                setModel: function (m) {
+                setModel : function (m) {
                     setModel(m);
                 }
             }
@@ -933,10 +933,10 @@ function mcomponent(args) {
      ****************************/
 
     var tagTypes = {
-        tag_show: {
-            token: "show",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_show : {
+            token : "show",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (name) {
@@ -948,19 +948,19 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_showif: {
-            token: "showif",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_showif : {
+            token : "showif",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (name) {
@@ -972,106 +972,106 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_context: {
-            token: "context",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_context : {
+            token : "context",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 result.pushBufferEmptyStringIfUndefined("executionContext.lookupContextInStack('" + name + "')");
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_showjs: {
-            token: "showjs",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_showjs : {
+            token : "showjs",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.pushBufferEmptyStringIfUndefined(tagInstance.tag.parameters);
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_js: {
-            token: "js",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_js : {
+            token : "js",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.push(tagInstance.tag.parameters);
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_setglobal: {
-            token: "setglobal",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_setglobal : {
+            token : "setglobal",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
                 result.push("executionContext.getGlobals()['" + p.iterName + "'] = " + p.variableName);
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_log: {
-            token: "log",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_log : {
+            token : "log",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_if: {
-            token: "if",
-            hasBlock: true,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_if : {
+            token : "if",
+            hasBlock : true,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var param = tagInstance.tag.parameters;
                 var isFirst = true;
@@ -1090,7 +1090,7 @@ function mcomponent(args) {
                 return result;
             },
 
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: " + startTagToken + " if model.isNice " + endTagToken, args.tag);
                 var condition = args.tag.parameters;
                 try {
@@ -1098,13 +1098,13 @@ function mcomponent(args) {
                     var c = createIfTag(args.subList, condition);
 
                     return {
-                        tagName: this.token,
-                        tag: args.tag,
-                        content: args.content,
-                        condition: condition,
-                        conditions: c.conditions,
-                        contentRoots: c.contentRoots,
-                        elseContent: c.elseContent
+                        tagName : this.token,
+                        tag : args.tag,
+                        content : args.content,
+                        condition : condition,
+                        conditions : c.conditions,
+                        contentRoots : c.contentRoots,
+                        elseContent : c.elseContent
                     };
                 } catch (e) {
                     throw e;
@@ -1112,10 +1112,10 @@ function mcomponent(args) {
             }
         },
 
-        tag_push: {
-            token: "push",
-            hasBlock: true,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_push : {
+            token : "push",
+            hasBlock : true,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var param = tagInstance.tag.parameters;
                 var compiledLookup = compileLookup(param);
@@ -1127,40 +1127,40 @@ function mcomponent(args) {
                 result.pushCompiledSource(createModelContextUpdateCompiledSource());
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_copy: {
-            token: "copy",
-            hasBlock: true,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_copy : {
+            token : "copy",
+            hasBlock : true,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 // Do nothing in compiled tag, we add it at parse time.
                 var result = new CompiledSource();
                 result.pushCompiledSource(compileTreeToSource(tagInstance.content));
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 var name = args.tag.parameters;
                 if (!name) name = "default";
                 executionContext.setClipboardWithName(name, args.content);
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_paste: {
-            token: "paste",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_paste : {
+            token : "paste",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (!name) name = "default";
@@ -1175,19 +1175,19 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_component: {
-            token: "component",
-            hasBlock: false,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_component : {
+            token : "component",
+            hasBlock : false,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var ss = tagInstance.tag.parameters.split(" ");
                 var name = ss[0];
@@ -1220,42 +1220,42 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_iter: {
-            token: "iter",
-            hasBlock: true,
-            compileTagInstance: function (tagInstance, executionContext, args) {
+        tag_iter : {
+            token : "iter",
+            hasBlock : true,
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 return tagTypes.tag_niter.compileTagInstance(tagInstance, executionContext, args);
             },
-            createTagInstance: function (args) {
+            createTagInstance : function (args) {
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             }
         },
 
-        tag_niter: {
-            token: "niter",
-            hasBlock: true,
-            createTagInstance: function (args) {
+        tag_niter : {
+            token : "niter",
+            hasBlock : true,
+            createTagInstance : function (args) {
                 // Cannot lookup iterConfig here, it might change after view has been rendered.
                 return {
-                    tagName: this.token,
-                    tag: args.tag,
-                    content: args.content
+                    tagName : this.token,
+                    tag : args.tag,
+                    content : args.content
                 };
             },
-            compileTagInstance: function (tagInstance, executionContext, args) {
+            compileTagInstance : function (tagInstance, executionContext, args) {
                 var resultOuter = new CompiledSource();
                 var result = new CompiledSource();
 
@@ -1361,9 +1361,9 @@ function mcomponent(args) {
     };
 
     var view = {
-        html: undefined,
-        tree: {},
-        list: []
+        html : undefined,
+        tree : {},
+        list : []
     };
 
     var createExpressionFunction = function (exp) {
@@ -1462,8 +1462,8 @@ function mcomponent(args) {
         localView.template = buildTemplate(localView.source, localCompilationContext);
 
         return {
-            view: localView,
-            compilationContext: localCompilationContext
+            view : localView,
+            compilationContext : localCompilationContext
         };
     };
 
@@ -1506,12 +1506,12 @@ function mcomponent(args) {
 
             if (startIndex < 0) {
                 // No tags left, just add rest as HTML.
-                if (viewHtml) list.push({html: viewHtml});
+                if (viewHtml) list.push({html : viewHtml});
                 break;
             } else if (startIndex > 0) {
                 // There was HTML in front of tag, adding it.
                 var html = viewHtml.substring(0, startIndex);
-                if (html) list.push({html: html});
+                if (html) list.push({html : html});
             }
 
             var endIndex = viewHtml.indexOf(endTagToken);
@@ -1592,14 +1592,14 @@ function mcomponent(args) {
                     subList = list.slice(i + 1, endIndexTag.index);
                     try {
                         var tagInstance = tagType.createTagInstance({
-                            tag: item,
-                            subList: subList,
-                            content: buildTree(subList)
+                            tag : item,
+                            subList : subList,
+                            content : buildTree(subList)
                         });
                         root.push(tagInstance);
                         i = endIndexTag.index;
                     } catch (e) {
-                        throw compileErrorToString({tag: item.tag, message: e.toString()});
+                        throw compileErrorToString({tag : item.tag, message : e.toString()});
                     }
 
                 } else if (tagType && tagType.hasBlock) {
@@ -1613,8 +1613,8 @@ function mcomponent(args) {
                     }
                     subList = list.slice(i + 1, endIndex);
                     root.push(tagType.createTagInstance({
-                        tag: item,
-                        content: buildTree(subList)
+                        tag : item,
+                        content : buildTree(subList)
                     }));
                     i = endIndex;
 
@@ -1623,14 +1623,14 @@ function mcomponent(args) {
                     // not hasBlock.
 
                     root.push(tagType.createTagInstance({
-                        tag: item
+                        tag : item
                     }));
 
                 } else if (isTagTokenEndTagToken(tagName)) {
                     throw createCompileExceptionMessage("Found closing tag without starting '" + getStartTagTokenFromEndTagToken(tagName) + "' tag.", item);
                 } else {
                     // Is not a system tag
-                    root.push({tag: item});
+                    root.push({tag : item});
                     //throw "No such tag type: " + item.tagName;
                 }
             }
@@ -1707,9 +1707,9 @@ function mcomponent(args) {
         }
 
         return {
-            conditions: conditions,
-            contentRoots: contentRoots,
-            elseContent: elseContent
+            conditions : conditions,
+            contentRoots : contentRoots,
+            elseContent : elseContent
         };
     };
 
@@ -1749,8 +1749,8 @@ function mcomponent(args) {
                         // Is "else" or "elseif"
                         if (stack.length == 1) { // 1 since we have "if" on stack.
                             return {
-                                index: i,
-                                endTag: item.tagName
+                                index : i,
+                                endTag : item.tagName
                             };
                         }
                     } else if (item.tagName.substring(0, "end".length) == "end") {
@@ -1760,8 +1760,8 @@ function mcomponent(args) {
                             stack.pop();
                             if (stack.length == 0) {
                                 return {
-                                    index: i,
-                                    endTag: item.tagName
+                                    index : i,
+                                    endTag : item.tagName
                                 };
                             }
                         } else {
@@ -1791,16 +1791,16 @@ function mcomponent(args) {
             iterName = tagParameter;
         }
         return {
-            iterName: iterName ? iterName : undefined,
-            variableName: variableName ? variableName : undefined
+            iterName : iterName ? iterName : undefined,
+            variableName : variableName ? variableName : undefined
         }
     };
 
     var createTagObject = function (tagContent) {
         return {
-            tag: tagContent,
-            tagName: getTagNameFromTag(tagContent),
-            parameters: getTagParameters(tagContent)
+            tag : tagContent,
+            tagName : getTagNameFromTag(tagContent),
+            parameters : getTagParameters(tagContent)
         };
     };
 
@@ -1832,15 +1832,9 @@ function mcomponent(args) {
         return name
             .replace(/\.\.\//g, "_parent_")
             .replace(/\//g, "_")
-            .replace(/\(/g, "")
-            .replace(/\)/g, "")
-            .replace(/'/g, "")
-            .replace(/"/g, "")
-            .replace(/\[/g, "")
-            .replace(/\]/g, "")
-            .replace(/\;/g, "")
-            .replace(/\,/g, "")
-            .replace(/\./g, "_");
+            .replace(/\./g, "_")
+            .replace(/[^A-Za-z0-9_]/g, "")
+            ;
     };
 
     var _uncompiledVariableName = {};
@@ -1920,10 +1914,10 @@ function mcomponent(args) {
                         tagCompiledSource = tagType.compileTagInstance(item, executionContext);
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag: item.tag.tag}));
+                            e.push(compileErrorToString({tag : item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
                             throw [msg];
                         }
                     }
@@ -1938,10 +1932,10 @@ function mcomponent(args) {
                         tagCompiledSource = compilePropertyTag(item);
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag: item.tag.tag}));
+                            e.push(compileErrorToString({tag : item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
                             throw [msg];
                         }
                     }
@@ -1957,10 +1951,10 @@ function mcomponent(args) {
                         tagOk = true;
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag: item.tag.tag}));
+                            e.push(compileErrorToString({tag : item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
+                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
                             throw [msg];
                         }
                     }
@@ -2004,8 +1998,8 @@ function mcomponent(args) {
         var body = compileTreeToSource(tree);
         result.pushCompiledSource(body);
         return {
-            full: result,
-            body: body
+            full : result,
+            body : body
         };
     };
 
@@ -2061,13 +2055,13 @@ function mcomponent(args) {
          * This is the c.getView().template object.
          ************************************************************/
         return {
-            getSource: function () {
+            getSource : function () {
                 return source;
             },
-            getBodySource: function () {
+            getBodySource : function () {
                 return bodySource;
             },
-            render: function () {
+            render : function () {
                 var r = {};
                 var msg;
                 if (f) {
@@ -2083,7 +2077,7 @@ function mcomponent(args) {
                         }
 
                         executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
-                        throwError(renderErrorToString({tag: executionContext.currentTag.name, message: e.toString()}));
+                        throwError(renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()}));
                     }
                 } else {
                     /**
@@ -2104,7 +2098,7 @@ function mcomponent(args) {
 
                 return executionContext.renderResult.join("");
             },
-            process: function () {
+            process : function () {
                 var html = "";
                 var ok = true;
                 var error = undefined;
@@ -2114,13 +2108,19 @@ function mcomponent(args) {
                     error = e;
                 }
                 return {
-                    ok: ok,
-                    html: html,
-                    error: error
+                    ok : ok,
+                    html : html,
+                    error : error
                 };
             }
         };
     };
+
+    function modelNameIsJsCode(name) {
+        return name.indexOf("?") >= 0 ||
+            name.indexOf("(") >= 0 ||
+            name.indexOf(")") >= 0;
+    }
 
     var compileLookup = function (name, allowMissingProperty) {
         var r = new CompiledSource();
@@ -2128,14 +2128,14 @@ function mcomponent(args) {
         if (!name) name = "model";
         var names = name.split(".");
 
-        var varName = getUncompiledVariableName(names.join(''));
+        var varName = getUncompiledVariableName(name);
 
         if (name.substring(0, 6) == "model." ||
             name.substring(0, 8) == "context." ||
             name.substring(0, 8) == "globals." ||
-            name.substring(0, 4) == "api." ||
-            name.indexOf("(") >= 0 ||
-            name.indexOf(")") >= 0) {
+            name.substring(0, 4) == "api.") {
+            r.push(varName + " = " + name);
+        } else if (modelNameIsJsCode(name)) {
             r.push(varName + " = " + name);
         } else if (name.substring(0, 13) == "this.context." ||
             name.substring(0, 11) == "this.model." ||
@@ -2159,8 +2159,8 @@ function mcomponent(args) {
         }
 
         return {
-            compiledSource: r,
-            varName: varName
+            compiledSource : r,
+            varName : varName
         };
 
     };
@@ -2246,8 +2246,8 @@ function mcomponent(args) {
         r.push("}");
 
         return {
-            compiledSource: r,
-            lookupFunctionName: lookupVar
+            compiledSource : r,
+            lookupFunctionName : lookupVar
         };
 
     };
@@ -2281,8 +2281,8 @@ function mcomponent(args) {
             count++;
         }
         return {
-            count: count,
-            name: name
+            count : count,
+            name : name
         };
     };
 
@@ -2472,82 +2472,86 @@ function mcomponent(args) {
 
     return {
 
-        addChild: function (id, child) {
+        addChild : function (id, child) {
             executionContext.addChild(id, child);
         },
 
-        removeAllChildren: function (id) {
+        removeAllChildren : function (id) {
             executionContext.removeAllChildren();
         },
 
-        removeChild: function (id) {
+        removeChild : function (id) {
             executionContext.removeChildWithId(id);
         },
 
-        hasChild: function (id) {
+        hasChild : function (id) {
             return executionContext.hasChildWithId(id);
         },
 
-        getChildren: function () {
+        getChildren : function () {
             return executionContext.getChildren();
         },
 
-        getChild: function (id) {
+        getChild : function (id) {
             return executionContext.getChildWithId(id);
         },
 
-        setModel: function (model) {
+        setModel : function (model) {
             _setModel(model);
         },
 
-        getModel: function () {
+        getModel : function () {
             return _getModel();
         },
 
-        setViewWithHtml: function (html) {
+        setViewWithHtml : function (html) {
             _setViewWithHtml(html);
         },
 
-        setViewFromComponent: function (component) {
+        setViewFromComponent : function (component) {
             _setViewFromComponent(component);
         },
 
-        getIterator: function (iteratorName) {
+        getIterator : function (iteratorName) {
             var i = executionContext.getIteratorWithName(iteratorName);
             return i ? i.getPublicInterface() : undefined;
         },
 
-        getGlobals: function () {
+        getGlobals : function () {
             return executionContext.getGlobals();
         },
 
-        render: function () {
+        render : function () {
             return render();
         },
 
-        hasRenderErrors: function () {
+        hasRenderErrors : function () {
             return executionContext.hasRenderErrors() || globalCompilationContext.hasCompileError();
         },
 
-        hasCompileError: function () {
+        hasCompileError : function () {
             return globalCompilationContext.hasCompileError();
         },
 
-        getResult: function () {
+        getResult : function () {
             return result;
         },
 
-        assert: {
+        assert : {
 
-            assertLookup: function (name, model) {
+            assertFormatVariableName : function (name) {
+                return formatVariableName(name);
+            },
+
+            assertLookup : function (name, model) {
                 return lookup(name, model);
             },
 
-            assertGetTagParameters: function (tagContent) {
+            assertGetTagParameters : function (tagContent) {
                 return getTagParameters(tagContent);
             },
 
-            assertListSize: function (i) {
+            assertListSize : function (i) {
                 if (getView().list.length == i) {
                     return true;
                 }
@@ -2556,11 +2560,11 @@ function mcomponent(args) {
                 }
             },
 
-            assertIsTagTokenEndTagToken: function (tagToken) {
+            assertIsTagTokenEndTagToken : function (tagToken) {
                 return isTagTokenEndTagToken(tagToken);
             },
 
-            assertListItemHasHtml: function (i, html) {
+            assertListItemHasHtml : function (i, html) {
                 var item = getView().list[i];
                 if (item && item.html && item.html === html) {
                     return true;
@@ -2576,7 +2580,7 @@ function mcomponent(args) {
                 }
             },
 
-            assertListItemHasTagName: function (i, tagName) {
+            assertListItemHasTagName : function (i, tagName) {
                 var item = getView().list[i];
                 if (item && item.tagName && item.tagName === tagName) {
                     return true;
@@ -2592,35 +2596,35 @@ function mcomponent(args) {
                 }
             },
 
-            assertBlockEnd: function (i, expected) {
+            assertBlockEnd : function (i, expected) {
                 var list = getView().list;
                 var r = findBlockEnd(list, i, {}).index;
                 if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
                 return true;
             },
 
-            assertFindParentPrefixCount: function (name) {
+            assertFindParentPrefixCount : function (name) {
                 return findParentPrefix(name).count;
             },
 
-            assertFindParentPrefixName: function (name) {
+            assertFindParentPrefixName : function (name) {
                 return findParentPrefix(name).name;
             },
 
-            assertRender: function () {
+            assertRender : function () {
                 return render().html;
             },
 
-            assertCompileLogSource: function () {
+            assertCompileLogSource : function () {
                 var t = buildTemplate(getView().tree);
                 return t.render();
             },
 
-            assertComponentIdEqualsExecutionContextId: function () {
+            assertComponentIdEqualsExecutionContextId : function () {
                 return id == executionContext.id;
             },
 
-            assertSetViewAndBuildList: function (html) {
+            assertSetViewAndBuildList : function (html) {
                 var v = getView();
                 v.html = html;
                 if (html) {
@@ -2637,79 +2641,83 @@ function mcomponent(args) {
                 return true;
             },
 
-            assertCompileLookup: function (name, allowMissingProperty) {
+            assertCompileLookup : function (name, allowMissingProperty) {
                 return compileLookup(name, allowMissingProperty);
+            },
+
+            assertModelNameIsJsCode : function (code) {
+                return modelNameIsJsCode(code);
             }
 
 
         },
 
-        _: {
+        _ : {
 
-            getExecutionStackSize: function () {
+            getExecutionStackSize : function () {
                 return executionContext.executionStack.length;
             },
 
-            getTemplate: function () {
+            getTemplate : function () {
                 return buildTemplate(getView().tree);
             },
 
-            findBlockEnd: function (list, i, args) {
+            findBlockEnd : function (list, i, args) {
                 return findBlockEnd(list, i, args);
             },
 
-            findBlockEndIndex: function (i, args) {
+            findBlockEndIndex : function (i, args) {
                 var list = getView().list;
                 return findBlockEnd(list, i, args).index;
             },
 
-            findBlockEndTag: function (i, args) {
+            findBlockEndTag : function (i, args) {
                 var list = getView().list;
                 return findBlockEnd(list, i, args);
             },
 
-            getTree: function () {
+            getTree : function () {
                 return getView().tree;
             },
 
-            getList: function () {
+            getList : function () {
                 return getView().list;
             },
 
-            getView: function () {
+            getView : function () {
                 return view;
             },
 
-            getSource: function () {
+            getSource : function () {
                 if (view.source == undefined) throw "Component has not been compiled properly, source not available.";
                 return view.source.full.toString();
             },
 
-            getBodySource: function () {
+            getBodySource : function () {
                 return buildTemplate(getView().tree).getBodySource().toString();
             },
 
-            isComponent: function () {
+            isComponent : function () {
                 return true;
             },
 
-            getId: function () {
+            getId : function () {
                 return id;
             },
 
-            getExecutionContext: function () {
+            getExecutionContext : function () {
                 return executionContext;
             },
 
-            getNiterParametersFromTagParameter: function (name) {
+            getNiterParametersFromTagParameter : function (name) {
                 return getNiterParametersFromTagParameter(name);
             },
 
-            getClipboard: function (name) {
+            getClipboard : function (name) {
                 return executionContext.getClipboardWithName(name);
             },
 
-            pushModel: function (model) {
+            pushModel : function (model) {
                 executionContext.pushModel(model);
                 return true;
             }
