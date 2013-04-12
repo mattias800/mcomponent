@@ -1,6 +1,6 @@
 TestCase("Push tag", {
 
-    "test push tag and property tag when pushed model is on top of stack" : function () {
+    "test push tag and property tag when pushed model is on top of stack" : function() {
         var c = mcomponent({
             model : {name : "must", hair : {color : "black", styling : "awesome"}},
             viewHtml : "{{ push hair }}{{ color }}{{ endpush }}"
@@ -8,7 +8,7 @@ TestCase("Push tag", {
         assertEquals("black", c.assert.assertRender());
     },
 
-    "test show name is must even with push and no specified name" : function () {
+    "test show name is must even with push and no specified name" : function() {
         var c = mcomponent({
             model : {name : "must"},
             viewHtml : "{{ push name }}{{ show }}{{ endpush }}"
@@ -16,7 +16,7 @@ TestCase("Push tag", {
         assertEquals("must", c.assert.assertRender());
     },
 
-    "test push tag" : function () {
+    "test push tag" : function() {
 
         var c;
 
@@ -52,7 +52,7 @@ TestCase("Push tag", {
                 throwOnError : true
             }
         );
-        assertException("Pushing two level property. Should contain something since model stack lookup should fail and cause error.", function () {
+        assertException("Pushing two level property. Should contain something since model stack lookup should fail and cause error.", function() {
             c.assert.assertRender();
         })
 
@@ -76,7 +76,7 @@ TestCase("Push tag", {
 
 TestCase("Push tag with JS code as specified model", {
 
-    "test it" : function () {
+    "test it" : function() {
         var c = mcomponent({ viewHtml : "{{ push getUserModel() }}{{ name }}{{ endpush }}" });
         assertEquals("mattias", c.assert.assertRender());
     }
@@ -85,7 +85,7 @@ TestCase("Push tag with JS code as specified model", {
 
 TestCase("Push tag with conditional expression", {
 
-    "test that conditional expression is working" : function () {
+    "test that conditional expression is working" : function() {
         var c = mcomponent({
             model : { firstName : "must", lastName : "pajas"},
             viewHtml : "{{ push true ? model.firstName : model.lastName }}{{ show }}{{ endpush }}"
