@@ -42,36 +42,36 @@ function mcomponent(args) {
 
     args.debugEnabled = args.debugEnabled ? true : false;
 
-    var validateChild = function(id, child) {
+    var validateChild = function (id, child) {
         if (id.indexOf(" ") >= 0) {
-            return { result : false, message : "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
+            return { result: false, message: "Child id contains space. Must be alphanumeric. id = '" + id + "'"};
         } else if (/[^a-zA-Z0-9]/.test(id)) {
-            return { result : false, message : "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
+            return { result: false, message: "Child id is not alphanumeric. Must be alphanumeric. id = '" + id + "'"};
         } else if (typeof child._.isComponent !== "function") {
-            return { result : false, message : "Child is not an mcomponent object."};
+            return { result: false, message: "Child is not an mcomponent object."};
         } else if (!child._.isComponent()) {
-            return { result : false, message : "Child is not an mcomponent object."};
+            return { result: false, message: "Child is not an mcomponent object."};
         }
-        return { result : true };
+        return { result: true };
     };
 
     /************************
      * Error message helpers
      ************************/
 
-    var renderErrorToString = function(error) {
+    var renderErrorToString = function (error) {
         return "Error at tag " + startTagToken + " " + error.tag + " " + endTagToken + ": " + error.message;
     };
 
-    var compileErrorToString = function(error) {
+    var compileErrorToString = function (error) {
         return "Error compiling tag " + startTagToken + " " + error.tag + " " + endTagToken + (error.message ? ": " + error.message : "");
     };
 
-    var createGenericCompileErrorMessage = function(e) {
+    var createGenericCompileErrorMessage = function (e) {
         return "Error compiling view, view is not formatted correctly, please check your tags: " + e.toString();
     };
 
-    var createCompileExceptionMessage = function(text, tag) {
+    var createCompileExceptionMessage = function (text, tag) {
         var tagText = tag.tag.tag ? tag.tag.tag : tag.tag;
         return "Error compiling tag " + startTagToken + " " + tagText + " " + endTagToken + ": " + text;
     };
@@ -80,7 +80,7 @@ function mcomponent(args) {
      * Throws exception, only if throwOnError is true.
      * @param e
      */
-    var throwError = function(e) {
+    var throwError = function (e) {
         if (mainArgs.logOnError && typeof console == "object") console.error(e);
         if (mainArgs.throwOnError) throw e;
     };
@@ -89,7 +89,7 @@ function mcomponent(args) {
      * Init code
      ***************************/
 
-    var init = function() {
+    var init = function () {
 
         if (args.model) {
             rootModel = args.model;
@@ -102,27 +102,27 @@ function mcomponent(args) {
             var config = {};
             config.usePages = extConfig.usePages ? true : false;
             config.itemsPerPage = extConfig.itemsPerPage || 10;
-            config.whenAllItemsAreShowing = extConfig.whenAllItemsAreShowing || function() {
+            config.whenAllItemsAreShowing = extConfig.whenAllItemsAreShowing || function () {
             };
-            config.whenNotAllItemsAreShowing = extConfig.whenNotAllItemsAreShowing || function() {
+            config.whenNotAllItemsAreShowing = extConfig.whenNotAllItemsAreShowing || function () {
             };
-            config.whenFirstOrLastPageIsShowing = extConfig.whenFirstOrLastPageIsShowing || function() {
+            config.whenFirstOrLastPageIsShowing = extConfig.whenFirstOrLastPageIsShowing || function () {
             };
-            config.whenNotFirstOrLastPageIsShowing = extConfig.whenNotFirstOrLastPageIsShowing || function() {
+            config.whenNotFirstOrLastPageIsShowing = extConfig.whenNotFirstOrLastPageIsShowing || function () {
             };
-            config.whenFirstAndLastPageIsShowing = extConfig.whenFirstAndLastPageIsShowing || function() {
+            config.whenFirstAndLastPageIsShowing = extConfig.whenFirstAndLastPageIsShowing || function () {
             };
-            config.whenFirstPageIsShowing = extConfig.whenFirstPageIsShowing || function() {
+            config.whenFirstPageIsShowing = extConfig.whenFirstPageIsShowing || function () {
             };
-            config.whenLastPageIsShowing = extConfig.whenLastPageIsShowing || function() {
+            config.whenLastPageIsShowing = extConfig.whenLastPageIsShowing || function () {
             };
-            config.whenNotFirstPageIsShowing = extConfig.whenNotFirstPageIsShowing || function() {
+            config.whenNotFirstPageIsShowing = extConfig.whenNotFirstPageIsShowing || function () {
             };
-            config.whenNotLastPageIsShowing = extConfig.whenNotLastPageIsShowing || function() {
+            config.whenNotLastPageIsShowing = extConfig.whenNotLastPageIsShowing || function () {
             };
-            config.whenThereAreItems = extConfig.whenThereAreItems || function() {
+            config.whenThereAreItems = extConfig.whenThereAreItems || function () {
             };
-            config.whenThereAreNoItems = extConfig.whenThereAreNoItems || function() {
+            config.whenThereAreNoItems = extConfig.whenThereAreNoItems || function () {
             };
             config.where = extConfig.where || undefined;
             executionContext.createIterator(iteratorName, config);
@@ -164,34 +164,34 @@ function mcomponent(args) {
      * Compilation context
      ***************************/
 
-    var CompilationContext_ = function() {
+    var CompilationContext_ = function () {
 
         var that = this;
 
         this.successfullyCompiledTags = [];
         this.compileError = undefined;
 
-        this.addSuccessfullyCompiledTag = function(tag) {
+        this.addSuccessfullyCompiledTag = function (tag) {
             this.successfullyCompiledTags.push(tag);
         };
 
-        this.getSuccessfullyCompiledTags = function() {
+        this.getSuccessfullyCompiledTags = function () {
             return this.successfullyCompiledTags;
         };
 
-        this.clearCompileError = function() {
+        this.clearCompileError = function () {
             this.compileError = undefined;
         };
 
-        this.setCompileError = function(msg) {
+        this.setCompileError = function (msg) {
             this.compileError = msg;
         };
 
-        this.getCompileError = function() {
+        this.getCompileError = function () {
             return this.compileError;
         };
 
-        this.hasCompileError = function() {
+        this.hasCompileError = function () {
             return this.compileError ? true : false;
         };
     };
@@ -208,7 +208,7 @@ function mcomponent(args) {
      * Execution context
      ***************************/
 
-    var ExecutionContext_ = function() {
+    var ExecutionContext_ = function () {
 
         this.id = id;
         this.executionStack = []; // DO NOT RENAME THIS VARIABLE. Compiled code is dependant on this name.
@@ -224,21 +224,21 @@ function mcomponent(args) {
 
         var that = this;
 
-        this.makeReadyForRender = function() {
+        this.makeReadyForRender = function () {
             this.globals = mainArgs.globals; // TODO: Dependency injection instead.
             this.renderResult = [];
             this.renderErrors = [];
             this.currentTag = {};
         };
 
-        this.beforeRender = function() {
+        this.beforeRender = function () {
             for (var id in this.iterators) {
                 var iterObj = this.iterators[id];
                 iterObj.beforeRender();
             }
         };
 
-        this.afterRender = function() {
+        this.afterRender = function () {
             // Update iterators. This was previously done while rendering, but we want to render, place result in DOM and finally run this.
             for (var i = 0; i < this.iteratorsToUpdateAfterRender.length; i++) {
                 var iterObj = this.iteratorsToUpdateAfterRender[i];
@@ -246,14 +246,14 @@ function mcomponent(args) {
             }
         };
 
-        this.pushCurrentRenderError = function(message) {
+        this.pushCurrentRenderError = function (message) {
             this.addRenderError(message, this.currentTag.name);
         };
 
-        this.addRenderError = function(message, tagName) {
+        this.addRenderError = function (message, tagName) {
             var error = {
-                message : message,
-                tag : tagName
+                message: message,
+                tag: tagName
             };
             this.renderErrors.push(error);
 
@@ -263,7 +263,7 @@ function mcomponent(args) {
 
         };
 
-        this.hasRenderErrors = function() {
+        this.hasRenderErrors = function () {
             return this.renderErrors.length ? true : false;
         };
 
@@ -271,17 +271,17 @@ function mcomponent(args) {
          * Children
          */
 
-        this.getChildCount = function() {
+        this.getChildCount = function () {
             var counter = 0;
             for (var id in this.children) counter++;
             return counter;
         };
 
-        this.getChildWithId = function(id) {
+        this.getChildWithId = function (id) {
             return this.children[id];
         };
 
-        this.addChild = function(id, child) {
+        this.addChild = function (id, child) {
             var v = validateChild(id, child);
             if (v.result) {
                 this.children[id] = child;
@@ -290,19 +290,19 @@ function mcomponent(args) {
             }
         };
 
-        this.hasChildWithId = function(id) {
+        this.hasChildWithId = function (id) {
             return this.children[id] ? true : false;
         };
 
-        this.removeChildWithId = function(id) {
+        this.removeChildWithId = function (id) {
             this.children[id] = undefined;
         };
 
-        this.removeAllChildren = function() {
+        this.removeAllChildren = function () {
             this.children = {};
         };
 
-        this.getChildren = function() {
+        this.getChildren = function () {
             return this.children;
         };
 
@@ -310,23 +310,23 @@ function mcomponent(args) {
          * Clipboard
          */
 
-        this.getClipboards = function() {
+        this.getClipboards = function () {
             return this.clipboard;
         };
 
-        this.getClipboardWithName = function(name) {
+        this.getClipboardWithName = function (name) {
             return this.clipboard[name];
         };
 
-        this.getClipboardErrorWithName = function(name) {
+        this.getClipboardErrorWithName = function (name) {
             return this.clipboardError[name];
         };
 
-        this.setClipboardWithName = function(name, val) {
+        this.setClipboardWithName = function (name, val) {
             this.clipboard[name] = val;
         };
 
-        this.setClipboardErrorWithName = function(name, val) {
+        this.setClipboardErrorWithName = function (name, val) {
             this.clipboardError[name] = val;
         };
 
@@ -334,7 +334,7 @@ function mcomponent(args) {
          * Iterator configs
          */
 
-        this.getIteratorConfigForId = function(id) {
+        this.getIteratorConfigForId = function (id) {
             if (this.iterators[id] == undefined) throw "Trying to get config for iterator (id=" + id + "), but there is no iterator with that id.";
             return this.iterators[id].getConfig();
         };
@@ -343,23 +343,23 @@ function mcomponent(args) {
          * Iterators
          */
 
-        this.getIteratorWithName = function(iteratorName) {
+        this.getIteratorWithName = function (iteratorName) {
             return this.iterators[iteratorName];
         };
 
-        this.setIteratorWithName = function(iteratorName, val) {
+        this.setIteratorWithName = function (iteratorName, val) {
             this.iterators[iteratorName] = val;
         };
 
-        this.getIterators = function() {
+        this.getIterators = function () {
             return this.iterators;
         };
 
-        this.createIterator = function(iteratorName, iteratorConfig) {
+        this.createIterator = function (iteratorName, iteratorConfig) {
             this.iterators[iteratorName] = new IteratorContext_(iteratorName, iteratorConfig);
         };
 
-        this.ensureIteratorExistsAndSetModel = function(iteratorName, model) {
+        this.ensureIteratorExistsAndSetModel = function (iteratorName, model) {
             var i = this.getIteratorWithName(iteratorName);
             if (i) {
                 i.setModel(model);
@@ -370,7 +370,7 @@ function mcomponent(args) {
             }
         };
 
-        this.clearIterators = function() {
+        this.clearIterators = function () {
             for (var iteratorName in this.iterators) {
                 this.iterators[iteratorName].clear();
             }
@@ -381,7 +381,7 @@ function mcomponent(args) {
          * If undefined is found, it will keep looking, but return undefined if no value is found further up the model stack.
          * @param name
          */
-        this.lookup = function(name) {
+        this.lookup = function (name) {
 
             var value = undefined;
             var foundValue = false;
@@ -432,7 +432,7 @@ function mcomponent(args) {
          * @param name
          * @param parentPrefixResult
          */
-        this.lookupModelInStack = function(name, parentPrefixResult) {
+        this.lookupModelInStack = function (name, parentPrefixResult) {
             parentPrefixResult = parentPrefixResult || {};
             parentPrefixResult.count = parentPrefixResult.count || 0;
             var nameToLookup = parentPrefixResult.name || name;
@@ -459,7 +459,7 @@ function mcomponent(args) {
          2. Update lookupContextInStack to use same mechanics, and update all usages to handle the exception thrown when not finding anything.
          */
 
-        this.lookupContextInStack = function(name) {
+        this.lookupContextInStack = function (name) {
             var stack = this.executionStack;
             var value = undefined;
             var foundValue;
@@ -476,11 +476,11 @@ function mcomponent(args) {
             return value;
         };
 
-        this.getStackItem = function(i) {
+        this.getStackItem = function (i) {
             return this.executionStack[i];
         };
 
-        this.getStackSize = function() {
+        this.getStackSize = function () {
             return this.executionStack.length;
         };
 
@@ -488,33 +488,33 @@ function mcomponent(args) {
          * This is the "api" object that is available in tags.
          * @return {{lookup: Function, getRootModel: Function, getIterator: Function, _assert: {componentIdEqualsExecutionContextId: Function, getExecutionContext: Function, childCount: Function}}}
          */
-        this.getTagApi = function() {
+        this.getTagApi = function () {
             var that = this;
             return {
-                lookup : function(name) {
+                lookup: function (name) {
                     try {
                         return that.lookup(name);
                     } catch (e) {
                         return undefined;
                     }
                 },
-                getRootModel : function() {
+                getRootModel: function () {
                     return that.executionStack[0].model;
                 },
-                getIterator : function(iteratorName) {
+                getIterator: function (iteratorName) {
                     var i = executionContext.getIteratorWithName(iteratorName);
                     return i ? i.getPublicInterface() : undefined;
                 },
-                _assert : {
-                    componentIdEqualsExecutionContextId : function() {
+                _assert: {
+                    componentIdEqualsExecutionContextId: function () {
                         return id == executionContext.id ?
                             true :
                             id + " != " + executionContext.id;
                     },
-                    getExecutionContext : function() {
+                    getExecutionContext: function () {
                         return executionContext;
                     },
-                    childCount : function(expectedCount) {
+                    childCount: function (expectedCount) {
                         var got = executionContext.getChildCount();
                         if (got !== expectedCount) throw "Wrong number of children. Expected " + expectedCount + ", got " + got + ".";
                     }
@@ -522,52 +522,52 @@ function mcomponent(args) {
             }
         };
 
-        this.runFunction = function(f) {
+        this.runFunction = function (f) {
             return f.apply(this, [this.getModel(), this.getContext(), this.getGlobals(), this.getTagApi()]);
         };
 
-        this.clear = function() {
+        this.clear = function () {
             this.executionStack = [];
             this.globals = [];
         };
 
-        this.getModel = function() {
+        this.getModel = function () {
             if (this.executionStack.length == 0) return undefined;
             return this.executionStack[this.executionStack.length - 1].model;
         };
 
-        this.getContext = function() {
+        this.getContext = function () {
             if (this.executionStack.length == 0) return undefined;
             return this.executionStack[this.executionStack.length - 1].context;
         };
 
-        this.getGlobals = function() {
+        this.getGlobals = function () {
             return this.globals;
         };
 
-        this.push = function(stackItem) {
+        this.push = function (stackItem) {
             if (stackItem === undefined) throw "Trying to push undefined to execution stack.";
             this.executionStack.push(stackItem);
             this.updateLocalState();
         };
 
-        this.pushModel = function(model) {
-            this.executionStack.push({model : model});
+        this.pushModel = function (model) {
+            this.executionStack.push({model: model});
             this.updateLocalState();
         };
 
-        this.pop = function() {
+        this.pop = function () {
             if (this.executionStack.length == 0) throw "Trying to pop execution stack, but it is already empty.";
             var v = this.executionStack.pop();
             this.updateLocalState();
             return v;
         };
 
-        this.peek = function() {
+        this.peek = function () {
             return this.executionStack[this.executionStack.length - 1];
         };
 
-        this.updateLocalState = function() {
+        this.updateLocalState = function () {
             this.model = this.getModel();
             this.context = this.getContext();
         };
@@ -579,7 +579,7 @@ function mcomponent(args) {
      * Iterator context
      ****************************/
 
-    var IteratorContext_ = function(aIteratorName, iterConfig) {
+    var IteratorContext_ = function (aIteratorName, iterConfig) {
 
         var iteratorName = aIteratorName;
         var model = undefined;
@@ -589,41 +589,41 @@ function mcomponent(args) {
         var showingAllItems = false;
         var whereFunction = config.where;
 
-        var setModel = function(m) {
+        var setModel = function (m) {
             model = m;
         };
 
-        this.setModel = function(m) {
+        this.setModel = function (m) {
             setModel(m);
         };
 
-        var getModel = function() {
+        var getModel = function () {
             return model;
         };
 
-        var hasModel = function() {
+        var hasModel = function () {
             return model ? true : false;
         };
 
-        var getModelLength = function() {
+        var getModelLength = function () {
             return model ? model.length : 0;
         };
 
         /**
          * Clears the iterator. This is run when the model of the component is changed.
          */
-        this.clear = function() {
+        this.clear = function () {
             // TODO How much must be cleared??
             itemsShowing = config.itemsPerPage;
             currentPage = 0;
             showingAllItems = false;
         };
 
-        this.getConfig = function() {
+        this.getConfig = function () {
             return config;
         };
 
-        this.getStart = function() {
+        this.getStart = function () {
             if (config.usePages) {
                 return currentPage * config.itemsPerPage;
             } else {
@@ -631,7 +631,7 @@ function mcomponent(args) {
             }
         };
 
-        this.getEnd = function() {
+        this.getEnd = function () {
             if (config.usePages) {
                 return currentPage * config.itemsPerPage + config.itemsPerPage;
             }
@@ -640,14 +640,14 @@ function mcomponent(args) {
             }
         };
 
-        this.beforeRender = function() {
+        this.beforeRender = function () {
             if (whereFunction) {
                 // If there is a where-function, the list might have changed before rendering. Ensure we don't overflow the page.
                 currentPage = ensurePageIsWithinLimits(currentPage);
             }
         };
 
-        this.renderUpdate = function(start, end) {
+        this.renderUpdate = function (start, end) {
             if (!config.usePages) {
                 if (this.getStart() == 0 && this.getEnd() >= getModelLength()) {
                     if (typeof config.whenAllItemsAreShowing === "function") {
@@ -725,23 +725,23 @@ function mcomponent(args) {
             }
         };
 
-        var isOnFirstPage = function() {
+        var isOnFirstPage = function () {
             return currentPage == 0;
         };
 
-        var isOnLastPage = function() {
+        var isOnLastPage = function () {
             return currentPage == getPageCount() - 1;
         };
 
-        var isOnFirstOrLastPage = function() {
+        var isOnFirstOrLastPage = function () {
             return isOnFirstPage() || isOnLastPage();
         };
 
-        var isOnFirstAndLastPage = function() {
+        var isOnFirstAndLastPage = function () {
             return isOnFirstPage() && isOnLastPage();
         };
 
-        var getFirstIndexForCurrentPage = function() {
+        var getFirstIndexForCurrentPage = function () {
             return currentPage * config.itemsPerPage;
         };
 
@@ -750,17 +750,17 @@ function mcomponent(args) {
          * If page shows items 5-9, but the model only has 7 items, then it returns 7.
          * @return {Number}
          */
-        var getLastIndexForCurrentPage = function() {
+        var getLastIndexForCurrentPage = function () {
             var pageEndIndex = currentPage * config.itemsPerPage + config.itemsPerPage - 1;
             return hasModel() ? Math.min(pageEndIndex, getFilteredModel().length) : pageEndIndex;
         };
 
-        var getFirstItemOnCurrentPage = function() {
+        var getFirstItemOnCurrentPage = function () {
             if (!hasModel()) throw "Iterators getFirstItemOnCurrentPage() function can not be used before the iterator has been assigned a model. Do this by rendering the view, or by running setModel() on iterator manually.";
             return getFilteredModel()[getFirstIndexForCurrentPage()];
         };
 
-        var getLastItemOnCurrentPage = function() {
+        var getLastItemOnCurrentPage = function () {
             if (!hasModel()) throw "Iterators getLastItemOnCurrentPage() function can not be used before the iterator has been assigned a model. Do this by rendering the view, or by running setModel() on iterator manually.";
             return getFilteredModel()[getLastIndexForCurrentPage()];
         };
@@ -769,7 +769,7 @@ function mcomponent(args) {
          * Calculates number of pages for iterator. Empty model will have 0 pages.
          * @return {Number}
          */
-        var getPageCount = function() {
+        var getPageCount = function () {
             if (!hasModel()) return 0;
             var s;
             if (whereFunction) {
@@ -786,7 +786,7 @@ function mcomponent(args) {
             return Math.ceil(s / config.itemsPerPage);
         };
 
-        var getFilteredModel = function() {
+        var getFilteredModel = function () {
             var filteredModel = [];
             if (!whereFunction) return model;
             for (var i = 0; i < model.length; i++) {
@@ -797,7 +797,7 @@ function mcomponent(args) {
             return filteredModel;
         };
 
-        var ensurePageIsWithinLimits = function(pageIndex) {
+        var ensurePageIsWithinLimits = function (pageIndex) {
             if (!hasModel()) return pageIndex;
             var pageCount = getPageCount();
             if (pageIndex >= pageCount) pageIndex = pageCount - 1;
@@ -805,57 +805,57 @@ function mcomponent(args) {
             return pageIndex;
         };
 
-        this.getPublicInterface = function() {
+        this.getPublicInterface = function () {
 
             return {
 
-                showingAllItems : showingAllItems,
-                currentPage : currentPage,
-                itemsShowing : Math.min(getModelLength(), itemsShowing),
-                itemsPerPage : config.itemsPerPage,
-                itemsTotal : getModelLength(),
+                showingAllItems: showingAllItems,
+                currentPage: currentPage,
+                itemsShowing: Math.min(getModelLength(), itemsShowing),
+                itemsPerPage: config.itemsPerPage,
+                itemsTotal: getModelLength(),
 
-                showMoreItems : function() {
+                showMoreItems: function () {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showMoreItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
                     itemsShowing += config.itemsPerPage;
                     if (itemsShowing >= model.length) itemsShowing = model.length;
                     showingAllItems = itemsShowing == model.length;
                 },
-                showAllItems : function() {
+                showAllItems: function () {
                     if (config.usePages) throw "Iterator '" + config.name + "' cannot use showAllItems() since it is using pages. Use showNextPage() and showPrevPage() instead.";
                     itemsShowing = getModelLength();
                     showingAllItems = true;
                 },
-                getCurrentPage : function() {
+                getCurrentPage: function () {
                     return currentPage;
                 },
-                getPageCount : function() {
+                getPageCount: function () {
                     return getPageCount();
                 },
-                showNextPage : function() {
+                showNextPage: function () {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showNextPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage++;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                showPrevPage : function() {
+                showPrevPage: function () {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPrevPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage--;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                showPage : function(index) {
+                showPage: function (index) {
                     if (!config.usePages) throw "Iterator '" + config.name + "' cannot use showPage() since it isn't using pages. Use showMoreItems() and showAllItems() instead.";
                     currentPage = index;
                     if (currentPage < 0) currentPage = 0;
                     currentPage = ensurePageIsWithinLimits(currentPage);
                 },
-                getIndexForItem : function(item) {
+                getIndexForItem: function (item) {
                     if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
                     if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
                     for (var i = 0; i < filteredModel.length; i++) if (filteredModel[i] == item) return i;
                     throw "Unable to find specified item in iterators list.";
                 },
-                getIndexForItemWhere : function(where) {
+                getIndexForItemWhere: function (where) {
                     if (!hasModel()) throw "Trying to find item in iterator list, but list is undefined. Maybe view has not been rendered yet?";
                     if (getModelLength() == 0) throw "Trying to find item in iterator list, but list is empty.";
                     var filteredModel = getFilteredModel();
@@ -868,19 +868,19 @@ function mcomponent(args) {
                     }
                     throw "Unable to find item that matches where function in iterators list.";
                 },
-                getPageWithItem : function(item) {
+                getPageWithItem: function (item) {
                     return this.getPageIndexForItemIndex(this.getIndexForItem(item));
                 },
-                getPageWithItemWhere : function(where) {
+                getPageWithItemWhere: function (where) {
                     return this.getPageIndexForItemIndex(this.getIndexForItemWhere(where));
                 },
-                getPageIndexForItemIndex : function(itemIndex) {
+                getPageIndexForItemIndex: function (itemIndex) {
                     return Math.floor(itemIndex / this.itemsPerPage)
                 },
-                showPageWithItemIndex : function(index) {
+                showPageWithItemIndex: function (index) {
                     this.showPage(this.getPageIndexForItemIndex(index));
                 },
-                showPageWithItem : function(item) {
+                showPageWithItem: function (item) {
                     try {
                         var pageWithItem = this.getPageWithItem(item);
                         this.showPage(pageWithItem);
@@ -888,7 +888,7 @@ function mcomponent(args) {
                         throw "Trying to show page with specified item, but no such item was found.";
                     }
                 },
-                showPageWithItemWhere : function(where) {
+                showPageWithItemWhere: function (where) {
                     try {
                         var pageWithItemWhere = this.getPageWithItemWhere(where);
                         this.showPage(pageWithItemWhere);
@@ -896,31 +896,31 @@ function mcomponent(args) {
                         throw "Trying to show page with item that passes where-function, but no such item was found.";
                     }
                 },
-                isOnFirstPage : function() {
+                isOnFirstPage: function () {
                     return isOnFirstPage();
                 },
-                isOnLastPage : function() {
+                isOnLastPage: function () {
                     return isOnLastPage();
                 },
-                isOnFirstOrLastPage : function() {
+                isOnFirstOrLastPage: function () {
                     return isOnFirstOrLastPage();
                 },
-                isOnFirstAndLastPage : function() {
+                isOnFirstAndLastPage: function () {
                     return isOnFirstAndLastPage();
                 },
-                getFirstIndexForCurrentPage : function() {
+                getFirstIndexForCurrentPage: function () {
                     return getFirstIndexForCurrentPage();
                 },
-                getLastIndexForCurrentPage : function() {
+                getLastIndexForCurrentPage: function () {
                     return getLastIndexForCurrentPage();
                 },
-                getFirstItemOnCurrentPage : function() {
+                getFirstItemOnCurrentPage: function () {
                     return getFirstItemOnCurrentPage();
                 },
-                getLastItemOnCurrentPage : function() {
+                getLastItemOnCurrentPage: function () {
                     return getLastItemOnCurrentPage();
                 },
-                setModel : function(m) {
+                setModel: function (m) {
                     setModel(m);
                 }
             }
@@ -933,10 +933,10 @@ function mcomponent(args) {
      ****************************/
 
     var tagTypes = {
-        tag_show : {
-            token : "show",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_show: {
+            token: "show",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (name) {
@@ -948,19 +948,19 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_showif : {
-            token : "showif",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_showif: {
+            token: "showif",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (name) {
@@ -972,106 +972,106 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_context : {
-            token : "context",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_context: {
+            token: "context",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 result.pushBufferEmptyStringIfUndefined("executionContext.lookupContextInStack('" + name + "')");
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_showjs : {
-            token : "showjs",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_showjs: {
+            token: "showjs",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.pushBufferEmptyStringIfUndefined(tagInstance.tag.parameters);
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_js : {
-            token : "js",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_js: {
+            token: "js",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.push(tagInstance.tag.parameters);
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_setglobal : {
-            token : "setglobal",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_setglobal: {
+            token: "setglobal",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var p = getNiterParametersFromTagParameter(tagInstance.tag.parameters);
                 result.push("executionContext.getGlobals()['" + p.iterName + "'] = " + p.variableName);
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_log : {
-            token : "log",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_log: {
+            token: "log",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 result.push("if (typeof console == 'object' && typeof console.log == 'function') console.log(" + tagInstance.tag.parameters + ")");
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_if : {
-            token : "if",
-            hasBlock : true,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_if: {
+            token: "if",
+            hasBlock: true,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var param = tagInstance.tag.parameters;
                 var isFirst = true;
@@ -1090,7 +1090,7 @@ function mcomponent(args) {
                 return result;
             },
 
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 if (!args.tag.parameters) throw createCompileExceptionMessage("If tag does not include a condition. Ex: " + startTagToken + " if model.isNice " + endTagToken, args.tag);
                 var condition = args.tag.parameters;
                 try {
@@ -1098,13 +1098,13 @@ function mcomponent(args) {
                     var c = createIfTag(args.subList, condition);
 
                     return {
-                        tagName : this.token,
-                        tag : args.tag,
-                        content : args.content,
-                        condition : condition,
-                        conditions : c.conditions,
-                        contentRoots : c.contentRoots,
-                        elseContent : c.elseContent
+                        tagName: this.token,
+                        tag: args.tag,
+                        content: args.content,
+                        condition: condition,
+                        conditions: c.conditions,
+                        contentRoots: c.contentRoots,
+                        elseContent: c.elseContent
                     };
                 } catch (e) {
                     throw e;
@@ -1112,10 +1112,10 @@ function mcomponent(args) {
             }
         },
 
-        tag_push : {
-            token : "push",
-            hasBlock : true,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_push: {
+            token: "push",
+            hasBlock: true,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var param = tagInstance.tag.parameters;
                 var compiledLookup = compileLookup(param);
@@ -1127,40 +1127,40 @@ function mcomponent(args) {
                 result.pushCompiledSource(createModelContextUpdateCompiledSource());
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_copy : {
-            token : "copy",
-            hasBlock : true,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_copy: {
+            token: "copy",
+            hasBlock: true,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 // Do nothing in compiled tag, we add it at parse time.
                 var result = new CompiledSource();
                 result.pushCompiledSource(compileTreeToSource(tagInstance.content));
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 var name = args.tag.parameters;
                 if (!name) name = "default";
                 executionContext.setClipboardWithName(name, args.content);
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_paste : {
-            token : "paste",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_paste: {
+            token: "paste",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var name = tagInstance.tag.parameters;
                 if (!name) name = "default";
@@ -1175,19 +1175,19 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_component : {
-            token : "component",
-            hasBlock : false,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_component: {
+            token: "component",
+            hasBlock: false,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var result = new CompiledSource();
                 var ss = tagInstance.tag.parameters.split(" ");
                 var name = ss[0];
@@ -1220,42 +1220,42 @@ function mcomponent(args) {
                 }
                 return result;
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_iter : {
-            token : "iter",
-            hasBlock : true,
-            compileTagInstance : function(tagInstance, executionContext, args) {
+        tag_iter: {
+            token: "iter",
+            hasBlock: true,
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 return tagTypes.tag_niter.compileTagInstance(tagInstance, executionContext, args);
             },
-            createTagInstance : function(args) {
+            createTagInstance: function (args) {
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             }
         },
 
-        tag_niter : {
-            token : "niter",
-            hasBlock : true,
-            createTagInstance : function(args) {
+        tag_niter: {
+            token: "niter",
+            hasBlock: true,
+            createTagInstance: function (args) {
                 // Cannot lookup iterConfig here, it might change after view has been rendered.
                 return {
-                    tagName : this.token,
-                    tag : args.tag,
-                    content : args.content
+                    tagName: this.token,
+                    tag: args.tag,
+                    content: args.content
                 };
             },
-            compileTagInstance : function(tagInstance, executionContext, args) {
+            compileTagInstance: function (tagInstance, executionContext, args) {
                 var resultOuter = new CompiledSource();
                 var result = new CompiledSource();
 
@@ -1361,12 +1361,12 @@ function mcomponent(args) {
     };
 
     var view = {
-        html : undefined,
-        tree : {},
-        list : []
+        html: undefined,
+        tree: {},
+        list: []
     };
 
-    var createExpressionFunction = function(exp) {
+    var createExpressionFunction = function (exp) {
         try {
             return new Function("model", "context", "globals", "api", "return " + exp);
         } catch (e) {
@@ -1379,7 +1379,7 @@ function mcomponent(args) {
      * @param model
      * @private
      */
-    var _setModel = function(model) {
+    var _setModel = function (model) {
         executionContext.clearIterators(); // If we change model, all iterators are reset.
         executionContext.clear();
         executionContext.pushModel(model);
@@ -1390,7 +1390,7 @@ function mcomponent(args) {
      * @return {*}
      * @private
      */
-    var _getModel = function() {
+    var _getModel = function () {
         return executionContext.getModel();
     };
 
@@ -1398,7 +1398,7 @@ function mcomponent(args) {
      * Takes view HTML in a string and compiles it. Returns a view and a compilation context.
      * @param html
      */
-    var compileHtmlToView = function(html) {
+    var compileHtmlToView = function (html) {
         /**
          * Executed by setView(). Should throw exception if throwOnError == true.
          */
@@ -1462,12 +1462,12 @@ function mcomponent(args) {
         localView.template = buildTemplate(localView.source, localCompilationContext);
 
         return {
-            view : localView,
-            compilationContext : localCompilationContext
+            view: localView,
+            compilationContext: localCompilationContext
         };
     };
 
-    var _setViewWithHtml = function(html) {
+    var _setViewWithHtml = function (html) {
         if (html !== undefined && html !== null) {
             var r = compileHtmlToView(html);
             view = r.view;
@@ -1481,17 +1481,17 @@ function mcomponent(args) {
         }
     };
 
-    var _setViewFromComponent = function(component) {
+    var _setViewFromComponent = function (component) {
         _setView(component._.getView());
         // Must recompile the source, since the compiled code now references the other components scope.
         view.template = buildTemplate(getView().source);
     };
 
-    var getView = function() {
+    var getView = function () {
         return view;
     };
 
-    var _setView = function(v) {
+    var _setView = function (v) {
         view = v;
     };
 
@@ -1499,19 +1499,19 @@ function mcomponent(args) {
      * Builds a list of elements from a view.
      * Even elements are HTML, odd elements are tags.
      */
-    var buildList = function(viewHtml) {
+    var buildList = function (viewHtml) {
         var list = [];
         for (var i = 0; i < args.maxTagCount; i++) {
             var startIndex = viewHtml.indexOf(startTagToken);
 
             if (startIndex < 0) {
                 // No tags left, just add rest as HTML.
-                if (viewHtml) list.push({html : viewHtml});
+                if (viewHtml) list.push({html: viewHtml});
                 break;
             } else if (startIndex > 0) {
                 // There was HTML in front of tag, adding it.
                 var html = viewHtml.substring(0, startIndex);
-                if (html) list.push({html : html});
+                if (html) list.push({html: html});
             }
 
             var endIndex = viewHtml.indexOf(endTagToken);
@@ -1522,7 +1522,7 @@ function mcomponent(args) {
                 throw "Too many end tags.";
             }
 
-            var trim = function(s) {
+            var trim = function (s) {
                 if (typeof String.prototype.trim !== 'function') {
                     // IE has no support for String.trim(), this code ensures that IE works properly.
                     return s.replace(/^\s+|\s+$/g, '');
@@ -1541,11 +1541,11 @@ function mcomponent(args) {
         return list;
     };
 
-    var getStartTagTokenFromEndTagToken = function(endTagToken) {
+    var getStartTagTokenFromEndTagToken = function (endTagToken) {
         return endTagToken.substr(3);
     };
 
-    var isTagTokenEndTagToken = function(tagToken) {
+    var isTagTokenEndTagToken = function (tagToken) {
         if (tagToken.substr(0, 3) != "end") {
             return false;
         } else {
@@ -1566,7 +1566,7 @@ function mcomponent(args) {
      * @param localCompilationContext
      * @return {Array}
      */
-    var buildTree = function(list) {
+    var buildTree = function (list) {
         var root = [];
         for (var i = 0; i < list.length; i++) {
             var item = list[i];
@@ -1592,14 +1592,14 @@ function mcomponent(args) {
                     subList = list.slice(i + 1, endIndexTag.index);
                     try {
                         var tagInstance = tagType.createTagInstance({
-                            tag : item,
-                            subList : subList,
-                            content : buildTree(subList)
+                            tag: item,
+                            subList: subList,
+                            content: buildTree(subList)
                         });
                         root.push(tagInstance);
                         i = endIndexTag.index;
                     } catch (e) {
-                        throw compileErrorToString({tag : item.tag, message : e.toString()});
+                        throw compileErrorToString({tag: item.tag, message: e.toString()});
                     }
 
                 } else if (tagType && tagType.hasBlock) {
@@ -1613,8 +1613,8 @@ function mcomponent(args) {
                     }
                     subList = list.slice(i + 1, endIndex);
                     root.push(tagType.createTagInstance({
-                        tag : item,
-                        content : buildTree(subList)
+                        tag: item,
+                        content: buildTree(subList)
                     }));
                     i = endIndex;
 
@@ -1623,14 +1623,14 @@ function mcomponent(args) {
                     // not hasBlock.
 
                     root.push(tagType.createTagInstance({
-                        tag : item
+                        tag: item
                     }));
 
                 } else if (isTagTokenEndTagToken(tagName)) {
                     throw createCompileExceptionMessage("Found closing tag without starting '" + getStartTagTokenFromEndTagToken(tagName) + "' tag.", item);
                 } else {
                     // Is not a system tag
-                    root.push({tag : item});
+                    root.push({tag: item});
                     //throw "No such tag type: " + item.tagName;
                 }
             }
@@ -1645,7 +1645,7 @@ function mcomponent(args) {
      * Needs firstCondition since we don't get first if case.
      * @param list
      */
-    var createIfTag = function(list, firstCondition) {
+    var createIfTag = function (list, firstCondition) {
         var conditions = [];
         var contentRoots = [];
         var elseContent = [];
@@ -1707,18 +1707,18 @@ function mcomponent(args) {
         }
 
         return {
-            conditions : conditions,
-            contentRoots : contentRoots,
-            elseContent : elseContent
+            conditions: conditions,
+            contentRoots: contentRoots,
+            elseContent: elseContent
         };
     };
 
-    var getTagType = function(token) {
+    var getTagType = function (token) {
         if (token == undefined) return undefined;
         return tagTypes["tag_" + token];
     };
 
-    var findBlockEnd = function(list, i, args) {
+    var findBlockEnd = function (list, i, args) {
         args = args || {};
         args.endTags = args.endTags || []; // If set, standard "end*" will be overridden.
         args.startIndex = args.startIndex || i; // The index to start searching. If undefined, starts at i.
@@ -1749,8 +1749,8 @@ function mcomponent(args) {
                         // Is "else" or "elseif"
                         if (stack.length == 1) { // 1 since we have "if" on stack.
                             return {
-                                index : i,
-                                endTag : item.tagName
+                                index: i,
+                                endTag: item.tagName
                             };
                         }
                     } else if (item.tagName.substring(0, "end".length) == "end") {
@@ -1760,8 +1760,8 @@ function mcomponent(args) {
                             stack.pop();
                             if (stack.length == 0) {
                                 return {
-                                    index : i,
-                                    endTag : item.tagName
+                                    index: i,
+                                    endTag: item.tagName
                                 };
                             }
                         } else {
@@ -1781,7 +1781,7 @@ function mcomponent(args) {
         throw createCompileExceptionMessage("Found no closing tag to '" + startItem.tag + "'.", startItem);
     };
 
-    var getNiterParametersFromTagParameter = function(tagParameter) {
+    var getNiterParametersFromTagParameter = function (tagParameter) {
         var iterName = undefined;
         var variableName = undefined;
         if (tagParameter.indexOf(" ") >= 0) {
@@ -1791,20 +1791,20 @@ function mcomponent(args) {
             iterName = tagParameter;
         }
         return {
-            iterName : iterName ? iterName : undefined,
-            variableName : variableName ? variableName : undefined
+            iterName: iterName ? iterName : undefined,
+            variableName: variableName ? variableName : undefined
         }
     };
 
-    var createTagObject = function(tagContent) {
+    var createTagObject = function (tagContent) {
         return {
-            tag : tagContent,
-            tagName : getTagNameFromTag(tagContent),
-            parameters : getTagParameters(tagContent)
+            tag: tagContent,
+            tagName: getTagNameFromTag(tagContent),
+            parameters: getTagParameters(tagContent)
         };
     };
 
-    var getTagNameFromTag = function(tag) {
+    var getTagNameFromTag = function (tag) {
         var i = tag.indexOf(" ");
         if (i < 0) {
             return tag;
@@ -1814,7 +1814,7 @@ function mcomponent(args) {
         }
     };
 
-    var getTagParameters = function(tag) {
+    var getTagParameters = function (tag) {
         var i = tag.indexOf(" ");
         if (i < 0) {
             return "";
@@ -1828,7 +1828,7 @@ function mcomponent(args) {
      * Formats a string to be usable as variable name. For example, list[0].name becomes list0_name
      * @param name
      */
-    var formatVariableName = function(name) {
+    var formatVariableName = function (name) {
         return name
             .replace(/\.\.\//g, "_parent_")
             .replace(/\//g, "_")
@@ -1849,7 +1849,7 @@ function mcomponent(args) {
      * Returns a variable name that is not already in use by the compiled code. Ensures no variable name collisions.
      * @param name
      */
-    var getUncompiledVariableName = function(name) {
+    var getUncompiledVariableName = function (name) {
         name = formatVariableName(name);
         if (_uncompiledVariableName[name] == undefined) {
             _uncompiledVariableName[name] = 0;
@@ -1870,11 +1870,11 @@ function mcomponent(args) {
      * @param s
      * @return {string}
      */
-    var encodeStringToJsString = function(s) {
+    var encodeStringToJsString = function (s) {
         return "\"" + replaceStringTokens(s) + "\"";
     };
 
-    var replaceStringTokens = function(s) {
+    var replaceStringTokens = function (s) {
         s = s
             .replace(/\\/g, "\\\\")
             .replace(/\n/g, "\\n")
@@ -1885,7 +1885,7 @@ function mcomponent(args) {
         return s;
     };
 
-    var compileTreeToSource = function(tree) {
+    var compileTreeToSource = function (tree) {
 
         var result = new CompiledSource();
 
@@ -1920,10 +1920,10 @@ function mcomponent(args) {
                         tagCompiledSource = tagType.compileTagInstance(item, executionContext);
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            e.push(compileErrorToString({tag: item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
                             throw [msg];
                         }
                     }
@@ -1938,10 +1938,10 @@ function mcomponent(args) {
                         tagCompiledSource = compilePropertyTag(item);
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            e.push(compileErrorToString({tag: item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
                             throw [msg];
                         }
                     }
@@ -1957,10 +1957,10 @@ function mcomponent(args) {
                         tagOk = true;
                     } catch (e) {
                         if (e && e.length !== undefined) {
-                            e.push(compileErrorToString({tag : item.tag.tag}));
+                            e.push(compileErrorToString({tag: item.tag.tag}));
                             throw e;
                         } else {
-                            var msg = compileErrorToString({tag : item.tag.tag, message : e.toString()});
+                            var msg = compileErrorToString({tag: item.tag.tag, message: e.toString()});
                             throw [msg];
                         }
                     }
@@ -1995,7 +1995,7 @@ function mcomponent(args) {
      * @param args
      * @return {{full: CompiledSource, body: *}}
      */
-    var compileTreeToSourceWithBaseCodeIncluded = function(tree) {
+    var compileTreeToSourceWithBaseCodeIncluded = function (tree) {
         var result = new CompiledSource();
         // executionContext is available at all times.
         result.push("var globals = executionContext.getGlobals()");
@@ -2004,12 +2004,12 @@ function mcomponent(args) {
         var body = compileTreeToSource(tree);
         result.pushCompiledSource(body);
         return {
-            full : result,
-            body : body
+            full: result,
+            body: body
         };
     };
 
-    var buildSource = function(tree) {
+    var buildSource = function (tree) {
         var sourceObj;
 
         try {
@@ -2029,7 +2029,7 @@ function mcomponent(args) {
      * @param tree
      * @return {{getSource: Function, getBodySource: Function, render: Function, process: Function}}
      */
-    var buildTemplate = function(sourceObj, localCompilationContext) {
+    var buildTemplate = function (sourceObj, localCompilationContext) {
         var debugEnabled = false;
 
         if (sourceObj == undefined && localCompilationContext == undefined) throw "Severe error: buildTemplate() must get sourceObj and/or compilation context. May not omit both.";
@@ -2061,13 +2061,13 @@ function mcomponent(args) {
          * This is the c.getView().template object.
          ************************************************************/
         return {
-            getSource : function() {
+            getSource: function () {
                 return source;
             },
-            getBodySource : function() {
+            getBodySource: function () {
                 return bodySource;
             },
-            render : function() {
+            render: function () {
                 var r = {};
                 var msg;
                 if (f) {
@@ -2083,7 +2083,7 @@ function mcomponent(args) {
                         }
 
                         executionContext.addRenderError(e.toString(), executionContext.currentTag.name);
-                        throwError(renderErrorToString({tag : executionContext.currentTag.name, message : e.toString()}));
+                        throwError(renderErrorToString({tag: executionContext.currentTag.name, message: e.toString()}));
                     }
                 } else {
                     /**
@@ -2104,7 +2104,7 @@ function mcomponent(args) {
 
                 return executionContext.renderResult.join("");
             },
-            process : function() {
+            process: function () {
                 var html = "";
                 var ok = true;
                 var error = undefined;
@@ -2114,17 +2114,18 @@ function mcomponent(args) {
                     error = e;
                 }
                 return {
-                    ok : ok,
-                    html : html,
-                    error : error
+                    ok: ok,
+                    html: html,
+                    error: error
                 };
             }
         };
     };
 
-    var compileLookup = function(name, allowMissingProperty) {
+    var compileLookup = function (name, allowMissingProperty) {
         var r = new CompiledSource();
 
+        if (!name) name = "model";
         var names = name.split(".");
 
         var varName = getUncompiledVariableName(names.join(''));
@@ -2140,8 +2141,9 @@ function mcomponent(args) {
             name.substring(0, 11) == "this.model." ||
             name.substring(0, 13) == "this.globals.") {
             r.push(varName + " = " + name.substring(5));
+        } else if (name == "model") {
+            r.push(varName + " = model");
         } else {
-
             var prefixResult = findParentPrefix(name);
             var compiledLookup = _compileLookupFunctionForVariableWithName(name, allowMissingProperty);
             var lookupVar = compiledLookup.lookupFunctionName;
@@ -2157,8 +2159,8 @@ function mcomponent(args) {
         }
 
         return {
-            compiledSource : r,
-            varName : varName
+            compiledSource: r,
+            varName: varName
         };
 
     };
@@ -2167,7 +2169,7 @@ function mcomponent(args) {
      * Creates a condition expression for checking if a value exists. For example:
      * "model" + "user.name.first" becomes "model && model.user && model.user.name && model.user.name.first"
      */
-    var createConditionForValueExists = function(tempVar, name) {
+    var createConditionForValueExists = function (tempVar, name) {
 
         var names = name.split(".");
 
@@ -2190,7 +2192,7 @@ function mcomponent(args) {
      * This does a lookupOnObject, implemented in compiler instead of in runtime.
      * @param name
      */
-    var _compileLookupFunctionForVariableWithName = function(name, allowMissingProperty) {
+    var _compileLookupFunctionForVariableWithName = function (name, allowMissingProperty) {
 
         var originalName = name;
         var names = name.split(".");
@@ -2244,13 +2246,13 @@ function mcomponent(args) {
         r.push("}");
 
         return {
-            compiledSource : r,
-            lookupFunctionName : lookupVar
+            compiledSource: r,
+            lookupFunctionName: lookupVar
         };
 
     };
 
-    var compilePropertyTag = function(tagItem) {
+    var compilePropertyTag = function (tagItem) {
         var result = new CompiledSource();
         var name = tagItem.tag.tag;
 
@@ -2268,23 +2270,23 @@ function mcomponent(args) {
         return result;
     };
 
-    var hasParentPrefix = function(name) {
+    var hasParentPrefix = function (name) {
         return name.substring(0, 3) == "../";
     };
 
-    var findParentPrefix = function(name) {
+    var findParentPrefix = function (name) {
         var count = 0;
         while (name.substring(0, 3) == "../") {
             name = name.substring(3);
             count++;
         }
         return {
-            count : count,
-            name : name
+            count: count,
+            name: name
         };
     };
 
-    var createModelContextUpdateCompiledSource = function() {
+    var createModelContextUpdateCompiledSource = function () {
         var r = new CompiledSource();
         r.push("var peek = executionContext.peek()");
         r.push("model = peek ? peek.model : undefined");
@@ -2292,30 +2294,30 @@ function mcomponent(args) {
         return r;
     };
 
-    var CompiledSource = function() {
+    var CompiledSource = function () {
         var stack = [];
 
-        this.getStack = function() {
+        this.getStack = function () {
             return stack;
         };
 
-        this.push = function(item) {
+        this.push = function (item) {
             stack.push(item);
         };
 
-        this.pushBuffer = function(item) {
+        this.pushBuffer = function (item) {
             stack.push("executionContext.renderResult.push(" + item + ")");
         };
 
-        this.pushComment = function(item) {
+        this.pushComment = function (item) {
             stack.push("// " + item);
         };
 
-        this.pushPrintStack = function() {
+        this.pushPrintStack = function () {
             stack.push("console.log('stack:', executionContext.executionStack)");
         };
 
-        this.pushTagComment = function(tag) {
+        this.pushTagComment = function (tag) {
             var tagString = (tag.tag.tag ? tag.tag.tag : tag.tag);
             var tagStringAsJs = encodeStringToJsString(tagString);
             if (args.logTags) stack.push("console.log('" + startTagToken + " ' + " + tagStringAsJs + " + ' " + endTagToken + "', model, executionContext.executionStack)");
@@ -2326,36 +2328,36 @@ function mcomponent(args) {
             stack.push("executionContext.currentTag.name = " + tagStringAsJs);
         };
 
-        this.pushBufferEmptyStringIfUndefined = function(item) {
+        this.pushBufferEmptyStringIfUndefined = function (item) {
             var varName = getUncompiledVariableName("v");
             stack.push("var " + varName + " = " + item);
             stack.push("executionContext.renderResult.push(" + varName + " !== undefined ? " + varName + " : '')");
         };
 
-        this.pushRenderErrorIf = function(condition, text) {
+        this.pushRenderErrorIf = function (condition, text) {
             stack.push("if (" + condition + ") executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
         };
 
-        this.pushRenderError = function(text) {
+        this.pushRenderError = function (text) {
             stack.push("executionContext.pushCurrentRenderError(" + encodeStringToJsString(text) + ")");
         };
 
-        this.pushAll = function(items) {
+        this.pushAll = function (items) {
             for (var i = 0; i < items.length; i++) {
                 this.push(items[i]);
             }
         };
 
-        this.pushCompiledSource = function(cs) {
+        this.pushCompiledSource = function (cs) {
             if (cs == undefined) throw "Trying to push CompiledSource content, but it is undefined.";
             this.pushAll(cs.getStack());
         };
 
-        this.toString = function() {
+        this.toString = function () {
             return stack.join("\n") + "\n";
         };
 
-        this.indent = function() {
+        this.indent = function () {
             for (var i = 0; i < stack.length; i++) {
                 stack[i] = "    " + stack[i];
             }
@@ -2369,7 +2371,7 @@ function mcomponent(args) {
      * @param name
      * @param model
      */
-    var lookup = function(name, model) {
+    var lookup = function (name, model) {
         return lookupInObject(name, model, name, "", model);
     };
 
@@ -2382,7 +2384,7 @@ function mcomponent(args) {
      * @param fullName
      * @param startModel
      */
-    var lookupInObject = function(name, model, startName, fullName, startModel) {
+    var lookupInObject = function (name, model, startName, fullName, startModel) {
 
         var msg;
 
@@ -2407,7 +2409,7 @@ function mcomponent(args) {
         return value;
     };
 
-    var listContains = function(list, value) {
+    var listContains = function (list, value) {
         for (var i = 0; i < list.length; i++) {
             var b = list[i] == value;
             if (b) {
@@ -2417,7 +2419,7 @@ function mcomponent(args) {
         return false;
     };
 
-    var render = function() {
+    var render = function () {
 
         _beforeRender();
 
@@ -2438,11 +2440,11 @@ function mcomponent(args) {
 
     };
 
-    var _beforeRender = function() {
+    var _beforeRender = function () {
         executionContext.beforeRender();
     };
 
-    var _afterRender = function() {
+    var _afterRender = function () {
 
         if (mainArgs.afterRender) {
             if (typeof mainArgs.afterRender == "function") {
@@ -2470,82 +2472,82 @@ function mcomponent(args) {
 
     return {
 
-        addChild : function(id, child) {
+        addChild: function (id, child) {
             executionContext.addChild(id, child);
         },
 
-        removeAllChildren : function(id) {
+        removeAllChildren: function (id) {
             executionContext.removeAllChildren();
         },
 
-        removeChild : function(id) {
+        removeChild: function (id) {
             executionContext.removeChildWithId(id);
         },
 
-        hasChild : function(id) {
+        hasChild: function (id) {
             return executionContext.hasChildWithId(id);
         },
 
-        getChildren : function() {
+        getChildren: function () {
             return executionContext.getChildren();
         },
 
-        getChild : function(id) {
+        getChild: function (id) {
             return executionContext.getChildWithId(id);
         },
 
-        setModel : function(model) {
+        setModel: function (model) {
             _setModel(model);
         },
 
-        getModel : function() {
+        getModel: function () {
             return _getModel();
         },
 
-        setViewWithHtml : function(html) {
+        setViewWithHtml: function (html) {
             _setViewWithHtml(html);
         },
 
-        setViewFromComponent : function(component) {
+        setViewFromComponent: function (component) {
             _setViewFromComponent(component);
         },
 
-        getIterator : function(iteratorName) {
+        getIterator: function (iteratorName) {
             var i = executionContext.getIteratorWithName(iteratorName);
             return i ? i.getPublicInterface() : undefined;
         },
 
-        getGlobals : function() {
+        getGlobals: function () {
             return executionContext.getGlobals();
         },
 
-        render : function() {
+        render: function () {
             return render();
         },
 
-        hasRenderErrors : function() {
+        hasRenderErrors: function () {
             return executionContext.hasRenderErrors() || globalCompilationContext.hasCompileError();
         },
 
-        hasCompileError : function() {
+        hasCompileError: function () {
             return globalCompilationContext.hasCompileError();
         },
 
-        getResult : function() {
+        getResult: function () {
             return result;
         },
 
-        assert : {
+        assert: {
 
-            assertLookup : function(name, model) {
+            assertLookup: function (name, model) {
                 return lookup(name, model);
             },
 
-            assertGetTagParameters : function(tagContent) {
+            assertGetTagParameters: function (tagContent) {
                 return getTagParameters(tagContent);
             },
 
-            assertListSize : function(i) {
+            assertListSize: function (i) {
                 if (getView().list.length == i) {
                     return true;
                 }
@@ -2554,11 +2556,11 @@ function mcomponent(args) {
                 }
             },
 
-            assertIsTagTokenEndTagToken : function(tagToken) {
+            assertIsTagTokenEndTagToken: function (tagToken) {
                 return isTagTokenEndTagToken(tagToken);
             },
 
-            assertListItemHasHtml : function(i, html) {
+            assertListItemHasHtml: function (i, html) {
                 var item = getView().list[i];
                 if (item && item.html && item.html === html) {
                     return true;
@@ -2574,7 +2576,7 @@ function mcomponent(args) {
                 }
             },
 
-            assertListItemHasTagName : function(i, tagName) {
+            assertListItemHasTagName: function (i, tagName) {
                 var item = getView().list[i];
                 if (item && item.tagName && item.tagName === tagName) {
                     return true;
@@ -2590,35 +2592,35 @@ function mcomponent(args) {
                 }
             },
 
-            assertBlockEnd : function(i, expected) {
+            assertBlockEnd: function (i, expected) {
                 var list = getView().list;
                 var r = findBlockEnd(list, i, {}).index;
                 if (r !== expected) throw "Assert findBlockEnd failed. Expected index:" + expected + ", but got:" + r;
                 return true;
             },
 
-            assertFindParentPrefixCount : function(name) {
+            assertFindParentPrefixCount: function (name) {
                 return findParentPrefix(name).count;
             },
 
-            assertFindParentPrefixName : function(name) {
+            assertFindParentPrefixName: function (name) {
                 return findParentPrefix(name).name;
             },
 
-            assertRender : function() {
+            assertRender: function () {
                 return render().html;
             },
 
-            assertCompileLogSource : function() {
+            assertCompileLogSource: function () {
                 var t = buildTemplate(getView().tree);
                 return t.render();
             },
 
-            assertComponentIdEqualsExecutionContextId : function() {
+            assertComponentIdEqualsExecutionContextId: function () {
                 return id == executionContext.id;
             },
 
-            assertSetViewAndBuildList : function(html) {
+            assertSetViewAndBuildList: function (html) {
                 var v = getView();
                 v.html = html;
                 if (html) {
@@ -2633,77 +2635,81 @@ function mcomponent(args) {
                     v.tree = {};
                 }
                 return true;
+            },
+
+            assertCompileLookup: function (name, allowMissingProperty) {
+                return compileLookup(name, allowMissingProperty);
             }
 
 
         },
 
-        _ : {
+        _: {
 
-            getExecutionStackSize : function() {
+            getExecutionStackSize: function () {
                 return executionContext.executionStack.length;
             },
 
-            getTemplate : function() {
+            getTemplate: function () {
                 return buildTemplate(getView().tree);
             },
 
-            findBlockEnd : function(list, i, args) {
+            findBlockEnd: function (list, i, args) {
                 return findBlockEnd(list, i, args);
             },
 
-            findBlockEndIndex : function(i, args) {
+            findBlockEndIndex: function (i, args) {
                 var list = getView().list;
                 return findBlockEnd(list, i, args).index;
             },
 
-            findBlockEndTag : function(i, args) {
+            findBlockEndTag: function (i, args) {
                 var list = getView().list;
                 return findBlockEnd(list, i, args);
             },
 
-            getTree : function() {
+            getTree: function () {
                 return getView().tree;
             },
 
-            getList : function() {
+            getList: function () {
                 return getView().list;
             },
 
-            getView : function() {
+            getView: function () {
                 return view;
             },
 
-            getSource : function() {
+            getSource: function () {
                 if (view.source == undefined) throw "Component has not been compiled properly, source not available.";
                 return view.source.full.toString();
             },
 
-            getBodySource : function() {
+            getBodySource: function () {
                 return buildTemplate(getView().tree).getBodySource().toString();
             },
 
-            isComponent : function() {
+            isComponent: function () {
                 return true;
             },
 
-            getId : function() {
+            getId: function () {
                 return id;
             },
 
-            getExecutionContext : function() {
+            getExecutionContext: function () {
                 return executionContext;
             },
 
-            getNiterParametersFromTagParameter : function(name) {
+            getNiterParametersFromTagParameter: function (name) {
                 return getNiterParametersFromTagParameter(name);
             },
 
-            getClipboard : function(name) {
+            getClipboard: function (name) {
                 return executionContext.getClipboardWithName(name);
             },
 
-            pushModel : function(model) {
+            pushModel: function (model) {
                 executionContext.pushModel(model);
                 return true;
             }

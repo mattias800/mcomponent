@@ -1,153 +1,153 @@
 TestCase("Iter tag - render result", {
 
-    "test iter tag with simple list and no output" : function() {
-        var c = mcomponent({model : {
-            list : ["mattias", "marcus", "johan"]
-        }, viewHtml : "{{ iter list }}{{ enditer }}"});
+    "test iter tag with simple list and no output": function () {
+        var c = mcomponent({model: {
+            list: ["mattias", "marcus", "johan"]
+        }, viewHtml: "{{ iter list }}{{ enditer }}"});
         assertEquals("", c.assert.assertRender());
     },
 
-    "test iter tag with one element list and output" : function() {
+    "test iter tag with one element list and output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias"]
-            }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"});
+            model: {
+                list: ["mattias"]
+            }, viewHtml: "{{ iter list }}{{ show }}{{ enditer }}"});
         assertEquals("mattias", c.assert.assertRender());
     },
 
-    "test iter tag with three element list and output" : function() {
+    "test iter tag with three element list and output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ show }}{{ enditer }}"});
         assertEquals("mattiasmarcusjohan", c.assert.assertRender());
     },
 
-    "test iter tag with empty list and output" : function() {
+    "test iter tag with empty list and output": function () {
         var c = mcomponent({
-            model : {
-                list : []
-            }, viewHtml : "{{ iter list }}{{ show }}{{ enditer }}"});
+            model: {
+                list: []
+            }, viewHtml: "{{ iter list }}{{ show }}{{ enditer }}"});
         assertEquals("", c.assert.assertRender());
     },
 
-    "test iter tag with three element list and context index output" : function() {
+    "test iter tag with three element list and context index output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context index }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context index }}{{ enditer }}"});
         assertEquals("012", c.assert.assertRender());
     },
 
-    "test iter tag with three element list and output context index using show tag" : function() {
+    "test iter tag with three element list and output context index using show tag": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ show context.index }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ show context.index }}{{ enditer }}"});
         assertEquals("012", c.assert.assertRender());
     },
 
-    "test iter tag with three element list and conditional output of contexts index" : function() {
+    "test iter tag with three element list and conditional output of contexts index": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ if (context.index == 1) }}{{ show context.index }}{{ endif }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ if (context.index == 1) }}{{ show context.index }}{{ endif }}{{ enditer }}"});
         assertEquals("1", c.assert.assertRender());
     },
 
-    "test iter tag with three element list and context.index output" : function() {
+    "test iter tag with three element list and context.index output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context.index }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context.index }}{{ enditer }}"});
         assertEquals("012", c.assert.assertRender());
     },
 
-    "test iter tag with context size output" : function() {
+    "test iter tag with context size output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context size }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context size }}{{ enditer }}"});
         assertEquals("333", c.assert.assertRender());
     },
 
-    "test iter tag with context.size output using show tag" : function() {
+    "test iter tag with context.size output using show tag": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ show context.size }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ show context.size }}{{ enditer }}"});
         assertEquals("333", c.assert.assertRender());
     },
 
-    "test iter tag with context.size output" : function() {
+    "test iter tag with context.size output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context.size }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context.size }}{{ enditer }}"});
         assertEquals("333", c.assert.assertRender());
     },
 
-    "test iter tag with context parity output" : function() {
+    "test iter tag with context parity output": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context parity }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context parity }}{{ enditer }}"});
         assertEquals("evenoddeven", c.assert.assertRender());
     },
 
-    "test iter tag with context parity output using show tag" : function() {
+    "test iter tag with context parity output using show tag": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
-            }, viewHtml : "{{ iter list }}{{ context.indexOne }}{{ enditer }}"});
+            model: {
+                list: ["mattias", "marcus", "johan"]
+            }, viewHtml: "{{ iter list }}{{ context.indexOne }}{{ enditer }}"});
         assertEquals("123", c.assert.assertRender());
     },
 
-    "test iter tag with model that doesn't exist throws error when rendering" : function() {
+    "test iter tag with model that doesn't exist throws error when rendering": function () {
         var c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
+            model: {
+                list: ["mattias", "marcus", "johan"]
             },
-            viewHtml : "{{ iter listaxe }}{{ enditer }}",
-            throwOnError : true
+            viewHtml: "{{ iter listaxe }}{{ enditer }}",
+            throwOnError: true
         });
-        assertException(function() {
+        assertException(function () {
             c.assert.assertRender();
         });
     },
 
-    "test iter tag with model that is a number throws error when rendering" : function() {
+    "test iter tag with model that is a number throws error when rendering": function () {
         var c = mcomponent({
-            model : {
-                test : 123
-            }, viewHtml : "{{ iter test }}{{ enditer }}",
-            throwOnError : true
+            model: {
+                test: 123
+            }, viewHtml: "{{ iter test }}{{ enditer }}",
+            throwOnError: true
         });
-        assertException(function() {
+        assertException(function () {
             c.assert.assertRender();
         });
     },
 
-    "test iter tag with model that is an object throws error when rendering" : function() {
+    "test iter tag with model that is an object throws error when rendering": function () {
         var c = mcomponent({
-            model : {
-                test : {age : 80}
-            }, viewHtml : "{{ iter test }}{{ enditer }}",
-            throwOnError : true
+            model: {
+                test: {age: 80}
+            }, viewHtml: "{{ iter test }}{{ enditer }}",
+            throwOnError: true
         });
-        assertException(function() {
+        assertException(function () {
             c.assert.assertRender();
         });
     },
 
-    "test iter tag with model that is a string throws error when rendering" : function() {
+    "test iter tag with model that is a string throws error when rendering": function () {
         var c = mcomponent({
-            model : {
-                test : "hejhej"
-            }, viewHtml : "{{ iter test }}{{ enditer }}",
-            throwOnError : true
+            model: {
+                test: "hejhej"
+            }, viewHtml: "{{ iter test }}{{ enditer }}",
+            throwOnError: true
         });
-        assertException(function() {
+        assertException(function () {
             c.assert.assertRender();
         });
 
@@ -157,51 +157,51 @@ TestCase("Iter tag - render result", {
 
 TestCase("Niter tag - using show more", {
 
-    "test niter tag, using show more" : function() {
+    "test niter tag, using show more": function () {
 
         var c;
         var i;
         var a = 3;
         var b = 1;
 
-        assertException("Construction should fail since there is no iterator config!", function() {
+        assertException("Construction should fail since there is no iterator config!", function () {
             c = mcomponent({
-                model : {
-                    list : ["mattias", "marcus", "johan"]
+                model: {
+                    list: ["mattias", "marcus", "johan"]
                 },
-                viewHtml : "{{ niter userListIter list }}{{ endniter }}",
-                throwOnError : true
+                viewHtml: "{{ niter userListIter list }}{{ endniter }}",
+                throwOnError: true
             });
         });
 
-        assertException("Should throw error since we haven't declared an iterator configuration.", function() {
+        assertException("Should throw error since we haven't declared an iterator configuration.", function () {
             c.assert.assertRender();
         });
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan"]
+            model: {
+                list: ["mattias", "marcus", "johan"]
             },
-            iter : {
-                userListIter : { itemsPerPage : 1 }
+            iter: {
+                userListIter: { itemsPerPage: 1 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ endniter }}"});
         assertEquals("Should contain nothing.", "", c.assert.assertRender());
 
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1,
-                    whenAllItemsAreShowing : function() {
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1,
+                    whenAllItemsAreShowing: function () {
                         a = 5;
                     },
-                    whenNotAllItemsAreShowing : function() {
+                    whenNotAllItemsAreShowing: function () {
                         b = 2;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("b should be 1 first.", 1, b);
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertEquals("b should be 2 after whenNotAllItemsAreShowing has been run.", 2, b);
@@ -218,16 +218,16 @@ TestCase("Niter tag - using show more", {
         a = 3;
 
         c = mcomponent({
-            model : {list : ["mattias", "marcus", "johan"]},
-            iter : {
-                userListIterYeah : {
-                    itemsPerPage : 1,
-                    whenAllItemsAreShowing : function() {
+            model: {list: ["mattias", "marcus", "johan"]},
+            iter: {
+                userListIterYeah: {
+                    itemsPerPage: 1,
+                    whenAllItemsAreShowing: function () {
                         a = 5;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIterYeah list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject("Should be able to get iterator context.", i = c.getIterator("userListIterYeah"));
         assertEquals("Trying to get iterator context that doesn't exist should return undefined.", undefined, c.getIterator("userListIterYeahASFSA"));
@@ -241,24 +241,23 @@ TestCase("Niter tag - using show more", {
 
 });
 
-
 TestCase("Niter tag - using pages", {
-    "test niter tag, using pages" : function() {
+    "test niter tag, using pages": function () {
 
         var c;
         var i;
 
         c = mcomponent({
-            model : {
-                list : []
+            model: {
+                list: []
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be empty.", "", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(0, i.getPageCount());
@@ -280,16 +279,16 @@ TestCase("Niter tag - using pages", {
         assertEquals(0, i.getCurrentPage());
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should show first two element.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(3, i.getPageCount());
@@ -305,16 +304,16 @@ TestCase("Niter tag - using pages", {
         assertEquals("And now we go back to previous page.", "johanbutters", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 3,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 3,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(2, i.getPageCount());
@@ -328,16 +327,16 @@ TestCase("Niter tag - using pages", {
         assertEquals("And now we go back to previous page.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 1,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 1,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(5, i.getPageCount());
@@ -357,16 +356,16 @@ TestCase("Niter tag - using pages", {
         assertEquals("And now we go back to previous page.", "butters", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 10,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 10,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(1, i.getPageCount());
@@ -384,16 +383,16 @@ TestCase("Niter tag - using pages", {
         assertEquals("And now we go back to previous page.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : []
+            model: {
+                list: []
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 1,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 1,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(0, i.getPageCount());
@@ -417,16 +416,16 @@ TestCase("Niter tag - using pages", {
          */
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         i = c.getIterator("userListIter");
         assertEquals(3, i.getPageCount());
@@ -436,19 +435,19 @@ TestCase("Niter tag - using pages", {
         /* Check that usePages = false causes showPage() to throw exception. */
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : false
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: false
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
-        assertException("showPage should throw exception when usePages == false.", function() {
+        assertException("showPage should throw exception when usePages == false.", function () {
             i.showPage(1);
         });
 
@@ -457,16 +456,16 @@ TestCase("Niter tag - using pages", {
          */
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(3, i.getPageCount());
@@ -485,37 +484,37 @@ TestCase("Niter tag - using pages", {
          *************************/
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias", selected : true},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 6, name : "butters"},
-                    {age : 8, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias", selected: true},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 6, name: "butters"},
+                    {age: 8, name: "stan"}
                 ]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ name }}{{ endniter }}"});
         assertEquals("mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(3, i.getPageCount());
 
         /* getIndexForItemWhere() */
 
-        assertEquals("getIndexForItemWhere() should work.", 3, i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 3, i.getIndexForItemWhere(function (item) {
             return item.age == 6;
         }));
 
-        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function (item) {
             return item.selected == true;
         }));
 
-        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function(item) {
+        assertEquals("getIndexForItemWhere() should work.", 0, i.getIndexForItemWhere(function (item) {
             return item.age == 32;
         }));
 
@@ -547,27 +546,27 @@ TestCase("Niter tag - using pages", {
 
         /* showPageWithItemWhere() */
 
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item.age == 6;
         });
         assertEquals("johanbutters", c.assert.assertRender());
 
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item.age == 8;
         });
         assertEquals("stan", c.assert.assertRender());
 
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item.age == 32;
         });
         assertEquals("mattiasmarcus", c.assert.assertRender());
 
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item.age == 31;
         });
         assertEquals("johanbutters", c.assert.assertRender());
 
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item.selected == true;
         });
         assertEquals("mattiasmarcus", c.assert.assertRender());
@@ -578,7 +577,7 @@ TestCase("Niter tag - using pages", {
 
 TestCase("Niter tag - misc iterator functions", {
 
-    "test niter tag, misc iterator functions" : function() {
+    "test niter tag, misc iterator functions": function () {
 
         /********************************************************
          * Check isOnFirstPage, etc, when more than one page.
@@ -587,16 +586,16 @@ TestCase("Niter tag - misc iterator functions", {
         var c, i;
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+            model: {
+                list: ["mattias", "marcus", "must", "johan", "kurt", "korv"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(3, i.getPageCount());
@@ -628,16 +627,16 @@ TestCase("Niter tag - misc iterator functions", {
          ********************************************************/
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus"]
+            model: {
+                list: ["mattias", "marcus"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(1, i.getPageCount());
@@ -651,16 +650,16 @@ TestCase("Niter tag - misc iterator functions", {
          ********************************************************/
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+            model: {
+                list: ["mattias", "marcus", "must", "johan", "kurt", "korv"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
 
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -685,16 +684,16 @@ TestCase("Niter tag - misc iterator functions", {
          ********************************************************/
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "must", "johan", "kurt", "korv"]
+            model: {
+                list: ["mattias", "marcus", "must", "johan", "kurt", "korv"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
 
         assertString(c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -716,21 +715,22 @@ TestCase("Niter tag - misc iterator functions", {
 
     }
 });
+
 TestCase("Niter tag - using getIterator() before rendering", {
 
-    "test niter tag, using iterator before rendering" : function() {
+    "test niter tag, using iterator before rendering": function () {
         var c, i;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "must", "johan"]
+            model: {
+                list: ["mattias", "marcus", "must", "johan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(0, i.getPageCount());
         assertEquals(0, i.getCurrentPage());
@@ -744,32 +744,32 @@ TestCase("Niter tag - using getIterator() before rendering", {
 
 TestCase("Niter tag - using showPageWithItemWhere using an external model", {
 
-    "test niter tag, using showPageWithItemWhere using an external model" : function() {
+    "test niter tag, using showPageWithItemWhere using an external model": function () {
         var c, i;
         var model = {
-            list : ["mattias", "marcus", "must", "johan"]
+            list: ["mattias", "marcus", "must", "johan"]
         };
 
         c = mcomponent({
-            model : model,
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true
+            model: model,
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertObject("Iterator should be available.", i = c.getIterator("userListIter"));
         assertEquals("No page count yet, since there is no model.", 0, i.getPageCount());
         assertEquals("Current page starts at 0.", 0, i.getCurrentPage());
-        assertException("Should throw exception, it cannot lookup the item on the list, since the list is still undefined.", function() {
-            i.showPageWithItemWhere(function(item) {
+        assertException("Should throw exception, it cannot lookup the item on the list, since the list is still undefined.", function () {
+            i.showPageWithItemWhere(function (item) {
                 return item == "must";
             });
         });
 
         i.setModel(model.list);
-        i.showPageWithItemWhere(function(item) {
+        i.showPageWithItemWhere(function (item) {
             return item == "must";
         });
 
@@ -785,25 +785,25 @@ TestCase("Niter tag - using showPageWithItemWhere using an external model", {
 
 TestCase("Niter tag - pages callbacks", {
 
-    "test niter tag, pages callbacks" : function() {
+    "test niter tag, pages callbacks": function () {
         var c;
         var a = 1;
         var i;
 
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 1,
-                    usePages : true,
-                    whenFirstPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 1,
+                    usePages: true,
+                    whenFirstPageIsShowing: function (api) {
                         a = 2;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 1 first.", 1, a);
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -812,19 +812,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 1;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 1,
-                    usePages : true,
-                    whenNotFirstPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 1,
+                    usePages: true,
+                    whenNotFirstPageIsShowing: function (api) {
                         a = 2;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 1 first.", 1, a);
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -837,22 +837,22 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 1;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 3,
-                    usePages : true,
-                    whenNotLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 3,
+                    usePages: true,
+                    whenNotLastPageIsShowing: function (api) {
                         a = 2;
                     },
-                    whenLastPageIsShowing : function(api) {
+                    whenLastPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
 
         assertEquals("Should be 1 first.", 1, a);
         assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
@@ -866,22 +866,22 @@ TestCase("Niter tag - pages callbacks", {
         a = 1;
         assertObject("Gonna test whenNotLastPageIsShowing and whenLastPageIsShowing!",
             c = mcomponent({
-                model : {
-                    list : ["mattias", "marcus", "johan", "butters", "stan"]
+                model: {
+                    list: ["mattias", "marcus", "johan", "butters", "stan"]
                 },
-                iter : {
-                    iterBeforeRender : {
-                        itemsPerPage : 3,
-                        usePages : true,
-                        whenNotLastPageIsShowing : function(api) {
+                iter: {
+                    iterBeforeRender: {
+                        itemsPerPage: 3,
+                        usePages: true,
+                        whenNotLastPageIsShowing: function (api) {
                             a = 2;
                         },
-                        whenLastPageIsShowing : function(api) {
+                        whenLastPageIsShowing: function (api) {
                             a = 3;
                         }
                     }
                 },
-                viewHtml : "{{ niter iterBeforeRender list }}{{ show }}{{ endniter }}"}));
+                viewHtml: "{{ niter iterBeforeRender list }}{{ show }}{{ endniter }}"}));
 
         assertObject("Should be able to use iterator before rendering the component.", i = c.getIterator("iterBeforeRender"));
         assertEquals("Should be 1 first.", 1, a);
@@ -895,19 +895,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 2;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 1,
-                    usePages : true,
-                    whenLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 1,
+                    usePages: true,
+                    whenLastPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 2 first.", 2, a);
         assertEquals("Should first element only.", "mattias", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -958,19 +958,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 5,
-                    usePages : true,
-                    whenLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 5,
+                    usePages: true,
+                    whenLastPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -980,19 +980,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 5,
-                    usePages : true,
-                    whenFirstPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 5,
+                    usePages: true,
+                    whenFirstPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -1002,19 +1002,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 5,
-                    usePages : true,
-                    whenFirstOrLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 5,
+                    usePages: true,
+                    whenFirstOrLastPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -1024,19 +1024,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 5,
-                    usePages : true,
-                    whenFirstAndLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 5,
+                    usePages: true,
+                    whenFirstAndLastPageIsShowing: function (api) {
                         a = 3;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcusjohanbuttersstan", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -1046,19 +1046,19 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true,
-                    whenNotFirstOrLastPageIsShowing : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true,
+                    whenNotFirstOrLastPageIsShowing: function (api) {
                         a = 77;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
@@ -1074,29 +1074,29 @@ TestCase("Niter tag - pages callbacks", {
 
         a = 22;
         c = mcomponent({
-            model : {
-                list : ["mattias", "marcus", "johan", "butters", "stan"]
+            model: {
+                list: ["mattias", "marcus", "johan", "butters", "stan"]
             },
-            iter : {
-                userListIter : {
-                    itemsPerPage : 2,
-                    usePages : true,
-                    whenThereAreItems : function(api) {
+            iter: {
+                userListIter: {
+                    itemsPerPage: 2,
+                    usePages: true,
+                    whenThereAreItems: function (api) {
                         a = 77;
                     },
-                    whenThereAreNoItems : function(api) {
+                    whenThereAreNoItems: function (api) {
                         a = 88;
                     }
                 }
             },
-            viewHtml : "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
+            viewHtml: "{{ niter userListIter list }}{{ show }}{{ endniter }}"});
         assertEquals("Should be 22 first.", 22, a);
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
         assertObject(i = c.getIterator("userListIter"));
         assertEquals(3, i.getPageCount());
         assertEquals("Should be on page 0.", 0, i.getCurrentPage());
         assertEquals("Should be 77.", 77, a);
-        c.setModel({list : []});
+        c.setModel({list: []});
         assertEquals("Should be 77.", 77, a);
         assertEquals("Empty since the list is empty.", "", c.assert.assertRender());
         assertEquals("Should be 88.", 88, a);
@@ -1110,167 +1110,167 @@ TestCase("Niter tag - pages callbacks", {
 
 TestCase("Niter tag - filter function", {
 
-    "test niter tag, filter function" : function() {
+    "test niter tag, filter function": function () {
         var c;
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 2,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 2,
+                    where: function (user) {
                         return user.age > 18;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should first element only.", "mattiasmarcus", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 3,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 3,
+                    where: function (user) {
                         return user.age > 18;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 4,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 4,
+                    where: function (user) {
                         return user.age > 18;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 40,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 40,
+                    where: function (user) {
                         return user.age > 18;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should first element only.", "mattiasmarcusjohan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 40,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 40,
+                    where: function (user) {
                         return user.age < 18;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should first element only.", "buttersstan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 40,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 40,
+                    where: function (user) {
                         return user.age == 9;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should contain stan only.", "stan", c.assert.assertRender());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 40,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 40,
+                    where: function (user) {
                         return user.age == 1;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should be empty.", "", c.assert.assertRender());
 
@@ -1280,54 +1280,54 @@ TestCase("Niter tag - filter function", {
 
 TestCase("Niter tag - filter function and getPageCount() in iterator", {
 
-    "test niter tag, filter function and getPageCount() in iterator" : function() {
+    "test niter tag, filter function and getPageCount() in iterator": function () {
         var c, i;
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 1,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 1,
+                    where: function (user) {
                         return user.age > 30;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should be empty.", "mattias", c.assert.assertRender());
         i = c.getIterator("filteredUserListIter");
         assertEquals("3 pages when there are 3 items after where has been applied.", 3, i.getPageCount());
 
         c = mcomponent({
-            model : {
-                list : [
-                    {age : 32, name : "mattias"},
-                    {age : 8, name : "butters"},
-                    {age : 32, name : "marcus"},
-                    {age : 31, name : "johan"},
-                    {age : 9, name : "stan"}
+            model: {
+                list: [
+                    {age: 32, name: "mattias"},
+                    {age: 8, name: "butters"},
+                    {age: 32, name: "marcus"},
+                    {age: 31, name: "johan"},
+                    {age: 9, name: "stan"}
                 ]
             },
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 1,
-                    where : function(user) {
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 1,
+                    where: function (user) {
                         return user.age == 1;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should be empty.", "", c.assert.assertRender());
         i = c.getIterator("filteredUserListIter");
@@ -1340,32 +1340,32 @@ TestCase("Niter tag - filter function and getPageCount() in iterator", {
 
 TestCase("Niter tag - prevent page overflow when using where function", {
 
-    "test niter tag, prevent page overflow when using where function" : function() {
+    "test niter tag, prevent page overflow when using where function": function () {
 
         var c, i;
 
         var model = {
-            list : [
-                {age : 32, name : "mattias"},
-                {age : 8, name : "butters"},
-                {age : 32, name : "marcus"},
-                {age : 31, name : "johan"},
-                {age : 9, name : "stan"}
+            list: [
+                {age: 32, name: "mattias"},
+                {age: 8, name: "butters"},
+                {age: 32, name: "marcus"},
+                {age: 31, name: "johan"},
+                {age: 9, name: "stan"}
             ]
         };
 
         c = mcomponent({
-            model : model,
-            iter : {
-                filteredUserListIter : {
-                    usePages : true,
-                    itemsPerPage : 2,
-                    where : function(user) {
+            model: model,
+            iter: {
+                filteredUserListIter: {
+                    usePages: true,
+                    itemsPerPage: 2,
+                    where: function (user) {
                         return user.age > 30;
                     }
                 }
             },
-            viewHtml : "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter filteredUserListIter list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Start state.", "mattiasmarcus", c.assert.assertRender());
         assertObject("Iterator should exist.", i = c.getIterator("filteredUserListIter"));
@@ -1384,51 +1384,51 @@ TestCase("Niter tag - prevent page overflow when using where function", {
 
 });
 
-TestCase("Niter tag - showPageWithItem methods, combined with where function", {
+TestCase("Niter tag - showPageWithItem methods combined with where function", {
 
-    "test niter tag, showPageWithItem methods, combined with where function" : function() {
+    "test niter tag showPageWithItem methods combined with where function": function () {
         var c, i;
 
         var model = {
-            list : [
-                {age : 32, name : "mattias"},
-                {age : 8, name : "butters"},
-                {age : 32, name : "marcus"},
-                {age : 31, name : "johan"},
-                {age : 9, name : "stan"}
+            list: [
+                {age: 32, name: "mattias"},
+                {age: 8, name: "butters"},
+                {age: 32, name: "marcus"},
+                {age: 31, name: "johan"},
+                {age: 9, name: "stan"}
             ]
         };
 
         c = mcomponent({
-            model : model,
-            iter : {
-                list : {
-                    usePages : true,
-                    itemsPerPage : 1,
-                    where : function(user) {
+            model: model,
+            iter: {
+                list: {
+                    usePages: true,
+                    itemsPerPage: 1,
+                    where: function (user) {
                         return user.age > 30;
                     }
                 }
             },
-            viewHtml : "{{ niter list list }}{{ name }}{{ endniter }}"});
+            viewHtml: "{{ niter list list }}{{ name }}{{ endniter }}"});
 
         assertEquals("Should be empty.", "mattias", c.assert.assertRender());
         assertObject("Iterator should exist", i = c.getIterator("list"));
         assertEquals("3 pages when there are 3 items after where has been applied.", 3, i.getPageCount());
 
-        assertException("Item -1 never exists, so should throw exception.", function() {
+        assertException("Item -1 never exists, so should throw exception.", function () {
             i.getPageWithItem(model.list[-1]);
         });
         assertEquals("Item 0 should be on page 0.", 0, i.getPageWithItem(model.list[0]));
-        assertException("Item 2 should be on NO page.", function() {
+        assertException("Item 2 should be on NO page.", function () {
             i.getPageWithItem(model.list[1]);
         });
         assertEquals("Item 2 should be on page 1.", 1, i.getPageWithItem(model.list[2]));
         assertEquals("Item 3 should be on page 2.", 2, i.getPageWithItem(model.list[3]));
-        assertException("Item 4 should be on NO page.", function() {
+        assertException("Item 4 should be on NO page.", function () {
             i.getPageWithItem(model.list[4]);
         });
-        assertException("Item 5 does not exist.", function() {
+        assertException("Item 5 does not exist.", function () {
             i.getPageWithItem(model.list[5]);
         });
 
@@ -1438,20 +1438,20 @@ TestCase("Niter tag - showPageWithItem methods, combined with where function", {
 
 TestCase("Niter tag - causing compile errors", {
 
-    "test niter tag, causing compile errors" : function() {
+    "test niter tag, causing compile errors": function () {
 
         var c;
 
-        assertException("Construction fails and with throwOnError, there should be an exception.", function() {
+        assertException("Construction fails and with throwOnError, there should be an exception.", function () {
             c = mcomponent({
-                viewHtml : "{{ niter list list }}{{ enditer }}",
-                throwOnError : true
+                viewHtml: "{{ niter list list }}{{ enditer }}",
+                throwOnError: true
             });
         });
 
         assertObject("Compiling fails, but should not throw an exception.",
             c = mcomponent({
-                viewHtml : "{{ niter list list }}{{ enditer }}"
+                viewHtml: "{{ niter list list }}{{ enditer }}"
             }));
 
         assertTrue("niter and enditer mismatch. Should output error in DOM, so result can not be empty.", c.assert.assertRender() !== "");
@@ -1464,20 +1464,20 @@ TestCase("Niter tag - causing compile errors", {
 
 TestCase("Niter/iter tag - looking up properties in objects in different ways", {
 
-    "test iter tag with property lookup using single fnutts compiling correctly" : function() {
-        assertNoException(function() {
+    "test iter tag with property lookup using single fnutts compiling correctly": function () {
+        assertNoException(function () {
             mcomponent({
-                viewHtml : "{{ iter bounds['out'] }}{{ enditer }}",
-                throwOnError : true
+                viewHtml: "{{ iter bounds['out'] }}{{ enditer }}",
+                throwOnError: true
             });
         });
     },
 
-    'test iter tag with property lookup using double fnutts compiling correctly' : function() {
-        assertNoException(function() {
+    'test iter tag with property lookup using double fnutts compiling correctly': function () {
+        assertNoException(function () {
             mcomponent({
-                viewHtml : '{{ iter bounds["out"] }}{{ enditer }}',
-                throwOnError : true
+                viewHtml: '{{ iter bounds["out"] }}{{ enditer }}',
+                throwOnError: true
             });
         });
     }
@@ -1486,20 +1486,28 @@ TestCase("Niter/iter tag - looking up properties in objects in different ways", 
 
 TestCase("Iter tag - without specified model", {
 
-    "test iter with no model does not throw exception" : function() {
-        assertNoException(function() {
-            var c = mcomponent({ throwOnError : true, viewHtml : "{{ iter }}{{ enditer }}" });
+    "test iter with no model does not throw exception": function () {
+        var c;
+        assertNoException(function () {
+            c = mcomponent({ throwOnError: true, viewHtml: "{{ iter }}{{ enditer }}" });
         });
     },
 
-    "test iter with no model renders correctly" : function() {
-        var c = mcomponent({ model : ["ab", "cd"], viewHtml : "{{ iter }}{{ enditer }}" });
-        assertEquals("abcd", c.assert.assertRender());
-        logstr(c._.getSource());
+    "test iter with model as model does not throw exception": function () {
+        var c;
+        assertNoException(function () {
+            c = mcomponent({ throwOnError: true, viewHtml: "{{ iter model }}{{ enditer }}" });
+        });
     },
 
-    "test it" : function() {
+    "test iter with model as model renders correctly": function () {
+        var c = mcomponent({ model: ["ab", "cd"], viewHtml: "{{ iter model }}{{ show }}{{ enditer }}" });
+        assertEquals("abcd", c.assert.assertRender());
+    },
 
+    "test iter with no model renders correctly": function () {
+        var c = mcomponent({ model: ["ab", "cd"], viewHtml: "{{ iter }}{{ show }}{{ enditer }}" });
+        assertEquals("abcd", c.assert.assertRender());
     }
 
 });
